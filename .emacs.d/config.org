@@ -1,0 +1,541 @@
+* OS Specifics
+#+begin_src emacs-lisp
+(setq default-font "Inconsolata-10")
+#+end_src
+** Mac
+#+begin_src emacs-lisp
+(if (eq system-type 'darwin)
+    (setq mac-command-modifier 'meta)
+    (setq mac-command-key-is-meta t))
+#+end_src
+** Windows
+#+begin_src emacs-lisp
+(if (eq system-type 'windows-nt)
+    (set-clipboard-coding-system 'utf-16le-dos))
+#+end_src
+* Basic things
+** Tidier UI
+*** Turn off toolbar, menu bar
+#+begin_src emacs-lisp
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+(display-battery-mode -1)
+#+end_src
+*** Inhibit splash screen and start with empty scratch buffer
+#+begin_src emacs-lisp
+(setq inhibit-startup-screen t)
+(setq initial-scratch-message "")
+#+end_src
+*** Prevent annoying beep - use visible bell
+#+begin_src emacs-lisp
+(setq visible-bell 1)
+#+end_src
+** Frame
+#+begin_src emacs-lisp
+(setq frame-title-format "%b [emacs]")
+(setq default-frame-alist
+      (append
+       (list
+	'(width . 100)
+	'(height . 78)
+        `(font . ,default-font))
+       default-frame-alist))
+#+end_src
+** Coding systems
+#+begin_src emacs-lisp
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(setq default-buffer-file-coding-system 'utf-8)
+#+end_src
+** Autosaves/backups
+*** Move autosave/backup files to ~/.emacs.d/autosaves and ~/.emacs.d/backups
+
+#+begin_src emacs-lisp
+(setq backup-directory-alist
+      `((".*" . , "~/.emacs.d/backups/")))
+(setq auto-save-file-name-transforms
+      `((".*" ,"~/.emacs.d/autosaves/" t)))
+#+end_src
+
+*** Ensure directory exists
+#+begin_src emacs-lisp
+(make-directory "~/.emacs.d/backups" t)
+(make-directory "~/.emacs.d/autosaves" t)
+#+end_src
+*** Remove old backups
+Remove backups older than one week
+
+#+begin_src emacs-lisp
+(message "Deleting old backup files...")
+(let ((week (* 60 60 24 7))
+      (current (float-time (current-time))))
+  (dolist (file (directory-files temporary-file-directory t))
+    (when (and (backup-file-name-p file)
+               (> (- current (float-time (fifth (file-attributes file))))
+                  week))
+      (message file)
+      (delete-file file))))
+#+end_src
+** Mode line
+#+begin_src emacs-lisp
+(column-number-mode)
+#+end_src
+** Scroll behaviour
+#+begin_src emacs-lisp
+(setq scroll-conservatively 10000)
+#+end_src
+* Whitespace rules
+#+begin_src emacs-lisp
+(setq-default indent-tabs-mode nil)
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+(setq require-final-newline t)
+(setq sentence-end-double-space nil)
+(setq default-tab-width 2)
+(setq-default fill-column 80)
+
+;; set a marker at column 80 and 100
+(require 'column-marker)
+(add-hook 'c++-mode-hook (lambda () (interactive) (column-marker-1 80)))
+(add-hook 'c++-mode-hook (lambda () (interactive) (column-marker-2 100)))
+#+end_src
+* Global key mappings
+#+begin_src emacs-lisp
+(global-set-key "\C-z" 'undo)
+(global-set-key "\C-o" 'goto-line)
+(global-set-key "\M-r" 'replace-string)
+(global-set-key "\M-k" 'compile)
+#+end_src
+** Turn off insert
+#+begin_src emacs-lisp
+(global-set-key [insert] (lambda () (interactive)))
+(global-set-key [insertchar] (lambda () (interactive)))
+#+end_src
+** Tab behaviour
+#+begin_src emacs-lisp
+(defun smart-tab ()
+  "This smart tab is minibuffer compliant: it acts as usual in
+   the minibuffer. Else, if mark is active, indents region. Else if
+   point is at the end of a symbol, expands it. Else indents the
+   current line."
+  (interactive)
+  (if (minibufferp)
+      (minibuffer-complete)
+    (if mark-active
+        (indent-region (region-beginning)
+                       (region-end))
+      (if (looking-at "\\_>")
+          (dabbrev-expand nil)
+        (indent-for-tab-command)))))
+
+(global-set-key [(tab)] 'smart-tab)
+#+end_src
+** Access killring menu
+#+begin_src emacs-lisp
+(global-set-key "\C-cy" '(lambda () (interactive) (popup-menu 'yank-menu)))
+#+end_src
+** Cycle buffers with F1/F2
+#+begin_src emacs-lisp
+(global-set-key [f1] 'previous-buffer)
+(global-set-key [f2] 'next-buffer)
+#+end_src
+** Home cycles between beginning of line and indent
+#+begin_src emacs-lisp
+(defun beginning-of-line-or-indentation ()
+  "move to beginning of line, or indentation"
+  (interactive)
+  (if (bolp)
+      (back-to-indentation)
+    (beginning-of-line)))
+
+(global-set-key [home] 'beginning-of-line-or-indentation)
+#+end_src
+* Auto modes
+#+begin_src emacs-lisp
+(setq auto-mode-alist (append '(("\\.mm$" . objc-mode)
+                                ("\\.h$" . c++-mode)
+                                ("\\.bsn$" . python-mode)
+                                ("SConstruct" . python-mode)
+                                ("SConscript" . python-mode)
+                                ("\\.presql$" . sql-mode)
+                                ("\\.lua$" . lua-mode)
+                                ("\\.ml[iyl]?$" . caml-mode)
+                                ("\\.pb$" . protobuf-mode)
+                                ("\\.cs$" . csharp-mode)
+                                ("\\.qml$" . js-mode)
+                                ("\\.ui$" . nxml-mode)
+                                ("\\.org$" . org-mode)
+                                ("\\.proto$" . protobuf-mode))
+                              auto-mode-alist))
+#+end_src
+** Guess mode for new buffer
+#+begin_src emacs-lisp
+(setq default-major-mode
+      (lambda () (let ((buffer-file-name (or buffer-file-name (buffer-name))))
+                   (set-auto-mode))))
+#+end_src
+* Color themes
+#+begin_src emacs-lisp
+(require 'color-theme)
+(color-theme-initialize)
+(defun normal-color-theme()
+  (color-theme-standard))
+(defun dark-color-theme()
+  (color-theme-midnight))
+#+end_src
+** Darkroom mode
+#+begin_src emacs-lisp
+(setq in-darkroom-mode 0)
+
+(defun switch-full-screen (&optional ii)
+  (interactive "p")
+  (if (> ii 0)
+      (shell-command "wmctrl -r :ACTIVE: -badd,fullscreen"))
+  (if (< ii 0)
+      (shell-command "wmctrl -r :ACTIVE: -bremove,fullscreen"))
+  (if (equal ii 0)
+      (shell-command "wmctrl -r :ACTIVE: -btoggle,fullscreen")))
+
+(defun darkroom-mode ()
+  "Make things simple-looking by removing decoration
+  and choosing a simple theme."
+  (interactive)
+  (switch-full-screen 1)
+  (dark-color-theme)
+  (scroll-bar-mode -1)
+  (setq in-darkroom-mode 1))
+
+(defun darkroom-mode-reset ()
+  (interactive)
+  (switch-full-screen -1)
+  (normal-color-theme)
+  (scroll-bar-mode 1)
+  (setq in-darkroom-mode 0))
+
+(if (eq system-type 'windows-nt)
+    (require 'darkroom-mode))
+
+(defun toggle-darkroom-mode ()
+  (interactive)
+  (if (equal in-darkroom-mode 1)
+      (darkroom-mode-reset)
+    (darkroom-mode)))
+
+(global-set-key [(meta return)] 'toggle-darkroom-mode)
+#+end_src
+
+** Syntax highlighting customizations
+#+begin_src emacs-lisp
+(set-face-foreground 'font-lock-comment-face "gray")
+(set-face-foreground 'font-lock-string-face "FireBrick")
+(set-face-foreground 'font-lock-warning-face "black")
+(set-face-background 'font-lock-warning-face "orange")
+;(set-face-background 'region "moccasin")
+#+end_src
+* Utility functions
+** Insert date/time
+#+begin_src emacs-lisp
+(defvar current-date-time-format "%a %b %d %H:%M:%S %Y"
+  "Format of date to insert with `insert-current-date-time' func
+See help of `format-time-string' for possible replacements")
+
+(defvar current-time-format "%a %H:%M:%S"
+  "Format of date to insert with `insert-current-time' func.
+Note the weekly scope of the command's precision.")
+
+(defun insert-current-date-time ()
+  "insert the current date and time into current buffer.
+Uses `current-date-time-format' for the formatting the date/time."
+  (interactive)
+  (insert (format-time-string current-date-time-format (current-time)))
+  (insert "\n")
+  )
+
+(defun insert-current-time ()
+  "insert the current time (1-week scope) into the current buffer."
+  (interactive)
+  (insert (format-time-string current-time-format (current-time)))
+  (insert "\n")
+  )
+
+(global-set-key "\C-c\C-d" 'insert-current-date-time)
+(global-set-key "\C-c\C-t" 'insert-current-time)
+#+end_src
+** Nuke all buffers (except scratch)
+#+begin_src emacs-lisp
+(defun nuke-all-buffers ()
+  "kill all buffers, leaving *scratch* only"
+  (interactive)
+  (mapcar (lambda (x) (kill-buffer x))
+    (buffer-list))
+  (delete-other-windows))
+#+end_src
+** ANSI colors
+#+begin_src emacs-lisp
+(require 'ansi-color)
+(require 'tty-format)
+(add-hook 'find-file-hooks 'tty-format-guess)
+(defun colorize-buffer ()
+  "apply ansi color codes to current buffer"
+  (interactive)
+  (ansi-color-apply-on-region (point-min) (point-max)))
+#+end_src
+* Language modes
+** C/C++
+#+begin_src emacs-lisp
+(setq c-basic-offset 2)
+
+(font-lock-add-keywords 'c++-mode
+  '(("\\<\\(FIXME\\|TODO\\).*?:" 0 font-lock-warning-face prepend)))
+
+(defun indentation-c++-mode-hook ()
+  (c-set-offset 'substatement-open 0)
+  (c-set-offset 'brace-list-open 0)
+  (c-set-offset 'arglist-intro '++)
+  (c-set-offset 'member-init-cont '-)
+  (c-set-offset 'case-label '+)
+  (c-set-offset 'statement-case-open 0))
+
+(add-hook 'c++-mode-hook 'indentation-c++-mode-hook)
+
+;; para-fill properly with doxygen comments
+(defun setup-doxygen-fill ()
+  (setq paragraph-separate "^\\s-*//!?\\s-*$"))
+(add-hook 'c++-mode-hook 'setup-doxygen-fill)
+#+end_src
+** Python
+#+begin_src emacs-lisp
+(setq python-indent 2)
+(font-lock-add-keywords 'python-mode
+  '(("\\<\\(FIXME\\|TODO\\).*?:" 0 font-lock-warning-face prepend)))
+#+end_src
+** Ocaml
+#+begin_src emacs-lisp
+(require 'caml-font)
+#+end_src
+** Lua
+#+begin_src emacs-lisp
+(setq lua-indent-level 2)
+#+end_src
+** Javascript
+#+begin_src emacs-lisp
+(setq js-indent-level 2)
+#+end_src
+** SQL
+#+begin_src emacs-lisp
+(font-lock-add-keywords 'sql-mode
+  '(("\\s-*//.*$" 0 font-lock-comment-face prepend)))
+#+end_src
+** Protobufs
+#+begin_src emacs-lisp
+(require 'protobuf-mode)
+#+end_src
+** Haskell
+#+begin_src emacs-lisp
+(autoload 'ghc-init "ghc" nil t)
+(add-hook 'haskell-mode-hook (lambda () (ghc-init)))
+#+end_src
+** Common Lisp
+#+begin_src emacs-lisp
+(require 'slime)
+(setq inferior-lisp-program "sbcl")
+(add-hook 'lisp-mode-hook (lambda () (slime-mode t)
+			    (local-set-key "\r" 'newline-and-indent)
+			    (setq lisp-indent-function 'common-lisp-indent-function)
+			    (setq indent-tabs-mode nil)))
+#+end_src
+* Compiling
+#+begin_src emacs-lisp
+(global-set-key [\M-up] 'previous-error)
+(global-set-key [\M-down] 'next-error)
+#+end_src
+** Scons
+#+begin_src emacs-lisp
+;; SCons builds into a 'build' subdir, but we want to find the errors
+;; in the regular source dir.  So we remove build/XXX/YYY/{dbg,final}/ from the
+;; filenames.
+(defun process-error-filename (filename)
+  (let ((case-fold-search t))
+    (setq f (replace-regexp-in-string
+             "[Ss]?[Bb]uild[\\/].*\\(final\\|dbg\\)[^\\/]*[\\/]" "" filename))
+    (cond ((file-exists-p f)
+           f)
+          (t filename))))
+
+(setq compilation-parse-errors-filename-function 'process-error-filename)
+
+;; inspired by jds-find-tags-file in http://www.emacswiki.org/emacs/EmacsTags
+(defun find-sconstruct ()
+  "recursively searches upwards from buffer's current dir for file named SConstruct and returns that dir. Or nil if not found or if buffer is not visiting a file"
+  (labels
+      ((find-sconstruct-r (path)
+                          (let* ((parent (file-name-directory path))
+                                 (possible-file (concat parent "SConstruct")))
+                            (cond
+                             ((file-exists-p possible-file)
+                              (throw 'found-it possible-file))
+                             ((string= "/SConstruct" possible-file)
+                              (error "No SConstruct found"))
+                             (t (find-sconstruct-r (directory-file-name parent)))))))
+    (if (buffer-file-name)
+        (catch 'found-it
+          (find-sconstruct-r (buffer-file-name)))
+      (error "Buffer is not visiting a file"))))
+
+(defun project-root ()
+  (file-name-directory (find-sconstruct)))
+
+(setq compile-command '(concat "cd " (project-root) " && scons"))
+(setq compilation-read-command nil)
+#+end_src
+
+* Tools
+** Git
+#+begin_src emacs-lisp
+(require 'magit)
+(global-set-key "\C-xg" 'magit-status)
+(require 'git-blame)
+(setq git-blame-prefix-format "%h %.10s:")
+#+end_src
+** Doxygen
+#+begin_src emacs-lisp
+(require 'doxygen)
+(global-set-key "\C-ce" 'doxygen-insert-function-comment-with-errors)
+(global-set-key "\C-cd" 'doxygen-insert-function-comment)
+#+end_src
+** Unique filenames
+#+begin_src emacs-lisp
+(require 'uniquify)
+(setq uniquify-buffer-name-style 'post-forward-angle-brackets)
+#+end_src
+** Find file at point
+#+begin_src emacs-lisp
+(eval-after-load "ffap" '(require 'ffap-include-start))
+(require 'ffap)
+(ffap-bindings)
+#+end_src
+** Interactively do things
+#+begin_src emacs-lisp
+(ido-mode 1)
+#+end_src
+** Dabbrev customization
+#+begin_src emacs-lisp
+(setq save-abbrevs nil)
+(setq case-replace nil)
+#+end_src
+** Tags
+#+begin_src emacs-lisp
+;; automatically reload the TAGS file without asking when it's updated
+(setq tags-revert-without-query 1)
+#+end_src
+** Recent files
+*** Enable recentf mode
+Also limit to 25 files
+#+begin_src emacs-lisp
+(require 'recentf)
+(setq recentf-max-menu-items 25)
+#+end_src
+
+*** Don't clean up recent files
+It potentially access network drives, which could trigger tramp,
+http://stackoverflow.com/questions/880625
+
+#+begin_src emacs-lisp
+(setq recentf-auto-cleanup 'never)
+#+end_src
+
+*** Bind to C-x C-r
+"C-x r" would be better, but it interfers with "C-x r k" for kill-rectangle
+#+begin_src emacs-lisp
+(global-set-key "\C-x\ \C-r" 'recentf-open-files)
+#+end_src
+* Org mode
+#+begin_src emacs-lisp
+(require 'org-install)
+(define-key global-map "\C-cl" 'org-store-link)
+(define-key global-map "\C-ca" 'org-agenda)
+(setq org-log-done t)
+(setq org-support-shift-select t)
+#+end_src
+* CEDET
+see https://github.com/alexott/emacs-configs/blob/master/rc/emacs-rc-cedet.el
+#+begin_src emacs-lisp
+(load-file "/home/bdeane/dev/cedet/cedet-devel-load.el")
+(add-to-list 'load-path "/home/bdeane/dev/cedet/contrib/")
+(add-to-list 'Info-directory-list "/home/bdeane/dev/cedet/doc/info")
+
+;;(add-to-list 'semantic-default-submodes 'global-semantic-idle-summary-mode)
+(add-to-list 'semantic-default-submodes 'global-semantic-mru-bookmark-mode)
+(add-to-list 'semantic-default-submodes 'global-semanticdb-minor-mode)
+(add-to-list 'semantic-default-submodes 'global-semantic-idle-scheduler-mode)
+;(add-to-list 'semantic-default-submodes 'global-semantic-stickyfunc-mode)
+(add-to-list 'semantic-default-submodes 'global-cedet-m3-minor-mode)
+(add-to-list 'semantic-default-submodes 'global-semantic-highlight-func-mode)
+;;(add-to-list 'semantic-default-submodes 'global-semantic-show-unmatched-syntax-mode)
+;;(add-to-list 'semantic-default-submodes 'global-semantic-highlight-edits-mode)
+;;(add-to-list 'semantic-default-submodes 'global-semantic-show-parser-state-mode)
+(add-to-list 'semantic-default-submodes 'global-semanticdb-minor-mode)
+
+;; Activate semantic
+(semantic-mode 1)
+
+(require 'semantic/bovine/c)
+(require 'semantic/bovine/gcc)
+(require 'semantic/bovine/clang)
+(require 'semantic/ia)
+(require 'semantic/decorate/include)
+(require 'semantic/lex-spp)
+(require 'eassist)
+
+;; customisation of modes
+(defun alexott/cedet-hook ()
+  (local-set-key [(control return)] 'semantic-ia-complete-symbol-menu)
+  (local-set-key "\C-c?" 'semantic-ia-complete-symbol)
+  ;;
+  (local-set-key "\C-c>" 'semantic-complete-analyze-inline)
+  (local-set-key "\C-c=" 'semantic-decoration-include-visit)
+
+  (local-set-key "\C-cj" 'semantic-ia-fast-jump)
+  (local-set-key "\C-cq" 'semantic-ia-show-doc)
+  (local-set-key "\C-cs" 'semantic-ia-show-summary)
+  (local-set-key "\C-cp" 'semantic-analyze-proto-impl-toggle)
+  (local-set-key (kbd "C-c <left>") 'senator-fold-tag)
+  (local-set-key (kbd "C-c <right>") 'senator-unfold-tag)
+
+  (local-set-key [f12] 'semantic-ia-fast-jump)
+  (local-set-key [(shift f12)] 'semantic-mrub-switch-tags)
+
+  (add-to-list 'ac-sources 'ac-source-semantic)
+  )
+
+;; (add-hook 'semantic-init-hooks 'alexott/cedet-hook)
+(add-hook 'c-mode-common-hook 'alexott/cedet-hook)
+
+(defun alexott/c-mode-cedet-hook ()
+ ;; (local-set-key "." 'semantic-complete-self-insert)
+ ;; (local-set-key ">" 'semantic-complete-self-insert)
+  (local-set-key "\C-x\C-h" 'eassist-switch-h-cpp)
+  (local-set-key "\C-cm" 'eassist-list-methods)
+  (local-set-key "\C-c\C-r" 'semantic-symref)
+
+;; (add-to-list 'ac-sources 'ac-source-etags)
+;; (add-to-list 'ac-sources 'ac-source-gtags)
+  (setq ac-sources '(ac-source-semantic-raw))
+  )
+
+(add-hook 'c-mode-common-hook 'alexott/c-mode-cedet-hook)
+
+(semanticdb-enable-gnu-global-databases 'c-mode t)
+(semanticdb-enable-gnu-global-databases 'c++-mode t)
+
+(when (cedet-ectag-version-check t)
+  (semantic-load-enable-primary-ectags-support))
+
+;; SRecode
+(global-srecode-minor-mode 1)
+
+;; EDE
+(global-ede-mode 1)
+(ede-enable-generic-projects)
+#+end_src
