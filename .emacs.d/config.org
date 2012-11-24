@@ -196,12 +196,25 @@ Remove backups older than one week
       (lambda () (let ((buffer-file-name (or buffer-file-name (buffer-name))))
                    (set-auto-mode))))
 #+end_src
-* Color themes
+* Colors
+** Syntax highlighting customizations
+#+begin_src emacs-lisp
+(defun color-customizations ()
+  (set-face-foreground 'font-lock-comment-face "gray")
+  (set-face-foreground 'font-lock-string-face "FireBrick")
+  (set-face-foreground 'font-lock-warning-face "black")
+  (set-face-background 'font-lock-warning-face "orange")
+  (set-face-background 'region "moccasin")
+  (set-face-foreground 'region "navy"))
+(color-customizations)
+#+end_src
+** Color themes
 #+begin_src emacs-lisp
 (require 'color-theme)
 (color-theme-initialize)
 (defun normal-color-theme()
-  (color-theme-standard))
+  (color-theme-standard)
+  (color-customizations))
 (defun dark-color-theme()
   (color-theme-midnight))
 #+end_src
@@ -246,15 +259,6 @@ Remove backups older than one week
 (global-set-key [(meta return)] 'toggle-darkroom-mode)
 #+end_src
 
-** Syntax highlighting customizations
-#+begin_src emacs-lisp
-(set-face-foreground 'font-lock-comment-face "gray")
-(set-face-foreground 'font-lock-string-face "FireBrick")
-(set-face-foreground 'font-lock-warning-face "black")
-(set-face-background 'font-lock-warning-face "orange")
-(set-face-background 'region "moccasin")
-(set-face-foreground 'region "navy")
-#+end_src
 * Utility functions
 ** Insert date/time
 #+begin_src emacs-lisp
