@@ -1,21 +1,29 @@
 * OS Specifics
+** Default values
+*** Default font = inconsolata
 #+begin_src emacs-lisp
 (setq default-font "Inconsolata-10")
 #+end_src
+*** Path to cedet
+#+begin_src emacs-lisp
+(setq cedet-dir "/home/bdeane/dev/cedet/")
+#+end_src
 ** Mac
+*** Alt = meta
 #+begin_src emacs-lisp
 (if (eq system-type 'darwin)
     (setq mac-command-modifier 'meta)
     (setq mac-command-key-is-meta t))
 #+end_src
 ** Windows
+*** Get the clipboard to work
 #+begin_src emacs-lisp
 (if (eq system-type 'windows-nt)
     (set-clipboard-coding-system 'utf-16le-dos))
 #+end_src
 * Basic things
 ** Tidier UI
-*** Turn off toolbar, menu bar
+*** Turn off toolbar, menu bar, etc
 #+begin_src emacs-lisp
 (tool-bar-mode -1)
 (menu-bar-mode -1)
@@ -41,7 +49,7 @@
         `(font . ,default-font))
        default-frame-alist))
 #+end_src
-** Coding systems
+** Coding system UTF-8
 #+begin_src emacs-lisp
 (prefer-coding-system 'utf-8)
 (set-default-coding-systems 'utf-8)
@@ -79,23 +87,36 @@ Remove backups older than one week
       (delete-file file))))
 #+end_src
 ** Mode line
+*** Add column-number
 #+begin_src emacs-lisp
 (column-number-mode)
 #+end_src
 ** Scroll behaviour
+*** Don't jump a half-page when scrolling
 #+begin_src emacs-lisp
 (setq scroll-conservatively 10000)
 #+end_src
 * Whitespace rules
+** Use spaces, not tabs
 #+begin_src emacs-lisp
 (setq-default indent-tabs-mode nil)
+#+end_src
+** On save, add newline at end and delete trailing whitespace
+#+begin_src emacs-lisp
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 (setq require-final-newline t)
+#+end_src
+** One space after period
+#+begin_src emacs-lisp
 (setq sentence-end-double-space nil)
+#+end_src
+** Two space tabs
+#+begin_src emacs-lisp
 (setq default-tab-width 2)
+#+end_src
+** Wrap at column 80, mark at 80 (soft) and 100 (hard)
+#+begin_src emacs-lisp
 (setq-default fill-column 80)
-
-;; set a marker at column 80 and 100
 (require 'column-marker)
 (add-hook 'c++-mode-hook (lambda () (interactive) (column-marker-1 80)))
 (add-hook 'c++-mode-hook (lambda () (interactive) (column-marker-2 100)))
@@ -155,10 +176,10 @@ Remove backups older than one week
 #+begin_src emacs-lisp
 (setq auto-mode-alist (append '(("\\.mm$" . objc-mode)
                                 ("\\.h$" . c++-mode)
-                                ("\\.bsn$" . python-mode)
                                 ("SConstruct" . python-mode)
                                 ("SConscript" . python-mode)
                                 ("\\.presql$" . sql-mode)
+                                ("\\.sql$" . sql-mode)
                                 ("\\.lua$" . lua-mode)
                                 ("\\.ml[iyl]?$" . caml-mode)
                                 ("\\.pb$" . protobuf-mode)
@@ -231,7 +252,8 @@ Remove backups older than one week
 (set-face-foreground 'font-lock-string-face "FireBrick")
 (set-face-foreground 'font-lock-warning-face "black")
 (set-face-background 'font-lock-warning-face "orange")
-;(set-face-background 'region "moccasin")
+(set-face-background 'region "moccasin")
+(set-face-foreground 'region "navy")
 #+end_src
 * Utility functions
 ** Insert date/time
@@ -283,12 +305,17 @@ Uses `current-date-time-format' for the formatting the date/time."
 #+end_src
 * Language modes
 ** C/C++
+*** 2-space basic offset
 #+begin_src emacs-lisp
 (setq c-basic-offset 2)
-
+#+end_src
+*** FIXME or TODO get highlighted
+#+begin_src emacs-lisp
 (font-lock-add-keywords 'c++-mode
   '(("\\<\\(FIXME\\|TODO\\).*?:" 0 font-lock-warning-face prepend)))
-
+#+end_src
+*** Indentation rules
+#+begin_src emacs-lisp
 (defun indentation-c++-mode-hook ()
   (c-set-offset 'substatement-open 0)
   (c-set-offset 'brace-list-open 0)
@@ -296,29 +323,36 @@ Uses `current-date-time-format' for the formatting the date/time."
   (c-set-offset 'member-init-cont '-)
   (c-set-offset 'case-label '+)
   (c-set-offset 'statement-case-open 0))
-
 (add-hook 'c++-mode-hook 'indentation-c++-mode-hook)
-
-;; para-fill properly with doxygen comments
+#+end_src
+*** Fill paras properly with doxygen comments
+#+begin_src emacs-lisp
 (defun setup-doxygen-fill ()
   (setq paragraph-separate "^\\s-*//!?\\s-*$"))
 (add-hook 'c++-mode-hook 'setup-doxygen-fill)
 #+end_src
 ** Python
+*** 2-space basic offset
 #+begin_src emacs-lisp
 (setq python-indent 2)
+#+end_src
+*** FIXME or TODO get highlighted
+#+begin_src emacs-lisp
 (font-lock-add-keywords 'python-mode
   '(("\\<\\(FIXME\\|TODO\\).*?:" 0 font-lock-warning-face prepend)))
 #+end_src
 ** Ocaml
+*** Syntax highlighting
 #+begin_src emacs-lisp
 (require 'caml-font)
 #+end_src
 ** Lua
+*** 2-space basic offset
 #+begin_src emacs-lisp
 (setq lua-indent-level 2)
 #+end_src
 ** Javascript
+*** 2-space basic offset
 #+begin_src emacs-lisp
 (setq js-indent-level 2)
 #+end_src
@@ -332,11 +366,13 @@ Uses `current-date-time-format' for the formatting the date/time."
 (require 'protobuf-mode)
 #+end_src
 ** Haskell
+*** Use ghc-mod
 #+begin_src emacs-lisp
 (autoload 'ghc-init "ghc" nil t)
 (add-hook 'haskell-mode-hook (lambda () (ghc-init)))
 #+end_src
 ** Common Lisp
+*** Use SLIME with SBCL
 #+begin_src emacs-lisp
 (require 'slime)
 (setq inferior-lisp-program "sbcl")
@@ -346,11 +382,13 @@ Uses `current-date-time-format' for the formatting the date/time."
 			    (setq indent-tabs-mode nil)))
 #+end_src
 * Compiling
+** M-up and M-down to go between errors
 #+begin_src emacs-lisp
 (global-set-key [\M-up] 'previous-error)
 (global-set-key [\M-down] 'next-error)
 #+end_src
 ** Scons
+*** Map compile errors from build dir to src dir
 #+begin_src emacs-lisp
 ;; SCons builds into a 'build' subdir, but we want to find the errors
 ;; in the regular source dir.  So we remove build/XXX/YYY/{dbg,final}/ from the
@@ -362,9 +400,10 @@ Uses `current-date-time-format' for the formatting the date/time."
     (cond ((file-exists-p f)
            f)
           (t filename))))
-
 (setq compilation-parse-errors-filename-function 'process-error-filename)
-
+#+end_src
+*** On compile, search for SConstruct in parent directories recursively
+#+begin_src emacs-lisp
 ;; inspired by jds-find-tags-file in http://www.emacswiki.org/emacs/EmacsTags
 (defun find-sconstruct ()
   "recursively searches upwards from buffer's current dir for file named SConstruct and returns that dir. Or nil if not found or if buffer is not visiting a file"
@@ -392,9 +431,13 @@ Uses `current-date-time-format' for the formatting the date/time."
 
 * Tools
 ** Git
+*** Use magit
 #+begin_src emacs-lisp
 (require 'magit)
 (global-set-key "\C-xg" 'magit-status)
+#+end_src
+*** Use git-blame
+#+begin_src emacs-lisp
 (require 'git-blame)
 (setq git-blame-prefix-format "%h %.10s:")
 #+end_src
@@ -404,19 +447,23 @@ Uses `current-date-time-format' for the formatting the date/time."
 (global-set-key "\C-ce" 'doxygen-insert-function-comment-with-errors)
 (global-set-key "\C-cd" 'doxygen-insert-function-comment)
 #+end_src
-** Unique filenames
+** Uniquify filenames with <>
 #+begin_src emacs-lisp
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'post-forward-angle-brackets)
 #+end_src
 ** Find file at point
 #+begin_src emacs-lisp
-(eval-after-load "ffap" '(require 'ffap-include-start))
-(require 'ffap)
-(ffap-bindings)
+;(eval-after-load "ffap" '(require 'ffap-include-start))
+;(require 'ffap)
+;(ffap-bindings)
 #+end_src
 ** Interactively do things
 #+begin_src emacs-lisp
+(setq ido-enable-flex-matching t)
+(setq ido-everywhere t)
+(setq ido-use-filename-at-point 'guess)
+(setq ido-create-new-buffer 'always)
 (ido-mode 1)
 #+end_src
 ** Dabbrev customization
@@ -461,9 +508,10 @@ http://stackoverflow.com/questions/880625
 * CEDET
 see https://github.com/alexott/emacs-configs/blob/master/rc/emacs-rc-cedet.el
 #+begin_src emacs-lisp
-(load-file "/home/bdeane/dev/cedet/cedet-devel-load.el")
-(add-to-list 'load-path "/home/bdeane/dev/cedet/contrib/")
-(add-to-list 'Info-directory-list "/home/bdeane/dev/cedet/doc/info")
+;; this file's directory
+(load-file (concat cedet-dir "cedet-devel-load.el"))
+(add-to-list 'load-path (concat cedet-dir "contrib/"))
+(add-to-list 'Info-directory-list (concat cedet-dir "doc/info/"))
 
 ;;(add-to-list 'semantic-default-submodes 'global-semantic-idle-summary-mode)
 (add-to-list 'semantic-default-submodes 'global-semantic-mru-bookmark-mode)
