@@ -593,3 +593,7 @@ see https://github.com/alexott/emacs-configs/blob/master/rc/emacs-rc-cedet.el
 (global-ede-mode 1)
 (ede-enable-generic-projects)
 #+end_src
+* Run as server
+#+begin_src emacs-lisp
+(server-start)
+#+end_src
