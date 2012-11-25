@@ -12,8 +12,9 @@
 *** Alt = meta
 #+begin_src emacs-lisp
 (if (eq system-type 'darwin)
-    (setq mac-command-modifier 'meta)
-    (setq mac-command-key-is-meta t))
+    (progn
+      (setq mac-command-modifier 'meta)
+      (setq mac-command-key-is-meta t)))
 #+end_src
 ** Windows
 *** Get the clipboard to work
@@ -378,7 +379,8 @@ Uses `current-date-time-format' for the formatting the date/time."
 ** Common Lisp
 *** Use SLIME with SBCL
 #+begin_src emacs-lisp
-(require 'slime)
+;(require 'slime)
+(load (expand-file-name "~/.quicklisp/slime-helper.el"))
 (setq inferior-lisp-program "sbcl")
 (add-hook 'lisp-mode-hook (lambda () (slime-mode t)
 			    (local-set-key "\r" 'newline-and-indent)
