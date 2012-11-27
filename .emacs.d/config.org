@@ -8,19 +8,45 @@
 #+begin_src emacs-lisp
 (setq cedet-dir "/home/bdeane/dev/cedet/")
 #+end_src
+*** Default frame height
+#+begin_src emacs-lisp
+(setq default-frame-height 78)
+#+end_src
+*** Use SBCL
+#+begin_src emacs-lisp
+(setq inferior-lisp-program "sbcl")
+#+end_src
 ** Mac
 *** Alt = meta
 #+begin_src emacs-lisp
 (if (eq system-type 'darwin)
-    (progn
-      (setq mac-command-modifier 'meta)
-      (setq mac-command-key-is-meta t)))
+    (setq mac-command-modifier 'meta))
 #+end_src
 ** Windows
 *** Get the clipboard to work
 #+begin_src emacs-lisp
 (if (eq system-type 'windows-nt)
     (set-clipboard-coding-system 'utf-16le-dos))
+#+end_src
+*** Use Consolas
+#+begin_src emacs-lisp
+(if (eq system-type 'windows-nt)
+    (setq default-font "-outline-Consolas-normal-r-normal-normal-13-97-96-96-c-*-iso8859-1"))
+#+end_src
+*** Path overrides
+#+begin_src emacs-lisp
+(if (eq system-type 'windows-nt)
+    (setq cedet-dir "f:/projects/cedet/"))
+#+end_src
+*** Use CLISP
+#+begin_src emacs-lisp
+(if (eq system-type 'windows-nt)
+    (setq inferior-lisp-program "clisp.exe"))
+#+end_src
+*** Frame height = 74
+#+begin_src emacs-lisp
+(if (eq system-type 'windows-nt)
+    (setq default-frame-height 74))
 #+end_src
 * Basic things
 ** Tidier UI
@@ -46,7 +72,7 @@
       (append
        (list
 	'(width . 100)
-	'(height . 78)
+	`(height . ,default-frame-height)
         `(font . ,default-font))
        default-frame-alist))
 #+end_src
@@ -177,6 +203,7 @@ Remove backups older than one week
 #+begin_src emacs-lisp
 (setq auto-mode-alist (append '(("\\.mm$" . objc-mode)
                                 ("\\.h$" . c++-mode)
+                                ("\\.hs$" . haskell-mode)
                                 ("SConstruct" . python-mode)
                                 ("SConscript" . python-mode)
                                 ("\\.presql$" . sql-mode)
@@ -185,7 +212,7 @@ Remove backups older than one week
                                 ("\\.ml[iyl]?$" . caml-mode)
                                 ("\\.pb$" . protobuf-mode)
                                 ("\\.cs$" . csharp-mode)
-                                ("\\.qml$" . js-mode)
+                                ("\\.qml$" . js2-mode)
                                 ("\\.ui$" . nxml-mode)
                                 ("\\.org$" . org-mode)
                                 ("\\.proto$" . protobuf-mode))
@@ -211,15 +238,15 @@ Remove backups older than one week
 #+end_src
 ** Color themes
 #+begin_src emacs-lisp
-(require 'color-theme)
 (color-theme-initialize)
 (defun normal-color-theme()
   (color-theme-standard)
   (color-customizations))
 (defun dark-color-theme()
   (color-theme-midnight))
+(add-hook 'after-init-hook 'normal-color-theme)
 #+end_src
-** Darkroom mode
+* Darkroom mode
 #+begin_src emacs-lisp
 (setq in-darkroom-mode 0)
 
@@ -228,38 +255,40 @@ Remove backups older than one week
   (if (> ii 0)
       (shell-command "wmctrl -r :ACTIVE: -badd,fullscreen"))
   (if (< ii 0)
-      (shell-command "wmctrl -r :ACTIVE: -bremove,fullscreen"))
-  (if (equal ii 0)
-      (shell-command "wmctrl -r :ACTIVE: -btoggle,fullscreen")))
+      (shell-command "wmctrl -r :ACTIVE: -bremove,fullscreen")))
 
-(defun darkroom-mode ()
-  "Make things simple-looking by removing decoration
-  and choosing a simple theme."
-  (interactive)
+(defun darkroom-mode-enable ()
   (switch-full-screen 1)
+  (scroll-bar-mode -1))
+
+(defun darkroom-mode-on ()
+  (interactive)
   (dark-color-theme)
-  (scroll-bar-mode -1)
+  (darkroom-mode-enable)
   (setq in-darkroom-mode 1))
 
-(defun darkroom-mode-reset ()
-  (interactive)
+(defun darkroom-mode-disable ()
   (switch-full-screen -1)
+  (scroll-bar-mode 1))
+
+(defun darkroom-mode-off ()
+  (interactive)
   (normal-color-theme)
-  (scroll-bar-mode 1)
+  (darkroom-mode-disable)
   (setq in-darkroom-mode 0))
 
+;; for windows, darkroom-mode overrides the darkroom-mode-{en|dis}able functions
 (if (eq system-type 'windows-nt)
     (require 'darkroom-mode))
 
 (defun toggle-darkroom-mode ()
   (interactive)
-  (if (equal in-darkroom-mode 1)
-      (darkroom-mode-reset)
-    (darkroom-mode)))
+  (if (equal in-darkroom-mode 0)
+      (darkroom-mode-on)
+      (darkroom-mode-off)))
 
 (global-set-key [(meta return)] 'toggle-darkroom-mode)
 #+end_src
-
 * Utility functions
 ** Insert date/time
 #+begin_src emacs-lisp
@@ -336,6 +365,10 @@ Uses `current-date-time-format' for the formatting the date/time."
   (setq paragraph-separate "^\\s-*//!?\\s-*$"))
 (add-hook 'c++-mode-hook 'setup-doxygen-fill)
 #+end_src
+** C#
+#+begin_src emacs-lisp
+(autoload 'csharp-mode "csharp-mode" "C# editing mode" t)
+#+end_src
 ** Python
 *** 2-space basic offset
 #+begin_src emacs-lisp
@@ -347,28 +380,36 @@ Uses `current-date-time-format' for the formatting the date/time."
   '(("\\<\\(FIXME\\|TODO\\).*?:" 0 font-lock-warning-face prepend)))
 #+end_src
 ** Ocaml
-*** Syntax highlighting
 #+begin_src emacs-lisp
-(require 'caml-font)
+(autoload 'caml-mode "caml" "Ocaml editing mode" t)
+(autoload 'run-caml "inf-caml" "Run an inferior caml process" t)
+(add-hook 'caml-mode-hook (lambda() (require 'caml-font)))
 #+end_src
 ** Lua
+#+begin_src emacs-lisp
+(autoload 'lua-mode "lua-mode" "Lua editing mode" t)
+#+end_src
 *** 2-space basic offset
 #+begin_src emacs-lisp
 (setq lua-indent-level 2)
 #+end_src
 ** Javascript
+#+begin_src emacs-lisp
+(autoload 'js2-mode "js2-mode" "Javascript editing mode" t)
+#+end_src
 *** 2-space basic offset
 #+begin_src emacs-lisp
 (setq js-indent-level 2)
 #+end_src
 ** SQL
 #+begin_src emacs-lisp
+(autoload 'sql-mode "sql-mode" "SQL editing mode" t)
 (font-lock-add-keywords 'sql-mode
   '(("\\s-*//.*$" 0 font-lock-comment-face prepend)))
 #+end_src
 ** Protobufs
 #+begin_src emacs-lisp
-(require 'protobuf-mode)
+(autoload 'protobuf-mode "protobuf-mode" "Protocol buffer editing mode" t)
 #+end_src
 ** Haskell
 *** Use ghc-mod
@@ -379,13 +420,30 @@ Uses `current-date-time-format' for the formatting the date/time."
 ** Common Lisp
 *** Use SLIME with SBCL
 #+begin_src emacs-lisp
-;(require 'slime)
-(load (expand-file-name "~/.quicklisp/slime-helper.el"))
-(setq inferior-lisp-program "sbcl")
-(add-hook 'lisp-mode-hook (lambda () (slime-mode t)
-			    (local-set-key "\r" 'newline-and-indent)
-			    (setq lisp-indent-function 'common-lisp-indent-function)
-			    (setq indent-tabs-mode nil)))
+(add-hook 'lisp-mode-hook
+          (lambda ()
+            (require 'slime)
+            (slime-mode t)
+            (local-set-key "\r" 'newline-and-indent)
+            (setq lisp-indent-function 'common-lisp-indent-function)))
+(defun slime ()
+  (interactive)
+  (if (eq system-type 'windows-nt)
+      (load "c:\\quicklisp\\slime-helper.el")
+      (require 'slime))
+  (slime-mode t))
+#+end_src
+** Emacs Lisp
+*** Byte-compile elisp files on save
+#+begin_src emacs-lisp
+(defun byte-compile-current-buffer ()
+  "`byte-compile' current buffer if it's emacs-lisp-mode and compiled file exists."
+  (interactive)
+  (when (and (eq major-mode 'emacs-lisp-mode)
+             (file-exists-p (byte-compile-dest-file buffer-file-name)))
+    (byte-compile-file buffer-file-name)))
+
+(add-hook 'after-save-hook 'byte-compile-current-buffer)
 #+end_src
 * Compiling
 ** M-up and M-down to go between errors
@@ -439,13 +497,20 @@ Uses `current-date-time-format' for the formatting the date/time."
 ** Git
 *** Use magit
 #+begin_src emacs-lisp
-(require 'magit)
-(global-set-key "\C-xg" 'magit-status)
+(global-set-key
+ "\C-cg"
+ (lambda ()
+   (interactive)
+   (call-interactively 'magit-status)))
 #+end_src
 *** Use git-blame
 #+begin_src emacs-lisp
-(require 'git-blame)
-(setq git-blame-prefix-format "%h %.10s:")
+(autoload 'git-blame-mode "git-blame" "Minor mode for incremental blame for Git." t)
+(global-set-key
+ "\C-cb"
+ (lambda ()
+   (interactive)
+   (call-interactively 'git-blame-mode)))
 #+end_src
 ** Doxygen
 #+begin_src emacs-lisp
@@ -514,10 +579,13 @@ http://stackoverflow.com/questions/880625
 * CEDET
 see https://github.com/alexott/emacs-configs/blob/master/rc/emacs-rc-cedet.el
 #+begin_src emacs-lisp
-;; this file's directory
-(load-file (concat cedet-dir "cedet-devel-load.el"))
-(add-to-list 'load-path (concat cedet-dir "contrib/"))
-(add-to-list 'Info-directory-list (concat cedet-dir "doc/info/"))
+;; if using a local cedet version, try that, otherwise try a default
+(if (file-accessible-directory-p cedet-dir)
+    (progn
+      (load-file (concat cedet-dir "cedet-devel-load.el"))
+      (add-to-list 'load-path (concat cedet-dir "contrib/"))
+      (add-to-list 'Info-directory-list (concat cedet-dir "doc/info/")))
+    (require 'cedet))
 
 ;;(add-to-list 'semantic-default-submodes 'global-semantic-idle-summary-mode)
 (add-to-list 'semantic-default-submodes 'global-semantic-mru-bookmark-mode)
@@ -593,7 +661,31 @@ see https://github.com/alexott/emacs-configs/blob/master/rc/emacs-rc-cedet.el
 (global-ede-mode 1)
 (ede-enable-generic-projects)
 #+end_src
-* Run as server
+* Package management
+** Use ELPA, Marmalade and MELPA
 #+begin_src emacs-lisp
+(setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
+                         ("marmalade" . "http://marmalade-repo.org/packages/")
+                         ("melpa" . "http://melpa.milkbox.net/packages/")))
+#+end_src
+** Fix for MELPA backwards dependencies
+#+begin_src emacs-lisp
+(defadvice package-compute-transaction
+  (before
+   package-compute-transaction-reverse (package-list requirements)
+   activate compile)
+  "reverse the requirements"
+  (setq requirements (reverse requirements))
+  (print requirements))
+#+end_src
+* Start server
+#+begin_src emacs-lisp
+(require 'server)
+(when (and (= emacs-major-version 24)
+           (= emacs-minor-version 1)
+           (eq system-type 'windows-nt))
+  (defun server-ensure-safe-dir (dir) "Noop" t)) ; Suppress error "directory
+                                        ; ~/.emacs.d/server is unsafe"
+                                        ; on windows.
 (server-start)
 #+end_src

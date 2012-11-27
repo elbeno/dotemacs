@@ -6,9 +6,16 @@
 (add-to-list 'load-path (concat dotfile-dir ".emacs.d/"))
 ;; 3rd party stuff is in site-lisp
 (add-to-list 'load-path (concat dotfile-dir ".emacs.d/site-lisp/"))
+;; pakacges are in elpa
+(setq package-user-dir (concat dotfile-dir ".emacs.d/elpa/"))
+;; extra binaries (if needed) are in site-bin
+(add-to-list 'exec-path (concat dotfile-dir ".emacs.d/site-bin/"))
 
 ;; load up org-mode and org-babel
 (require 'org-install)
 (require 'ob-tangle)
 
 (org-babel-load-file (concat dotfile-dir ".emacs.d/config.org"))
+
+;; when using a different init file, this needs to be called manually
+(package-initialize)

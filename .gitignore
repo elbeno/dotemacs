@@ -1,0 +1,4 @@
+.emacs.d/config.el
+*.elc
+.emacs.d/elpa
+
