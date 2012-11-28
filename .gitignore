@@ -1,4 +1,5 @@
-.emacs.d/config.el
+.emacs.d/pre-package-init.el
+.emacs.d/post-package-init.el
 *.elc
 .emacs.d/elpa
-
+.emacs.d/site-bin/ghc-mod

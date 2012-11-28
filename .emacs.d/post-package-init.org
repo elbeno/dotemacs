@@ -1,0 +1,31 @@
+* Colors
+** Color themes
+#+begin_src emacs-lisp
+(require 'color-theme)
+(color-theme-initialize)
+(normal-color-theme)
+#+end_src
+* SLIME
+#+begin_src emacs-lisp
+(require 'slime)
+#+end_src
+** Ignore protocol mismatches
+#+begin_src emacs-lisp
+(setq slime-protocol-version 'ignore)
+#+end_src
+** Fancy completion
+#+begin_src emacs-lisp
+(setq slime-complete-symbol*-fancy t)
+(setq slime-complete-symbol-function 'slime-fuzzy-complete-symbol)
+#+end_src
+** Load SLIME
+#+begin_src emacs-lisp
+(slime-setup '(slime-fancy slime-asdf slime-banner))
+#+end_src
+* Cygwin mount points
+#+begin_src emacs-lisp
+(if (eq system-type 'windows-nt)
+    (progn
+      (require 'cygwin-mount)
+      (cygwin-mount-activate)))
+#+end_src

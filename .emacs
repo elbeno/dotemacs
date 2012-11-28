@@ -15,7 +15,9 @@
 (require 'org-install)
 (require 'ob-tangle)
 
-(org-babel-load-file (concat dotfile-dir ".emacs.d/config.org"))
+(org-babel-load-file (concat dotfile-dir ".emacs.d/pre-package-init.org"))
 
 ;; when using a different init file, this needs to be called manually
 (package-initialize)
+
+(org-babel-load-file (concat dotfile-dir ".emacs.d/post-package-init.org"))

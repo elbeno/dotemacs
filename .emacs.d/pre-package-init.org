@@ -234,17 +234,14 @@ Remove backups older than one week
   (set-face-background 'font-lock-warning-face "orange")
   (set-face-background 'region "moccasin")
   (set-face-foreground 'region "navy"))
-(color-customizations)
 #+end_src
 ** Color themes
 #+begin_src emacs-lisp
-(color-theme-initialize)
 (defun normal-color-theme()
   (color-theme-standard)
   (color-customizations))
 (defun dark-color-theme()
   (color-theme-midnight))
-(add-hook 'after-init-hook 'normal-color-theme)
 #+end_src
 * Darkroom mode
 #+begin_src emacs-lisp
@@ -263,18 +260,24 @@ Remove backups older than one week
 
 (defun darkroom-mode-on ()
   (interactive)
-  (dark-color-theme)
   (darkroom-mode-enable)
+  (dark-color-theme)
   (setq in-darkroom-mode 1))
 
 (defun darkroom-mode-disable ()
   (switch-full-screen -1)
   (scroll-bar-mode 1))
 
+;; for some reason, windows needs this one way, and linux another
 (defun darkroom-mode-off ()
   (interactive)
-  (normal-color-theme)
-  (darkroom-mode-disable)
+  (if (eq system-type 'windows-nt)
+      (progn
+        (darkroom-mode-disable)
+        (normal-color-theme))
+      (progn
+        (normal-color-theme)
+        (darkroom-mode-disable)))
   (setq in-darkroom-mode 0))
 
 ;; for windows, darkroom-mode overrides the darkroom-mode-{en|dis}able functions
@@ -365,10 +368,6 @@ Uses `current-date-time-format' for the formatting the date/time."
   (setq paragraph-separate "^\\s-*//!?\\s-*$"))
 (add-hook 'c++-mode-hook 'setup-doxygen-fill)
 #+end_src
-** C#
-#+begin_src emacs-lisp
-(autoload 'csharp-mode "csharp-mode" "C# editing mode" t)
-#+end_src
 ** Python
 *** 2-space basic offset
 #+begin_src emacs-lisp
@@ -381,29 +380,20 @@ Uses `current-date-time-format' for the formatting the date/time."
 #+end_src
 ** Ocaml
 #+begin_src emacs-lisp
-(autoload 'caml-mode "caml" "Ocaml editing mode" t)
-(autoload 'run-caml "inf-caml" "Run an inferior caml process" t)
 (add-hook 'caml-mode-hook (lambda() (require 'caml-font)))
 #+end_src
 ** Lua
-#+begin_src emacs-lisp
-(autoload 'lua-mode "lua-mode" "Lua editing mode" t)
-#+end_src
 *** 2-space basic offset
 #+begin_src emacs-lisp
 (setq lua-indent-level 2)
 #+end_src
 ** Javascript
-#+begin_src emacs-lisp
-(autoload 'js2-mode "js2-mode" "Javascript editing mode" t)
-#+end_src
 *** 2-space basic offset
 #+begin_src emacs-lisp
 (setq js-indent-level 2)
 #+end_src
 ** SQL
 #+begin_src emacs-lisp
-(autoload 'sql-mode "sql-mode" "SQL editing mode" t)
 (font-lock-add-keywords 'sql-mode
   '(("\\s-*//.*$" 0 font-lock-comment-face prepend)))
 #+end_src
@@ -411,27 +401,14 @@ Uses `current-date-time-format' for the formatting the date/time."
 #+begin_src emacs-lisp
 (autoload 'protobuf-mode "protobuf-mode" "Protocol buffer editing mode" t)
 #+end_src
-** Haskell
-*** Use ghc-mod
-#+begin_src emacs-lisp
-(autoload 'ghc-init "ghc" nil t)
-(add-hook 'haskell-mode-hook (lambda () (ghc-init)))
-#+end_src
 ** Common Lisp
-*** Use SLIME with SBCL
+*** Use SLIME with lisp files
 #+begin_src emacs-lisp
 (add-hook 'lisp-mode-hook
           (lambda ()
-            (require 'slime)
             (slime-mode t)
             (local-set-key "\r" 'newline-and-indent)
             (setq lisp-indent-function 'common-lisp-indent-function)))
-(defun slime ()
-  (interactive)
-  (if (eq system-type 'windows-nt)
-      (load "c:\\quicklisp\\slime-helper.el")
-      (require 'slime))
-  (slime-mode t))
 #+end_src
 ** Emacs Lisp
 *** Byte-compile elisp files on save
@@ -503,14 +480,13 @@ Uses `current-date-time-format' for the formatting the date/time."
    (interactive)
    (call-interactively 'magit-status)))
 #+end_src
-*** Use git-blame
+*** Use mo-git-blame
 #+begin_src emacs-lisp
-(autoload 'git-blame-mode "git-blame" "Minor mode for incremental blame for Git." t)
 (global-set-key
  "\C-cb"
  (lambda ()
    (interactive)
-   (call-interactively 'git-blame-mode)))
+   (call-interactively 'mo-git-blame-current)))
 #+end_src
 ** Doxygen
 #+begin_src emacs-lisp
@@ -662,9 +638,10 @@ see https://github.com/alexott/emacs-configs/blob/master/rc/emacs-rc-cedet.el
 (ede-enable-generic-projects)
 #+end_src
 * Package management
-** Use ELPA, Marmalade and MELPA
+** Use GNU, ELPA, Marmalade and MELPA
 #+begin_src emacs-lisp
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
+                         ("elpa" . "http://tromey.com/elpa/")
                          ("marmalade" . "http://marmalade-repo.org/packages/")
                          ("melpa" . "http://melpa.milkbox.net/packages/")))
 #+end_src
