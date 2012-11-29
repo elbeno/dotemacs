@@ -15,9 +15,34 @@
 (require 'org-install)
 (require 'ob-tangle)
 
+;; process the pre-package stuff
 (org-babel-load-file (concat dotfile-dir ".emacs.d/pre-package-init.org"))
 
-;; when using a different init file, this needs to be called manually
+;; initialize package system
 (package-initialize)
 
+;; useful packages
+(setq useful-packages
+      '(caml
+        color-theme
+        csharp-mode
+        ghc
+        git-commit-mode
+        gitconfig-mode
+        gitignore-mode
+        guess-offset
+        ido-ubiquitous
+        js2-mode
+        lua-mode
+        magit
+        mo-git-blame
+        nlinum
+        nxml-mode
+        protobuf-mode
+        slime
+        smart-tab
+        smex
+        undo-tree))
+
+;; process the post-package-init stuff (eg. always-load requires)
 (org-babel-load-file (concat dotfile-dir ".emacs.d/post-package-init.org"))

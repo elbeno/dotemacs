@@ -55,6 +55,7 @@
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 (display-battery-mode -1)
+(scroll-bar-mode -1)
 #+end_src
 *** Inhibit splash screen and start with empty scratch buffer
 #+begin_src emacs-lisp
@@ -160,25 +161,6 @@ Remove backups older than one week
 (global-set-key [insert] (lambda () (interactive)))
 (global-set-key [insertchar] (lambda () (interactive)))
 #+end_src
-** Tab behaviour
-#+begin_src emacs-lisp
-(defun smart-tab ()
-  "This smart tab is minibuffer compliant: it acts as usual in
-   the minibuffer. Else, if mark is active, indents region. Else if
-   point is at the end of a symbol, expands it. Else indents the
-   current line."
-  (interactive)
-  (if (minibufferp)
-      (minibuffer-complete)
-    (if mark-active
-        (indent-region (region-beginning)
-                       (region-end))
-      (if (looking-at "\\_>")
-          (dabbrev-expand nil)
-        (indent-for-tab-command)))))
-
-(global-set-key [(tab)] 'smart-tab)
-#+end_src
 ** Access killring menu
 #+begin_src emacs-lisp
 (global-set-key "\C-cy" '(lambda () (interactive) (popup-menu 'yank-menu)))
@@ -198,6 +180,10 @@ Remove backups older than one week
     (beginning-of-line)))
 
 (global-set-key [home] 'beginning-of-line-or-indentation)
+#+end_src
+** Tab behaviour
+#+begin_src emacs-lisp
+(global-set-key [(tab)] 'smart-tab)
 #+end_src
 * Auto modes
 #+begin_src emacs-lisp
@@ -255,8 +241,7 @@ Remove backups older than one week
       (shell-command "wmctrl -r :ACTIVE: -bremove,fullscreen")))
 
 (defun darkroom-mode-enable ()
-  (switch-full-screen 1)
-  (scroll-bar-mode -1))
+  (switch-full-screen 1))
 
 (defun darkroom-mode-on ()
   (interactive)
@@ -265,8 +250,7 @@ Remove backups older than one week
   (setq in-darkroom-mode 1))
 
 (defun darkroom-mode-disable ()
-  (switch-full-screen -1)
-  (scroll-bar-mode 1))
+  (switch-full-screen -1))
 
 ;; for some reason, windows needs this one way, and linux another
 (defun darkroom-mode-off ()

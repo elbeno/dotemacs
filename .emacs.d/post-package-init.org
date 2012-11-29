@@ -29,3 +29,23 @@
       (require 'cygwin-mount)
       (cygwin-mount-activate)))
 #+end_src
+* Undo-tree
+#+begin_src emacs-lisp
+(require 'undo-tree)
+(global-undo-tree-mode 1)
+#+end_src
+* Guess c-basic-offset of buffers
+#+begin_src emacs-lisp
+(require 'guess-offset)
+#+end_src
+* IDO ubiquitous
+#+begin_src emacs-lisp
+(require 'ido-ubiquitous)
+(ido-ubiquitous-mode)
+#+end_src
+* IDO support for M-x
+#+begin_src emacs-lisp
+(require 'smex)
+(smex-initialize)
+(global-set-key (kbd "M-x") 'smex)
+#+end_src
