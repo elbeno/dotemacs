@@ -8,9 +8,14 @@
 #+begin_src emacs-lisp
 (setq cedet-dir "/home/bdeane/dev/cedet/")
 #+end_src
-*** Default frame height
+*** Default frame height, width
 #+begin_src emacs-lisp
 (setq default-frame-height 78)
+#+end_src
+*** Column to wrap at
+#+begin_src emacs-lisp
+(setq column-wrap-soft 80)
+(setq column-wrap-hard 100)
 #+end_src
 *** Use SBCL
 #+begin_src emacs-lisp
@@ -72,7 +77,7 @@
 (setq default-frame-alist
       (append
        (list
-	'(width . 100)
+	`(width . ,column-wrap-hard)
 	`(height . ,default-frame-height)
         `(font . ,default-font))
        default-frame-alist))
@@ -144,10 +149,10 @@ Remove backups older than one week
 #+end_src
 ** Wrap at column 80, mark at 80 (soft) and 100 (hard)
 #+begin_src emacs-lisp
-(setq-default fill-column 80)
-(require 'column-marker)
-(add-hook 'c++-mode-hook (lambda () (interactive) (column-marker-1 80)))
-(add-hook 'c++-mode-hook (lambda () (interactive) (column-marker-2 100)))
+(setq-default fill-column column-wrap-soft)
+(autoload 'column-marker-2 "column-marker" "Highlight a column." t)
+(add-hook 'c++-mode-hook (lambda () (interactive) (column-marker-1 column-wrap-soft)))
+(add-hook 'c++-mode-hook (lambda () (interactive) (column-marker-2 column-wrap-hard)))
 #+end_src
 * Global key mappings
 #+begin_src emacs-lisp
@@ -184,6 +189,26 @@ Remove backups older than one week
 ** Tab behaviour
 #+begin_src emacs-lisp
 (global-set-key [(tab)] 'smart-tab)
+#+end_src
+** Minimap toggle
+#+begin_src emacs-lisp
+(defun minimap-toggle ()
+  "Toggle minimap for current buffer."
+  (interactive)
+  (if (not (boundp 'minimap-bufname))
+      (setf minimap-bufname nil))
+  (if (null minimap-bufname)
+      (progn (minimap-create)
+	     (set-frame-width (selected-frame) (+ (/ (* column-wrap-hard 5) 4) 4)))
+    (progn (minimap-kill)
+	   (set-frame-width (selected-frame) column-wrap-hard))))
+(global-set-key "\M-m" 'minimap-toggle)
+#+end_src
+** Highlight symbol
+#+begin_src emacs-lisp
+(global-set-key [(control f3)] 'highlight-symbol-at-point)
+(global-set-key [f3] 'highlight-symbol-next)
+(global-set-key [(shift f3)] 'highlight-symbol-prev)
 #+end_src
 * Auto modes
 #+begin_src emacs-lisp
@@ -532,7 +557,9 @@ http://stackoverflow.com/questions/880625
 #+begin_src emacs-lisp
 (require 'org-install)
 (define-key global-map "\C-cl" 'org-store-link)
+(define-key global-map "\C-cc" 'org-capture)
 (define-key global-map "\C-ca" 'org-agenda)
+(define-key global-map "\C-ci" 'org-iswitchb)
 (setq org-log-done t)
 (setq org-support-shift-select t)
 #+end_src

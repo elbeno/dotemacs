@@ -49,3 +49,8 @@
 (smex-initialize)
 (global-set-key (kbd "M-x") 'smex)
 #+end_src
+* Nyancat mode-line!
+#+begin_src emacs-lisp
+;(nyan-mode)
+;(nyan-start-animation)
+#+end_src

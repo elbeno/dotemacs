@@ -21,28 +21,25 @@
 ;; initialize package system
 (package-initialize)
 
-;; useful packages
-(setq useful-packages
-      '(caml
-        color-theme
-        csharp-mode
-        ghc
-        git-commit-mode
-        gitconfig-mode
-        gitignore-mode
-        guess-offset
-        ido-ubiquitous
-        js2-mode
-        lua-mode
-        magit
-        mo-git-blame
-        nlinum
-        nxml-mode
-        protobuf-mode
-        slime
-        smart-tab
-        smex
-        undo-tree))
+;; packages installed:
+
+;;caml              js2-mode
+;;color-theme       lua-mode
+;;column-marker     magit
+;;csharp-mode       minimap
+;;ecb               mo-git-blame
+;;ghc               nlinum
+;;git-commit-mode   nxml-mode
+;;gitconfig-mode    nyan-mode
+;;gitignore-mode    protobuf-mode
+;;guess-offset      slime
+;;haskell-mode      smart-tab
+;;highlight-symbol  smex
+;;ido-ubiquitous    undo-tree
 
 ;; process the post-package-init stuff (eg. always-load requires)
 (org-babel-load-file (concat dotfile-dir ".emacs.d/post-package-init.org"))
+
+;; apply custom variables
+(setq custom-file "~/.emacs-custom.el")
+(load custom-file)
