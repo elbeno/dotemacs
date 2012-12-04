@@ -648,6 +648,12 @@ see https://github.com/alexott/emacs-configs/blob/master/rc/emacs-rc-cedet.el
 (global-ede-mode 1)
 (ede-enable-generic-projects)
 #+end_src
+* Multiple cursors
+#+begin_src emacs-lisp
+(global-set-key (kbd "C->") 'mc/mark-next-like-this)
+(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+#+end_src
 * Package management
 ** Use GNU, ELPA, Marmalade and MELPA
 #+begin_src emacs-lisp
