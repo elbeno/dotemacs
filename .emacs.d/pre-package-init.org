@@ -249,9 +249,11 @@ Remove backups older than one week
 ** Color themes
 #+begin_src emacs-lisp
 (defun normal-color-theme()
+  (interactive)
   (color-theme-standard)
   (color-customizations))
 (defun dark-color-theme()
+  (interactive)
   (color-theme-midnight))
 #+end_src
 * Darkroom mode
@@ -300,6 +302,10 @@ Remove backups older than one week
       (darkroom-mode-off)))
 
 (global-set-key [(meta return)] 'toggle-darkroom-mode)
+#+end_src
+* Dired customizations
+#+begin_src emacs-lisp
+(add-hook 'dired-mode-hook 'hl-line-mode)
 #+end_src
 * Utility functions
 ** Insert date/time
