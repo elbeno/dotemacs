@@ -23,20 +23,21 @@
 
 ;; packages installed:
 
-;;caml              js2-mode
-;;color-theme       lua-mode
-;;column-marker     magit
-;;csharp-mode       minimap
-;;ecb               mo-git-blame
-;;ghc               multiple-cursors
-;;git-commit-mode   nlinum
-;;gitconfig-mode    nxml-mode
-;;gitignore-mode    nyan-mode
-;;guess-offset      protobuf-mode
-;;haskell-mode      slime
-;;highlight-symbol  smart-tab
-;;ido-ubiquitous    smex
-;;                  undo-tree
+;;bm                js2-mode
+;;caml              lua-mode
+;;color-theme       magit
+;;column-marker     minimap
+;;csharp-mode       mo-git-blame
+;;ecb               multiple-cursors
+;;ghc               nlinum
+;;git-commit-mode   nxml-mode
+;;gitconfig-mode    nyan-mode
+;;gitignore-mode    protobuf-mode
+;;guess-offset      slime
+;;haskell-mode      smart-tab
+;;highlight-symbol  smex
+;;ido-ubiquitous    undo-tree
+
 
 ;; process the post-package-init stuff (eg. always-load requires)
 (org-babel-load-file (concat dotfile-dir ".emacs.d/post-package-init.org"))

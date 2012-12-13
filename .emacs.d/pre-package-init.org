@@ -170,10 +170,10 @@ Remove backups older than one week
 #+begin_src emacs-lisp
 (global-set-key "\C-cy" '(lambda () (interactive) (popup-menu 'yank-menu)))
 #+end_src
-** Cycle buffers with F1/F2
+** Cycle buffers with F7/F8
 #+begin_src emacs-lisp
-(global-set-key [f1] 'previous-buffer)
-(global-set-key [f2] 'next-buffer)
+(global-set-key [f7] 'previous-buffer)
+(global-set-key [f8] 'next-buffer)
 #+end_src
 ** Home cycles between beginning of line and indent
 #+begin_src emacs-lisp
@@ -209,6 +209,12 @@ Remove backups older than one week
 (global-set-key [(control f3)] 'highlight-symbol-at-point)
 (global-set-key [f3] 'highlight-symbol-next)
 (global-set-key [(shift f3)] 'highlight-symbol-prev)
+#+end_src
+** Bookmarks
+#+begin_src emacs-lisp
+(global-set-key [(control f2)] 'bm-toggle)
+(global-set-key [f2] 'bm-next)
+(global-set-key [(shift f2)] 'bm-previous)
 #+end_src
 * Auto modes
 #+begin_src emacs-lisp

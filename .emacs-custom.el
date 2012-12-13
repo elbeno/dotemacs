@@ -5,4 +5,6 @@
  '(ecb-options-version "2.40")
  '(ecb-tip-of-the-day nil)
  '(highlight-symbol-on-navigation-p t)
- '(highlight-symbol-idle-delay 0))
+ '(highlight-symbol-idle-delay 0)
+ '(bm-cycle-all-buffers t)
+ '(bm-marker 'bm-marker-right))
