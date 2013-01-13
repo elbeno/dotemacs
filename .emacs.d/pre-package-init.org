@@ -443,6 +443,10 @@ Uses `current-date-time-format' for the formatting the date/time."
 
 (add-hook 'after-save-hook 'byte-compile-current-buffer)
 #+end_src
+** Haskell
+#+begin_src emacs-lisp
+(add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
+#+end_src
 * Compiling
 ** M-up and M-down to go between errors
 #+begin_src emacs-lisp

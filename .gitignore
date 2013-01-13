@@ -3,6 +3,7 @@
 *.elc
 .emacs.d/elpa
 .emacs.d/site-bin/ghc-mod
+.emacs.d/site-bin/hoogle
 .emacs.d/ede-projects.el
 .emacs.d/backups
 .emacs.d/auto-save-list
