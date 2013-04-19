@@ -33,7 +33,7 @@
 ;;git-commit-mode   nxml-mode
 ;;gitconfig-mode    nyan-mode
 ;;gitignore-mode    protobuf-mode
-;;guess-offset      slime
+;;                  slime
 ;;haskell-mode      smart-tab
 ;;highlight-symbol  smex
 ;;ido-ubiquitous    undo-tree

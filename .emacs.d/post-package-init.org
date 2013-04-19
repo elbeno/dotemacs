@@ -24,7 +24,7 @@
 #+end_src
 * Cygwin mount points
 #+begin_src emacs-lisp
-(if (eq system-type 'windows-nt)
+(if (or (eq system-type 'windows-nt) (eq system-type 'cygwin))
     (progn
       (require 'cygwin-mount)
       (cygwin-mount-activate)))
@@ -33,10 +33,6 @@
 #+begin_src emacs-lisp
 (require 'undo-tree)
 (global-undo-tree-mode 1)
-#+end_src
-* Guess c-basic-offset of buffers
-#+begin_src emacs-lisp
-(require 'guess-offset)
 #+end_src
 * IDO ubiquitous
 #+begin_src emacs-lisp

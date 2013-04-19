@@ -1,2 +1,1 @@
-@echo off
-emacsclientw -na "%~dp0runemacs.bat" %1
+run bash %~dp0/emacs-wrapper.sh %1
