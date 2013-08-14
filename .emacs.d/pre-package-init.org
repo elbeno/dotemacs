@@ -3,6 +3,7 @@
 *** Default font = inconsolata
 #+begin_src emacs-lisp
 (setq default-font "Inconsolata-10")
+(setq large-font "Inconsolata-13")
 #+end_src
 *** Path to cedet
 #+begin_src emacs-lisp
@@ -36,7 +37,8 @@
 *** Use Consolas
 #+begin_src emacs-lisp
 (if (eq system-type 'windows-nt)
-    (setq default-font "-outline-Consolas-normal-r-normal-normal-13-97-96-96-c-*-iso8859-1"))
+    (setq default-font "-outline-Consolas-normal-r-normal-normal-13-97-96-96-c-*-iso8859-1")
+    (setq large-font "-outline-Consolas-normal-r-normal-normal-16-97-96-96-c-*-iso8859-1"))
 #+end_src
 *** Path overrides
 #+begin_src emacs-lisp
@@ -187,6 +189,7 @@ Remove backups older than one week
 (global-set-key "\M-r" 'replace-string)
 (global-set-key "\M-k" 'compile)
 (global-set-key "\C-cz" 'goto-last-change)
+(global-set-key [(meta return)] 'toggle-max-frame)
 #+end_src
 ** Turn off insert
 #+begin_src emacs-lisp
@@ -201,6 +204,18 @@ Remove backups older than one week
 #+begin_src emacs-lisp
 (global-set-key [f7] 'previous-buffer)
 (global-set-key [f8] 'next-buffer)
+#+end_src
+** Cycle windows with F5/F6
+#+begin_src emacs-lisp
+(global-set-key [f5] 'other-window)
+(global-set-key [f6] (lambda () (interactive) (other-window -1)))
+#+end_src
+** Windmove with C-c <arrow>
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-c <left>")  'windmove-left)
+(global-set-key (kbd "C-c <right>") 'windmove-right)
+(global-set-key (kbd "C-c <up>")    'windmove-up)
+(global-set-key (kbd "C-c <down>")  'windmove-down)
 #+end_src
 ** Home cycles between beginning of line and indent
 #+begin_src emacs-lisp
@@ -334,7 +349,7 @@ Remove backups older than one week
       (darkroom-mode-on)
       (darkroom-mode-off)))
 
-(global-set-key [(meta return)] 'toggle-darkroom-mode)
+;(global-set-key [(meta return)] 'toggle-darkroom-mode)
 #+end_src
 * Dired customizations
 #+begin_src emacs-lisp
@@ -650,7 +665,47 @@ http://stackoverflow.com/questions/880625
 #+begin_src emacs-lisp
 (global-set-key "\C-x\ \C-r" 'recentf-open-files)
 #+end_src
-** Bash Shell
+* Shell things
+** Names of shell buffers
+#+begin_src emacs-lisp
+(defvar my-local-shells
+  '("*eshell*" "*shell*" "*shell0*" "*shell1*" "*shell2*" "*shell3*"))
+#+end_src
+** Custom vars
+#+begin_src emacs-lisp
+(custom-set-variables
+ '(comint-scroll-to-bottom-on-input t)  ; always insert at the bottom
+ '(comint-scroll-to-bottom-on-output nil) ; always add output at the bottom
+ '(comint-scroll-show-maximum-output t) ; scroll to show max possible output
+ ;; '(comint-completion-autolist t)     ; show completion list when ambiguous
+ '(comint-input-ignoredups t)           ; no duplicates in command history
+ '(comint-completion-addsuffix t)       ; insert space/slash after file completion
+ '(comint-buffer-maximum-size 20000)    ; max length of the buffer in lines
+ '(comint-prompt-read-only nil)         ; if this is t, it breaks shell-command
+ '(comint-get-old-input (lambda () "")) ; what to run when i press enter on a
+                                        ; line above the current prompt
+ '(comint-input-ring-size 5000)         ; max shell history size
+ '(protect-buffer-bury-p nil))
+#+end_src
+** Truncate buffers continuously
+#+begin_src emacs-lisp
+(add-hook 'comint-output-filter-functions 'comint-truncate-buffer)
+#+end_src
+** Make the output read only
+#+begin_src emacs-lisp
+(defun make-my-shell-output-read-only (text)
+  "Add to comint-output-filter-functions to make stdout read only in my shells."
+  (if (member (buffer-name) my-local-shells)
+      (let ((inhibit-read-only t)
+            (output-end (process-mark (get-buffer-process (current-buffer)))))
+        (put-text-property comint-last-output-start output-end 'read-only t))))
+(add-hook 'comint-output-filter-functions 'make-my-shell-output-read-only)
+#+end_src
+** Colour in shells
+#+begin_src emacs-lisp
+(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+#+end_src
+** Open a bash shell
 #+begin_src emacs-lisp
 (defun bash-shell ()
   "Opens a bash shell."
@@ -658,8 +713,41 @@ http://stackoverflow.com/questions/880625
   (let ((explicit-shell-file-name "bash")
         (explicit-bash-args '("--login" "-i")))
     (call-interactively 'shell)))
-(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 (global-set-key (kbd "C-c s") 'bash-shell)
+#+end_src
+** Repeat last shell buffer input
+#+begin_src emacs-lisp
+(defun repeat-last-command-in-eshell ()
+  "Repeat the last command that the *eshell* buffer did."
+  (interactive)
+  (let ((buf (current-buffer)))
+    (if (get-buffer "*eshell*")
+        (progn
+          (display-buffer "*eshell*" t)
+          (switch-to-buffer-other-window "*eshell*")
+          (end-of-buffer)
+          (eshell-kill-input)
+          (insert (eshell-get-history 0))
+          (eshell-send-input)
+          (end-of-buffer)
+          (switch-to-buffer-other-window buf)))))
+
+(defun repeat-last-command-in-comint-shell ()
+  "Repeat the last command that the *shell* buffer did."
+  (interactive)
+  (with-current-buffer (get-buffer "*shell*")
+    (comint-previous-input 0)
+    (comint-send-input nil t)))
+
+(defun repeat-last-command-in-shell ()
+  "Repeat the last command that the (e)shell buffer did."
+  (interactive)
+  (cond ((get-buffer "*eshell*")
+         (repeat-last-command-in-eshell))
+        ((get-buffer "*shell*")
+         (repeat-last-command-in-comint-shell))))
+
+(global-set-key (kbd "C-c r") 'repeat-last-command-in-shell)
 #+end_src
 * Org mode
 #+begin_src emacs-lisp
@@ -698,6 +786,7 @@ see https://github.com/alexott/emacs-configs/blob/master/rc/emacs-rc-cedet.el
 (semantic-mode 1)
 
 (require 'semantic/bovine/c)
+(require 'semantic/bovine/el)
 (require 'semantic/bovine/gcc)
 (require 'semantic/bovine/clang)
 (require 'semantic/ia)
@@ -780,6 +869,31 @@ see https://github.com/alexott/emacs-configs/blob/master/rc/emacs-rc-cedet.el
   "reverse the requirements"
   (setq requirements (reverse requirements))
   (print requirements))
+#+end_src
+* Window layouts
+** For screencasting
+#+begin_src emacs-lisp
+(defun setup-screencasting-layout ()
+  (interactive)
+  (delete-other-windows)
+  (maximize-frame)
+  (split-window-horizontally -80)
+  (other-window 1)
+  (switch-to-buffer "*compilation*")
+  (split-window-vertically)
+  (other-window 1)
+  (bash-shell)
+  (other-window 1)
+  (text-scale-set 1))
+
+(defun setup-normal-layout ()
+  (interactive)
+  (delete-other-windows)
+  (text-scale-set 0)
+  (set-frame-size (selected-frame) column-wrap-hard default-frame-height))
+
+(global-set-key "\C-cw" 'setup-screencasting-layout)
+(global-set-key "\C-cn" 'setup-normal-layout)
 #+end_src
 * Start server
 #+begin_src emacs-lisp

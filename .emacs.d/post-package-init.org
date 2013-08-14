@@ -50,3 +50,8 @@
 ;(nyan-mode)
 ;(nyan-start-animation)
 #+end_src
+* Yasnippet config
+#+begin_src emacs-lisp
+(require 'yasnippet)
+(yas-global-mode 1)
+#+end_src
