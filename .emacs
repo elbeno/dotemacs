@@ -11,6 +11,23 @@
 ;; extra binaries (if needed) are in site-bin
 (add-to-list 'exec-path (concat dotfile-dir ".emacs.d/site-bin/"))
 
+;; for some reason we need to set these ahead of loading org-mode!
+(setq org-emphasis-alist (quote (("*" bold "<b>" "</b>")
+                                 ("/" italic "<i>" "</i>")
+                                 ("_" underline "<span style=\"text-decoration:underline;\">" "</span>")
+                                 ("=" org-code "<code>" "</code>" verbatim)
+                                 ("~" org-verbatim "<code>" "</code>" verbatim)
+                                 ("+" (:strike-through t) "<del>" "</del>")
+                                 ("@" org-warning "<b>" "</b>"))))
+(setq org-export-latex-emphasis-alist (quote
+                                       (("*" "\\textbf{%s}" nil)
+                                        ("/" "\\emph{%s}" nil)
+                                        ("_" "\\underline{%s}" nil)
+                                        ("+" "\\texttt{%s}" nil)
+                                        ("=" "\\verb=%s=" nil)
+                                        ("~" "\\verb~%s~" t)
+                                        ("@" "\\alert{%s}" nil))))
+
 ;; load up org-mode and org-babel
 (require 'org-install)
 (require 'ob-tangle)
@@ -21,23 +38,25 @@
 ;; initialize package system
 (package-initialize)
 
-;; packages installed:
-
-;;bm                js2-mode
-;;caml              lua-mode
-;;color-theme       magit
-;;column-marker     minimap
-;;csharp-mode       mo-git-blame
-;;ecb               multiple-cursors
-;;ghc               nlinum
-;;git-commit-mode   nxml-mode
-;;gitconfig-mode    nyan-mode
-;;gitignore-mode    protobuf-mode
-;;                  slime
-;;haskell-mode      smart-tab
-;;highlight-symbol  smex
-;;ido-ubiquitous    undo-tree
-
+;; contents of elpa dir:
+;; archives                        js2-mode-20130920.429
+;; bm-20121212.2224                json-mode-1.1.0
+;; caml-20130904.1012              lua-mode-20130910.922
+;; cl-lib-0.3                      magit-20131001.226
+;; color-theme-20080305.834        markdown-mode+-20120829.710
+;; column-marker-20121128.843      markdown-mode-20130726.2142
+;; csharp-mode-20130824.1200       minimap-20110427.1123
+;; ecb-20130826.1941               mo-git-blame-20130728.1717
+;; frame-cmds-20130921.1622        multiple-cursors-20130913.1148
+;; frame-fns-20130723.2318         nlinum-1.1
+;; ghc-20130520.1540               nxml-mode-20041004
+;; git-commit-mode-20130919.341    nyan-mode-20120710.1922
+;; gitconfig-mode-20130831.828     protobuf-mode-20091217.1955
+;; gitignore-mode-20130831.828     slime-20130929.1345
+;; git-rebase-mode-20130912.1429   smart-tab-20130317.1157
+;; haskell-mode-20130902.1113      smex-20130707.1255
+;; highlight-symbol-20130628.1552  undo-tree-20130812.1224
+;; ido-ubiquitous-20130927.1229    yasnippet-20130907.1855
 
 ;; process the post-package-init stuff (eg. always-load requires)
 (org-babel-load-file (concat dotfile-dir ".emacs.d/post-package-init.org"))

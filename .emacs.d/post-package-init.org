@@ -24,10 +24,14 @@
 #+end_src
 * Cygwin mount points
 #+begin_src emacs-lisp
-(if (or (eq system-type 'windows-nt) (eq system-type 'cygwin))
+(if (eq system-type 'windows-nt)
     (progn
       (require 'cygwin-mount)
       (cygwin-mount-activate)))
+(if (eq system-type 'cygwin)
+    (progn
+      (require 'windows-path)
+      (windows-path-activate)))
 #+end_src
 * Undo-tree
 #+begin_src emacs-lisp

@@ -164,7 +164,10 @@ Remove backups older than one week
 #+end_src
 ** On save, add newline at end and delete trailing whitespace
 #+begin_src emacs-lisp
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
+(defun my-delete-trailing-whitespace ()
+  (if (eq indent-tabs-mode nil)
+      (delete-trailing-whitespace)))
+(add-hook 'before-save-hook 'my-delete-trailing-whitespace)
 (setq require-final-newline t)
 #+end_src
 ** One space after period
@@ -274,6 +277,7 @@ Remove backups older than one week
                                 ("\\.qml$" . js2-mode)
                                 ("\\.ui$" . nxml-mode)
                                 ("\\.org$" . org-mode)
+                                ("\\.json$" . json-mode)
                                 ("\\.proto$" . protobuf-mode))
                               auto-mode-alist))
 #+end_src
@@ -303,53 +307,6 @@ Remove backups older than one week
 (defun dark-color-theme()
   (interactive)
   (color-theme-midnight))
-#+end_src
-* Darkroom mode
-#+begin_src emacs-lisp
-(setq in-darkroom-mode 0)
-
-(defun switch-full-screen (&optional ii)
-  (interactive "p")
-  (if (> ii 0)
-      (shell-command "wmctrl -r :ACTIVE: -badd,fullscreen"))
-  (if (< ii 0)
-      (shell-command "wmctrl -r :ACTIVE: -bremove,fullscreen")))
-
-(defun darkroom-mode-enable ()
-  (switch-full-screen 1))
-
-(defun darkroom-mode-on ()
-  (interactive)
-  (darkroom-mode-enable)
-  (dark-color-theme)
-  (setq in-darkroom-mode 1))
-
-(defun darkroom-mode-disable ()
-  (switch-full-screen -1))
-
-;; for some reason, windows needs this one way, and linux another
-(defun darkroom-mode-off ()
-  (interactive)
-  (if (eq system-type 'windows-nt)
-      (progn
-        (darkroom-mode-disable)
-        (normal-color-theme))
-      (progn
-        (normal-color-theme)
-        (darkroom-mode-disable)))
-  (setq in-darkroom-mode 0))
-
-;; for windows, darkroom-mode overrides the darkroom-mode-{en|dis}able functions
-(if (eq system-type 'windows-nt)
-    (require 'darkroom-mode))
-
-(defun toggle-darkroom-mode ()
-  (interactive)
-  (if (equal in-darkroom-mode 0)
-      (darkroom-mode-on)
-      (darkroom-mode-off)))
-
-;(global-set-key [(meta return)] 'toggle-darkroom-mode)
 #+end_src
 * Dired customizations
 #+begin_src emacs-lisp
@@ -587,7 +544,9 @@ Uses `current-date-time-format' for the formatting the date/time."
 (defun project-root ()
   (file-name-directory (find-sconstruct)))
 
-(setq compile-command '(concat "cd " (project-root) " && scons"))
+(if (eq system-type 'cygwin)
+    (setq compile-command '(concat "cd " (project-root) " && /usr/local/bin/scons"))
+    (setq compile-command '(concat "cd " (project-root) " && scons")))
 (setq compilation-read-command nil)
 #+end_src
 
@@ -749,6 +708,19 @@ http://stackoverflow.com/questions/880625
 
 (global-set-key (kbd "C-c r") 'repeat-last-command-in-shell)
 #+end_src
+** Use external ls
+#+begin_src emacs-lisp
+(setq ls-lisp-use-insert-directory-program t)
+(setq insert-directory-program "/bin/ls")
+#+end_src
+** Run test on successful compilation
+#+begin_src emacs-lisp
+(setq compilation-finish-functions 'compile-autoclose)
+(defun compile-autoclose (buffer string)
+  (cond ((string-match "finished" string)
+         (message "Build maybe successful: running tests.")
+         (run-with-timer 1 nil 'repeat-last-command-in-shell))))
+#+end_src
 * Org mode
 #+begin_src emacs-lisp
 (require 'org-install)
@@ -758,6 +730,16 @@ http://stackoverflow.com/questions/880625
 (define-key global-map "\C-ci" 'org-iswitchb)
 (setq org-log-done t)
 (setq org-support-shift-select t)
+(add-hook 'org-mode-hook
+  (lambda ()
+    (define-key org-mode-map "\M-Q" 'toggle-truncate-lines)))
+(setq org-startup-indented t)
+(setq org-export-latex-listings 'minted)
+(setq org-export-latex-minted-options
+           '(("frame" "lines")
+             ("fontsize" "\\scriptsize")
+             ("linenos" "")))
+(setq org-src-fontify-natively t)
 #+end_src
 * CEDET
 see https://github.com/alexott/emacs-configs/blob/master/rc/emacs-rc-cedet.el
@@ -873,26 +855,57 @@ see https://github.com/alexott/emacs-configs/blob/master/rc/emacs-rc-cedet.el
 * Window layouts
 ** For screencasting
 #+begin_src emacs-lisp
+(setq fullscreen-screencast nil)
 (defun setup-screencasting-layout ()
   (interactive)
+  (require 'frame-fns)
   (delete-other-windows)
-  (maximize-frame)
-  (split-window-horizontally -80)
+  (if fullscreen-screencast
+    (progn
+      (maximize-frame)
+      (split-window-horizontally -80))
+    (progn
+      (shell-command (concat "wmctrl -r " (get-frame-name) " -e 0,100,100,1280,720")))
+      (split-window-horizontally -50))
   (other-window 1)
   (switch-to-buffer "*compilation*")
   (split-window-vertically)
   (other-window 1)
-  (bash-shell)
+  (eshell)
   (other-window 1)
-  (text-scale-set 1))
-
+  (if fullscreen-screencast
+    (text-scale-set 2)
+    (text-scale-set 1)))
+#+end_src
+** Normal mode
+#+begin_src emacs-lisp
 (defun setup-normal-layout ()
   (interactive)
   (delete-other-windows)
   (text-scale-set 0)
   (set-frame-size (selected-frame) column-wrap-hard default-frame-height))
-
+#+end_src
+** With compilation/shell buffers
+#+begin_src emacs-lisp
+(defun setup-dev-layout ()
+  (interactive)
+  (delete-other-windows)
+  (text-scale-set 0)
+  (set-frame-size (selected-frame) column-wrap-hard default-frame-height)
+  (set-frame-width (selected-frame) 183)
+  (sleep-for 1)
+  (split-window-horizontally 103)
+  (other-window 1)
+  (switch-to-buffer "*compilation*")
+  (split-window-vertically 40)
+  (other-window 1)
+  (eshell)
+  (other-window 1))
+#+end_src
+** Key bindings
+#+begin_src emacs-lisp
 (global-set-key "\C-cw" 'setup-screencasting-layout)
+(global-set-key "\C-cm" 'setup-dev-layout)
 (global-set-key "\C-cn" 'setup-normal-layout)
 #+end_src
 * Start server
