@@ -740,6 +740,7 @@ http://stackoverflow.com/questions/880625
              ("fontsize" "\\scriptsize")
              ("linenos" "")))
 (setq org-src-fontify-natively t)
+(setq org-completion-use-ido t)
 #+end_src
 * CEDET
 see https://github.com/alexott/emacs-configs/blob/master/rc/emacs-rc-cedet.el
