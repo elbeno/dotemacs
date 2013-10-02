@@ -106,3 +106,4 @@
     el-files-list))
 
 (mapcar 'load (files-in-below-directory (concat dotfile-dir ".emacs.d/custom/")))
+(mapcar 'load (files-in-below-directory (concat dotfile-dir ".emacs.d/autoloads/")))

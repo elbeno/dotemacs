@@ -734,13 +734,16 @@ http://stackoverflow.com/questions/880625
   (lambda ()
     (define-key org-mode-map "\M-Q" 'toggle-truncate-lines)))
 (setq org-startup-indented t)
+(setq org-src-fontify-natively t)
+(setq org-completion-use-ido t)
+
+(require 'org-latex)
+(add-to-list 'org-export-latex-packages-alist '("" "minted"))
 (setq org-export-latex-listings 'minted)
 (setq org-export-latex-minted-options
            '(("frame" "lines")
              ("fontsize" "\\scriptsize")
              ("linenos" "")))
-(setq org-src-fontify-natively t)
-(setq org-completion-use-ido t)
 #+end_src
 * CEDET
 see https://github.com/alexott/emacs-configs/blob/master/rc/emacs-rc-cedet.el
