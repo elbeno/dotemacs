@@ -38,12 +38,24 @@
 (require 'undo-tree)
 (global-undo-tree-mode 1)
 #+end_src
-* IDO ubiquitous
+* IDO
+** Use flx-ido
+#+begin_src emacs-lisp
+(require 'flx-ido)
+(ido-mode 1)
+(setq ido-everywhere t)
+(setq ido-use-filename-at-point nil) ;'guess)
+(setq ido-create-new-buffer 'always)
+(flx-ido-mode 1)
+(setq ido-use-faces nil)
+;(setq flx-ido-use-faces nil)
+#+end_src
+** Ubiqitous
 #+begin_src emacs-lisp
 (require 'ido-ubiquitous)
 (ido-ubiquitous-mode)
 #+end_src
-* IDO support for M-x
+** IDO support for M-x
 #+begin_src emacs-lisp
 (require 'smex)
 (smex-initialize)
@@ -58,4 +70,9 @@
 #+begin_src emacs-lisp
 (require 'yasnippet)
 (yas-global-mode 1)
+#+end_src
+* Projectile
+#+begin_src emacs-lisp
+(require 'projectile)
+(projectile-global-mode)
 #+end_src

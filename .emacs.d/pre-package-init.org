@@ -578,21 +578,6 @@ Uses `current-date-time-format' for the formatting the date/time."
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'post-forward-angle-brackets)
 #+end_src
-** Find file at point
-#+begin_src emacs-lisp
-(defadvice ffap-file-at-point (after ffap-file-at-point-after-advice ())
-  (if (string= ad-return-value "/")
-      (setq ad-return-value nil)))
-(ad-activate 'ffap-file-at-point)
-#+end_src
-** Interactively do things
-#+begin_src emacs-lisp
-(setq ido-enable-flex-matching t)
-(setq ido-everywhere t)
-(setq ido-use-filename-at-point nil) ;'guess)
-(setq ido-create-new-buffer 'always)
-(ido-mode 1)
-#+end_src
 ** Dabbrev customization
 #+begin_src emacs-lisp
 (setq save-abbrevs nil)
