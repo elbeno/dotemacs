@@ -82,10 +82,10 @@
 (defun toggle-fourcc-to-hex-at-point ()
   (interactive)
   (condition-case nil
-      (dec-to-fourcc-at-point)
+      (hex-to-fourcc-at-point)
     (error (condition-case nil
-                (hex-to-fourcc-at-point)
-              (error (fourcc-to-hex-at-point))))))
+                (fourcc-to-hex-at-point)
+              (error (dec-to-fourcc-at-point))))))
 
 (global-set-key "\C-cf" 'toggle-fourcc-to-hex-at-point)
 
@@ -124,3 +124,38 @@
     (error (endian-swap-dec-at-point))))
 
 (global-set-key "\C-ce" 'toggle-endianness-at-point)
+
+;; number-to-timestamp at point
+
+; use calc for big numbers
+(require 'calc-ext)
+
+(defun hex-to-time (hexstring)
+  "Convert a hex string into an Elisp time."
+  ;; Could do with some asserts to check byte-list
+  (let ((calc-num (concat "16#" hexstring)))
+    (list
+     (calc-eval
+      "rsh(and(idiv($,1000000),16#ffff0000),16)"
+      'rawnum
+      calc-num)
+     (calc-eval
+      "and(idiv($,1000000),16#ffff)"
+      'rawnum
+      calc-num))))
+
+(defun usec-to-ts-at-point ()
+  (interactive)
+  (save-excursion
+    (skip-chars-backward "0-9")
+    (or (looking-at "[0-9]+")
+        (error "No number at point"))
+    (let ((replacement (usec-to-ts (match-string 0))))
+      (and (looking-at "[0-9]+")
+           (replace-match replacement)))))
+
+(defun usec-to-ts (numstring)
+  (let ((hexstring (format "%x" (string-to-number numstring))))
+    (current-time-string (hex-to-time hexstring))))
+
+(global-set-key "\C-ct" 'usec-to-ts-at-point)
