@@ -13,3 +13,4 @@
 .emacs.d/.mc-lists.el
 .emacs.d/eshell
 .emacs.d/projectile-bookmarks.eld
+.emacs.d/projectile.cache

@@ -75,4 +75,16 @@
 #+begin_src emacs-lisp
 (require 'projectile)
 (projectile-global-mode)
+(setq projectile-enable-caching t)
+(if (eq system-type 'gnu/linux)
+    (setq projectile-tags-command "ctags-exuberant -Re %s %s"))
+#+end_src
+* Tags
+#+begin_src emacs-lisp
+;; automatically reload the TAGS file without asking when it's updated
+(setq tags-revert-without-query 1)
+(require 'etags-select)
+(require 'etags-table)
+(global-set-key "\M-." 'etags-select-find-tag-at-point)
+(setq etags-table-search-up-depth 10)
 #+end_src
