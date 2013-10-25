@@ -61,6 +61,17 @@
 (smex-initialize)
 (global-set-key (kbd "M-x") 'smex)
 #+end_src
+* Find file or include
+#+begin_src emacs-lisp
+(defun visit-file-or-include ()
+  "If the point is on an include line, visit that file. Else do a
+normal ido-find-file."
+  (interactive)
+  (condition-case nil
+      (semantic-decoration-include-visit)
+    (error (ido-find-file))))
+(global-set-key "\C-x\C-f" 'visit-file-or-include)
+#+end_src
 * Nyancat mode-line!
 #+begin_src emacs-lisp
 ;(nyan-mode)
