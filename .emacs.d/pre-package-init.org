@@ -3,7 +3,19 @@
 *** Default font = inconsolata
 #+begin_src emacs-lisp
 (setq default-font "Inconsolata-10")
-(setq large-font "Inconsolata-13")
+(set-face-attribute 'default nil
+                    :family "Inconsolata"
+                    :height 100
+                    :weight 'normal
+                    :width 'normal)
+
+(when (functionp 'set-fontset-font)
+  (set-fontset-font "fontset-default"
+                    'unicode
+                    (font-spec :family "DejaVu Sans Mono"
+                               :width 'normal
+                               :size 10
+                               :weight 'normal)))
 #+end_src
 *** Path to cedet
 #+begin_src emacs-lisp
@@ -41,8 +53,13 @@
 *** Use Consolas
 #+begin_src emacs-lisp
 (if (eq system-type 'windows-nt)
-    (setq default-font "-outline-Consolas-normal-r-normal-normal-13-97-96-96-c-*-iso8859-1")
-    (setq large-font "-outline-Consolas-normal-r-normal-normal-16-97-96-96-c-*-iso8859-1"))
+    (progn
+      (setq default-font "-outline-Consolas-normal-r-normal-normal-13-97-96-96-c-*-iso8859-1")
+      (set-face-attribute 'default nil
+                          :family "Consolas"
+                          :height 130
+                          :weight 'normal
+                          :width 'normal)))
 #+end_src
 *** Path overrides
 #+begin_src emacs-lisp
@@ -67,7 +84,13 @@
 *** Use Consolas
 #+begin_src emacs-lisp
 (if (eq system-type 'cygwin)
-    (setq default-font "Consolas-10"))
+    (progn
+      (setq default-font "Consolas-10")
+      (set-face-attribute 'default nil
+                          :family "Consolas"
+                          :height 100
+                          :weight 'normal
+                          :width 'normal)))
 #+end_src
 *** Path overrides
 #+begin_src emacs-lisp
@@ -111,8 +134,8 @@
   `((top . 2)
     (left . ,frame-left-coord)
     (width . ,column-wrap-hard)
-    (height . ,default-frame-height)
-    (font . ,default-font)))
+    (height . ,default-frame-height)))
+    ;(font . ,default-font)))
 #+end_src
 ** Coding system UTF-8
 #+begin_src emacs-lisp
@@ -157,9 +180,18 @@ Remove backups older than one week
 (column-number-mode)
 #+end_src
 ** Scroll behaviour
-*** Don't jump a half-page when scrolling
+*** Smoother scrolling with keyboard
 #+begin_src emacs-lisp
-(setq scroll-conservatively 10000)
+(setq redisplay-dont-pause t
+      scroll-margin 1
+      scroll-step 1
+      scroll-conservatively 10000
+      scroll-preserve-screen-position 1)
+#+end_src
+*** Smoother scrolling with mouse
+#+begin_src emacs-lisp
+(setq mouse-wheel-follow-mouse 't)
+(setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
 #+end_src
 * Whitespace rules
 ** Use spaces, not tabs

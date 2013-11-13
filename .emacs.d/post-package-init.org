@@ -98,3 +98,9 @@ normal find-tag."
     (error (etags-select-find-tag-at-point))))
 (global-set-key "\M-." 'find-tag-or-include)
 #+end_src
+* git-gutter-fringe
+#+begin_src emacs-lisp
+(require 'git-gutter-fringe+)
+(global-git-gutter+-mode 1)
+(setq git-gutter-fr+-side 'right-fringe)
+#+end_src
