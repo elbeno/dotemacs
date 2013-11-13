@@ -9,10 +9,6 @@
 #+begin_src emacs-lisp
 (setq cedet-dir "/home/bdeane/dev/cedet/")
 #+end_src
-*** Default frame height, width
-#+begin_src emacs-lisp
-(setq default-frame-height 78)
-#+end_src
 *** Column to wrap at
 #+begin_src emacs-lisp
 (setq column-wrap-soft 80)
@@ -22,11 +18,19 @@
 #+begin_src emacs-lisp
 (setq inferior-lisp-program "sbcl")
 #+end_src
+*** Monitor width
+#+begin_src emacs-lisp
+(setq primary-monitor-width 1920)
+#+end_src
 ** Mac
 *** Alt = meta
 #+begin_src emacs-lisp
 (if (eq system-type 'darwin)
     (setq mac-command-modifier 'meta))
+#+end_src
+*** Monitor width
+#+begin_src emacs-lisp
+(setq primary-monitor-width 1920)
 #+end_src
 ** Windows
 *** Get the clipboard to work
@@ -50,10 +54,9 @@
 (if (eq system-type 'windows-nt)
     (setq inferior-lisp-program "clisp.exe"))
 #+end_src
-*** Frame height = 74
+*** Monitor width
 #+begin_src emacs-lisp
-(if (eq system-type 'windows-nt)
-    (setq default-frame-height 74))
+(setq primary-monitor-width 1920)
 #+end_src
 ** Cygwin
 *** Get the clipboard to work
@@ -76,10 +79,9 @@
 (if (eq system-type 'cygwin)
     (setq inferior-lisp-program "clisp.exe"))
 #+end_src
-*** Frame height = 74
+*** Monitor width
 #+begin_src emacs-lisp
-(if (eq system-type 'cygwin)
-    (setq default-frame-height 74))
+(setq primary-monitor-width 1920)
 #+end_src
 * Basic things
 ** Tidier UI
@@ -101,14 +103,16 @@
 #+end_src
 ** Frame
 #+begin_src emacs-lisp
+(setq default-frame-height (/ (display-pixel-height) (frame-char-height)))
+(setq frame-left-coord (- primary-monitor-width
+                          (/ primary-monitor-width (frame-char-width))))
 (setq frame-title-format "%b [emacs]")
 (setq default-frame-alist
-      (append
-       (list
-	`(width . ,column-wrap-hard)
-	`(height . ,default-frame-height)
-        `(font . ,default-font))
-       default-frame-alist))
+  `((top . 2)
+    (left . ,frame-left-coord)
+    (width . ,column-wrap-hard)
+    (height . ,default-frame-height)
+    (font . ,default-font)))
 #+end_src
 ** Coding system UTF-8
 #+begin_src emacs-lisp
@@ -562,11 +566,19 @@ Uses `current-date-time-format' for the formatting the date/time."
 #+end_src
 *** Use mo-git-blame
 #+begin_src emacs-lisp
+(defun my-mo-git-blame-quit ()
+  (interactive)
+  (mo-git-blame-quit)
+  (setup-normal-layout))
+
 (global-set-key
- "\C-cb"
- (lambda ()
-   (interactive)
-   (call-interactively 'mo-git-blame-current)))
+  "\C-cb"
+  (lambda ()
+    (interactive)
+    (setup-doublewide-layout)
+    (call-interactively 'mo-git-blame-current)
+    (define-key mo-git-blame-mode-map (kbd "q") 'my-mo-git-blame-quit)
+    (define-key mo-git-blame-content-mode-map (kbd "q") 'my-mo-git-blame-quit)))
 #+end_src
 ** Doxygen
 #+begin_src emacs-lisp
@@ -861,16 +873,23 @@ see https://github.com/alexott/emacs-configs/blob/master/rc/emacs-rc-cedet.el
   (text-scale-set 0)
   (set-frame-size (selected-frame) column-wrap-hard default-frame-height))
 #+end_src
+** Double-wide mode, split
+#+begin_src emacs-lisp
+(defun setup-doublewide-layout ()
+  (interactive)
+  (delete-other-windows)
+  (text-scale-set 0)
+  (set-frame-size (selected-frame) (+ 3 (* 2 column-wrap-hard)) default-frame-height)
+  (split-window-horizontally))
+#+end_src
 ** With compilation/shell buffers
 #+begin_src emacs-lisp
 (defun setup-dev-layout ()
   (interactive)
   (delete-other-windows)
   (text-scale-set 0)
-  (set-frame-size (selected-frame) column-wrap-hard default-frame-height)
-  (set-frame-width (selected-frame) 183)
-  (sleep-for 1)
-  (split-window-horizontally 103)
+  (set-frame-size (selected-frame) (+ 3 column-wrap-hard column-wrap-soft) default-frame-height)
+  (split-window-horizontally (+ 3 column-wrap-hard))
   (other-window 1)
   (switch-to-buffer "*compilation*")
   (split-window-vertically 40)
@@ -878,11 +897,21 @@ see https://github.com/alexott/emacs-configs/blob/master/rc/emacs-rc-cedet.el
   (eshell)
   (other-window 1))
 #+end_src
+** Expand to double wide, keep split if already
+#+begin_src emacs-lisp
+(defun setup-doublewide-layout-keep-split ()
+  (interactive)
+  (set-frame-size (selected-frame) (+ 3 (* 2 column-wrap-hard)) default-frame-height)
+  (when (= (length (window-list)) 1)
+    (split-window-horizontally)))
+#+end_src
 ** Key bindings
 #+begin_src emacs-lisp
 (global-set-key "\C-cw" 'setup-screencasting-layout)
 (global-set-key "\C-cm" 'setup-dev-layout)
 (global-set-key "\C-cn" 'setup-normal-layout)
+(global-set-key "\C-c1" 'setup-normal-layout)
+(global-set-key "\C-c2" 'setup-doublewide-layout-keep-split)
 #+end_src
 * Start server
 #+begin_src emacs-lisp
@@ -895,3 +924,7 @@ see https://github.com/alexott/emacs-configs/blob/master/rc/emacs-rc-cedet.el
                                         ; on windows.
 (server-start)
 #+end_src
+
+(display-pixel-width)
+display-monitor-attributes-list
+frame-monitor-attributes
