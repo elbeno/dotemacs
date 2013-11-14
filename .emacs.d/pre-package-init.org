@@ -30,19 +30,16 @@
 #+begin_src emacs-lisp
 (setq inferior-lisp-program "sbcl")
 #+end_src
-*** Monitor width
+*** Monitor width and height
 #+begin_src emacs-lisp
 (setq primary-monitor-width 1920)
+(setq primary-monitor-height 1200)
 #+end_src
 ** Mac
 *** Alt = meta
 #+begin_src emacs-lisp
 (if (eq system-type 'darwin)
     (setq mac-command-modifier 'meta))
-#+end_src
-*** Monitor width
-#+begin_src emacs-lisp
-(setq primary-monitor-width 1920)
 #+end_src
 ** Windows
 *** Get the clipboard to work
@@ -71,9 +68,10 @@
 (if (eq system-type 'windows-nt)
     (setq inferior-lisp-program "clisp.exe"))
 #+end_src
-*** Monitor width
+*** Monitor width and height
 #+begin_src emacs-lisp
 (setq primary-monitor-width 1920)
+(setq primary-monitor-height 1125) ; allow for bottom bar
 #+end_src
 ** Cygwin
 *** Get the clipboard to work
@@ -102,9 +100,10 @@
 (if (eq system-type 'cygwin)
     (setq inferior-lisp-program "clisp.exe"))
 #+end_src
-*** Monitor width
+*** Monitor width and height
 #+begin_src emacs-lisp
 (setq primary-monitor-width 1920)
+(setq primary-monitor-height 1125) ; allow for bottom bar
 #+end_src
 * Basic things
 ** Tidier UI
@@ -126,16 +125,14 @@
 #+end_src
 ** Frame
 #+begin_src emacs-lisp
-(setq default-frame-height (/ (display-pixel-height) (frame-char-height)))
-(setq frame-left-coord (- primary-monitor-width
-                          (/ primary-monitor-width (frame-char-width))))
+(setq default-frame-height (/ primary-monitor-height (frame-char-height)))
 (setq frame-title-format "%b [emacs]")
 (setq default-frame-alist
-  `((top . 2)
-    (left . ,frame-left-coord)
-    (width . ,column-wrap-hard)
-    (height . ,default-frame-height)))
-    ;(font . ,default-font)))
+  (append
+    `((width . ,column-wrap-hard)
+      (height . ,default-frame-height)
+      (font . ,default-font))
+    default-frame-alist))
 #+end_src
 ** Coding system UTF-8
 #+begin_src emacs-lisp
@@ -885,8 +882,13 @@ see https://github.com/alexott/emacs-configs/blob/master/rc/emacs-rc-cedet.el
       (maximize-frame)
       (split-window-horizontally -80))
     (progn
-      (shell-command (concat "wmctrl -r " (get-frame-name) " -e 0,100,100,1280,720")))
-      (split-window-horizontally -50))
+      (shell-command (concat "wmctrl -r "
+                       (car (split-string (get-frame-name)))
+                       " -b remove,maximized_vert,maximized_horz"))
+      (shell-command (concat "wmctrl -r "
+                       (car (split-string (get-frame-name)))
+                       " -e 0,100,100,1280,720"))
+      (split-window-horizontally -50)))
   (other-window 1)
   (switch-to-buffer "*compilation*")
   (split-window-vertically)
@@ -937,13 +939,36 @@ see https://github.com/alexott/emacs-configs/blob/master/rc/emacs-rc-cedet.el
   (when (= (length (window-list)) 1)
     (split-window-horizontally)))
 #+end_src
+** Dock frame to screen edge
+#+begin_src emacs-lisp
+(defun dock-frame-right ()
+  (interactive)
+  (if (eq system-type 'gnu/linux)
+    (progn (require 'frame-fns)
+      (shell-command
+        (concat dotfile-dir ".emacs.d/site-bin/dockwindow.sh "
+               (car (split-string (get-frame-name))) " right")))
+    (set-frame-position (selected-frame) -1 0)))
+(defun dock-frame-left ()
+  (interactive)
+  (if (eq system-type 'gnu/linux)
+    (progn (require 'frame-fns)
+      (shell-command
+        (concat dotfile-dir ".emacs.d/site-bin/dockwindow.sh "
+               (car (split-string (get-frame-name))) " left")))
+    (set-frame-position (selected-frame) -1 0)))
+#+end_src
 ** Key bindings
 #+begin_src emacs-lisp
 (global-set-key "\C-cw" 'setup-screencasting-layout)
 (global-set-key "\C-cm" 'setup-dev-layout)
 (global-set-key "\C-cn" 'setup-normal-layout)
-(global-set-key "\C-c1" 'setup-normal-layout)
-(global-set-key "\C-c2" 'setup-doublewide-layout-keep-split)
+(global-set-key "\C-c1"
+  (lambda () (interactive) (setup-normal-layout) (dock-frame-right)))
+(global-set-key "\C-c2"
+  (lambda () (interactive) (setup-doublewide-layout-keep-split) (dock-frame-right)))
+(global-set-key "\C-c9" 'dock-frame-left)
+(global-set-key "\C-c0" 'dock-frame-right)
 #+end_src
 * Start server
 #+begin_src emacs-lisp
@@ -956,7 +981,3 @@ see https://github.com/alexott/emacs-configs/blob/master/rc/emacs-rc-cedet.el
                                         ; on windows.
 (server-start)
 #+end_src
-
-(display-pixel-width)
-display-monitor-attributes-list
-frame-monitor-attributes
