@@ -956,7 +956,7 @@ see https://github.com/alexott/emacs-configs/blob/master/rc/emacs-rc-cedet.el
       (shell-command
         (concat dotfile-dir ".emacs.d/site-bin/dockwindow.sh "
                (car (split-string (get-frame-name))) " left")))
-    (set-frame-position (selected-frame) -1 0)))
+    (set-frame-position (selected-frame) 0 0)))
 #+end_src
 ** Key bindings
 #+begin_src emacs-lisp
