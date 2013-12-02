@@ -36,8 +36,9 @@
 ;; process the pre-package stuff
 (org-babel-load-file (concat dotfile-dir ".emacs.d/pre-package-init.org"))
 
-;; initialize package system
+;; initialize package system (only once)
 (package-initialize)
+(setq package-enable-at-startup nil)
 
 ;; contents of elpa dir:
 ;; archives                        ido-ubiquitous-20131009.1047

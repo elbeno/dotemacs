@@ -2,20 +2,18 @@
 ** Default values
 *** Default font = inconsolata
 #+begin_src emacs-lisp
-(setq default-font "Inconsolata-10")
 (set-face-attribute 'default nil
                     :family "Inconsolata"
                     :height 100
                     :weight 'normal
                     :width 'normal)
 
-(when (functionp 'set-fontset-font)
-  (set-fontset-font "fontset-default"
-                    'unicode
-                    (font-spec :family "DejaVu Sans Mono"
-                               :width 'normal
-                               :size 10
-                               :weight 'normal)))
+(set-fontset-font "fontset-default"
+                  '(#x0100 . #xffff)
+                  (font-spec :family "DejaVu Sans Mono"
+                             :height 100
+                             :weight 'normal
+                             :width 'normal))
 #+end_src
 *** Path to cedet
 #+begin_src emacs-lisp
@@ -51,12 +49,17 @@
 #+begin_src emacs-lisp
 (if (eq system-type 'windows-nt)
     (progn
-      (setq default-font "-outline-Consolas-normal-r-normal-normal-13-97-96-96-c-*-iso8859-1")
       (set-face-attribute 'default nil
                           :family "Consolas"
                           :height 130
                           :weight 'normal
-                          :width 'normal)))
+                          :width 'normal)
+      (set-fontset-font "fontset-default"
+                        '(#x0100 . #xffff)
+                        (font-spec :family "Arial Unicode MS"
+                                   :height 100
+                                   :weight 'normal
+                                   :width 'normal))))
 #+end_src
 *** Path overrides
 #+begin_src emacs-lisp
@@ -83,12 +86,17 @@
 #+begin_src emacs-lisp
 (if (eq system-type 'cygwin)
     (progn
-      (setq default-font "Consolas-10")
       (set-face-attribute 'default nil
                           :family "Consolas"
                           :height 100
                           :weight 'normal
-                          :width 'normal)))
+                          :width 'normal)
+      (set-fontset-font "fontset-default"
+                        '(#x0100 . #xffff)
+                        (font-spec :family "Arial Unicode MS"
+                                   :height 100
+                                   :weight 'normal
+                                   :width 'normal))))
 #+end_src
 *** Path overrides
 #+begin_src emacs-lisp
@@ -130,8 +138,7 @@
 (setq default-frame-alist
   (append
     `((width . ,column-wrap-hard)
-      (height . ,default-frame-height)
-      (font . ,default-font))
+      (height . ,default-frame-height))
     default-frame-alist))
 #+end_src
 ** Coding system UTF-8
@@ -404,7 +411,8 @@ Uses `current-date-time-format' for the formatting the date/time."
              (current-buffer))
     (error (message "Invalid expression")
            (insert (current-kill 0)))))
-(global-set-key (kbd "\C-x\C-e") 'eval-and-replace)
+(global-set-key (kbd "C-x C-S-e") 'eval-and-replace)
+;(global-set-key (kbd "C-x C-e") 'eval-last-sexp)
 #+end_src
 * Project-specific indent rules
 #+begin_src emacs-lisp
