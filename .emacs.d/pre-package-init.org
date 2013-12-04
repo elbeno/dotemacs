@@ -422,7 +422,7 @@ Uses `current-date-time-format' for the formatting the date/time."
   (setq default-tab-width 2)
   (setq c-basic-offset 2)
   (setq c-basic-indent 2))
-(defun phoenix-indent-rules ()
+(defun tabbed-indent-rules ()
   (interactive)
   (setq indent-tabs-mode t)
   (setq default-tab-width 4)
@@ -474,7 +474,7 @@ Uses `current-date-time-format' for the formatting the date/time."
   (let ((space-count (how-many-region (point-min) (point-max) "^  "))
         (tab-count (how-many-region (point-min) (point-max) "^\t")))
     (if (> space-count tab-count) (normal-indent-rules))
-    (if (> tab-count space-count) (phoenix-indent-rules))))
+    (if (> tab-count space-count) (tabbed-indent-rules))))
 (add-hook 'c++-mode-hook 'infer-indentation-style)
 #+end_src
 *** Fill paras properly with doxygen comments
@@ -542,6 +542,10 @@ Uses `current-date-time-format' for the formatting the date/time."
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
 #+end_src
 * Compiling
+** Scroll compilation window to end
+#+begin_src emacs-lisp
+(setq compilation-scroll-output t)
+#+end_src
 ** M-up and M-down to go between errors
 #+begin_src emacs-lisp
 (global-set-key [\M-up] 'previous-error)
@@ -658,22 +662,6 @@ http://stackoverflow.com/questions/880625
 #+begin_src emacs-lisp
 (defvar my-local-shells
   '("*eshell*" "*shell*" "*shell0*" "*shell1*" "*shell2*" "*shell3*"))
-#+end_src
-** Custom vars
-#+begin_src emacs-lisp
-(custom-set-variables
- '(comint-scroll-to-bottom-on-input t)  ; always insert at the bottom
- '(comint-scroll-to-bottom-on-output nil) ; always add output at the bottom
- '(comint-scroll-show-maximum-output t) ; scroll to show max possible output
- ;; '(comint-completion-autolist t)     ; show completion list when ambiguous
- '(comint-input-ignoredups t)           ; no duplicates in command history
- '(comint-completion-addsuffix t)       ; insert space/slash after file completion
- '(comint-buffer-maximum-size 20000)    ; max length of the buffer in lines
- '(comint-prompt-read-only nil)         ; if this is t, it breaks shell-command
- '(comint-get-old-input (lambda () "")) ; what to run when i press enter on a
-                                        ; line above the current prompt
- '(comint-input-ring-size 5000)         ; max shell history size
- '(protect-buffer-bury-p nil))
 #+end_src
 ** Truncate buffers continuously
 #+begin_src emacs-lisp
@@ -830,13 +818,7 @@ see https://github.com/alexott/emacs-configs/blob/master/rc/emacs-rc-cedet.el
   ;;(local-set-key ">" 'semantic-complete-self-insert)
   (local-set-key "\C-x\C-h" 'eassist-switch-h-cpp)
   (local-set-key "\C-cm" 'eassist-list-methods)
-  (local-set-key "\C-c\C-r" 'semantic-symref)
-
-  ;;(add-to-list 'ac-sources 'ac-source-etags)
-  ;;(add-to-list 'ac-sources 'ac-source-gtags)
-  ;;(add-to-list 'ac-sources 'ac-source-semantic)
-  (setq ac-sources '(ac-source-semantic-raw))
-  )
+  (local-set-key "\C-c\C-r" 'semantic-symref))
 
 (add-hook 'c-mode-common-hook 'my-c-mode-cedet-hook)
 
@@ -845,9 +827,6 @@ see https://github.com/alexott/emacs-configs/blob/master/rc/emacs-rc-cedet.el
 
 (when (cedet-ectag-version-check t)
   (semantic-load-enable-primary-ectags-support))
-
-;; SRecode
-(global-srecode-minor-mode 1)
 
 ;; EDE
 (global-ede-mode 1)

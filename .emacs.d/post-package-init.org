@@ -70,6 +70,19 @@
 #+begin_src emacs-lisp
 (require 'yasnippet)
 (yas-global-mode 1)
+
+(require 'dropdown-list)
+(setq yas-prompt-functions '(yas-dropdown-prompt
+                             yas-ido-prompt
+                             yas-completing-prompt))
+#+end_src
+* Autocomplete
+#+begin_src emacs-lisp
+(require 'auto-complete-config)
+(add-to-list 'ac-dictionary-directories "~/.emacs.d/ac-dict")
+(ac-config-default)
+(ac-set-trigger-key "TAB")
+(ac-set-trigger-key "<tab>")
 #+end_src
 * Projectile
 #+begin_src emacs-lisp
@@ -103,4 +116,35 @@ normal find-tag."
 (require 'git-gutter-fringe+)
 (global-git-gutter+-mode 1)
 (setq git-gutter-fr+-side 'right-fringe)
+#+end_src
+* ecb
+#+begin_src emacs-lisp
+(require 'ecb)
+(require 'ecb-autoloads)
+(setq ecb-show-sources-in-directories-buffer 'always)
+
+;;; activate and deactivate ecb
+(defun my/ecb-activate ()
+  (interactive)
+  (ecb-activate)
+  (set-frame-size (selected-frame) (+ column-wrap-hard 48) default-frame-height))
+(defun my/ecb-deactivate ()
+  (interactive)
+  (ecb-deactivate)
+  (set-frame-size (selected-frame) column-wrap-hard default-frame-height))
+(global-set-key (kbd "C-c C-;") 'my/ecb-activate)
+(global-set-key (kbd "C-c C-'") 'my/ecb-deactivate)
+
+;;; quick navigation between ecb windows
+(global-set-key (kbd "C-)") 'ecb-goto-window-edit1)
+(global-set-key (kbd "C-!") 'ecb-goto-window-directories)
+(global-set-key (kbd "C-\"") 'ecb-goto-window-sources)
+(global-set-key (kbd "C-£") 'ecb-goto-window-methods)
+(global-set-key (kbd "C-$") 'ecb-goto-window-compilation)
+#+end_src
+* smart mode line
+#+begin_src emacs-lisp
+(require 'smart-mode-line)
+(sml/setup)
+(sml/apply-theme 'light)
 #+end_src

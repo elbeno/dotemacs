@@ -15,3 +15,5 @@
 .emacs.d/projectile-bookmarks.eld
 .emacs.d/projectile.cache
 .emacs.d/semanticdb
+.emacs.d/snippets
+.emacs.d/ac-comphist.dat
