@@ -147,7 +147,9 @@
 (set-default-coding-systems 'utf-8)
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
+(set-selection-coding-system 'utf-8)
 (setq default-buffer-file-coding-system 'utf-8)
+(setq locale-coding-system 'utf-8)
 #+end_src
 ** Autosaves/backups
 *** Move autosave/backup files to ~/.emacs.d/autosaves and ~/.emacs.d/backups
@@ -956,6 +958,14 @@ see https://github.com/alexott/emacs-configs/blob/master/rc/emacs-rc-cedet.el
   (lambda () (interactive) (setup-doublewide-layout-keep-split) (dock-frame-right)))
 (global-set-key "\C-c9" 'dock-frame-left)
 (global-set-key "\C-c0" 'dock-frame-right)
+#+end_src
+* Lilypond
+#+begin_src emacs-lisp
+(if (eq system-type 'gnu/linux)
+  (progn
+    (autoload 'LilyPond-mode "lilypond-mode")
+    (setq auto-mode-alist (cons '("\\.ly$" . LilyPond-mode) auto-mode-alist))
+    (add-hook 'LilyPond-mode-hook (lambda () (turn-on-font-lock)))))
 #+end_src
 * Start server
 #+begin_src emacs-lisp
