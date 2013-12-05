@@ -693,6 +693,16 @@ http://stackoverflow.com/questions/880625
     (call-interactively 'shell)))
 (global-set-key (kbd "C-c s") 'bash-shell)
 #+end_src
+** Open an MSVC 2010 shell
+#+begin_src emacs-lisp
+(defun msvc-2010-shell ()
+  "Opens a command shell with MSVC 2010 environment."
+  (interactive)
+  (let ((explicit-shell-file-name "cmd")
+        (explicit-cmd-args '("/k" "C:\\Program Files (x86)\\Microsoft Visual Studio 10.0\\VC\\vcvarsall.bat" "x86")))
+    (call-interactively 'shell)))
+(global-set-key (kbd "C-c v") 'msvc-2010-shell)
+#+end_src
 ** Repeat last shell buffer input
 #+begin_src emacs-lisp
 (defun repeat-last-command-in-eshell ()
@@ -966,6 +976,29 @@ see https://github.com/alexott/emacs-configs/blob/master/rc/emacs-rc-cedet.el
     (autoload 'LilyPond-mode "lilypond-mode")
     (setq auto-mode-alist (cons '("\\.ly$" . LilyPond-mode) auto-mode-alist))
     (add-hook 'LilyPond-mode-hook (lambda () (turn-on-font-lock)))))
+#+end_src
+* ace jump
+#+begin_src emacs-lisp
+(autoload
+  'ace-jump-mode
+  "ace-jump-mode"
+  "Emacs quick move minor mode"
+  t)
+(define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
+
+(autoload
+  'ace-jump-mode-pop-mark
+  "ace-jump-mode"
+  "Ace jump back:-)"
+  t)
+(eval-after-load "ace-jump-mode"
+  '(ace-jump-mode-enable-mark-sync))
+(define-key global-map (kbd "C-x SPC") 'ace-jump-mode-pop-mark)
+#+end_src
+* show parens
+#+begin_src emacs-lisp
+(show-paren-mode 1)
+(setq show-paren-delay 0)
 #+end_src
 * Start server
 #+begin_src emacs-lisp

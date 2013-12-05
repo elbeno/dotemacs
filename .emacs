@@ -45,32 +45,33 @@
 (setq package-enable-at-startup nil)
 
 ;; contents of elpa dir:
-;; archives                          git-rebase-mode-20131005.1730
-;; auto-complete-20131128.233        haskell-mode-20131129.1536
-;; bm-20121212.2224                  highlight-symbol-20131103.2233
-;; caml-20130904.1012                ido-ubiquitous-20131009.1047
-;; cl-lib-0.3                        js2-mode-20131119.116
-;; color-theme-20080305.834          json-mode-20131016.1653
-;; column-marker-20121128.843        lua-mode-20131019.959
-;; csharp-mode-20130824.1200         magit-20131126.621
-;; dash-20131030.2119                markdown-mode+-20120829.710
-;; dropdown-list-20120329.1636       markdown-mode-20131005.1155
-;; ecb-20131116.1319                 minimap-20110427.1123
-;; epl-20131101.1205                 mo-git-blame-20131002.1223
-;; etags-select-1.13                 multiple-cursors-20131126.2320
-;; etags-table-20130824.1157         nlinum-1.1
-;; f-20131130.1927                   nxml-mode-20041004
-;; flx-20130728.2028                 nyan-mode-20120710.1922
-;; flx-ido-20131030.1243             pkg-info-20131101.1208
-;; frame-cmds-20130921.1622          popup-20130708.2245
-;; frame-fns-20131028.2235           projectile-20131203.2055
-;; fringe-helper-20130519.1641       protobuf-mode-20091217.1955
-;; ghc-20131119.1414                 s-20130905.558
-;; git-commit-mode-20131124.2132     slime-20131117.759
-;; gitconfig-mode-20131009.1430      smart-tab-20130317.1157
+;; ace-jump-mode-20130720.1153       git-rebase-mode-20131124.1840
+;; archives                          haskell-mode-20131129.1536
+;; auto-complete-20131128.233        highlight-symbol-20131103.2236
+;; bm-20121212.2224                  ido-ubiquitous-20131009.1047
+;; caml-20130904.1012                js2-mode-20131119.116
+;; cl-lib-0.3                        json-mode-20131016.1653
+;; color-theme-20080305.834          lua-mode-20131019.959
+;; column-marker-20121128.843        magit-20131126.621
+;; csharp-mode-20130824.1200         markdown-mode+-20120829.710
+;; dash-20131030.2119                markdown-mode-20131005.1155
+;; dropdown-list-20120329.1636       minimap-20110427.1123
+;; ecb-20131116.1319                 mo-git-blame-20131002.1223
+;; epl-20131101.1205                 multiple-cursors-20131128.149
+;; etags-select-1.13                 nlinum-1.1
+;; etags-table-20130824.1157         nxml-mode-20041004
+;; f-20131130.1927                   nyan-mode-20131014.1806
+;; flx-20131030.1243                 pkg-info-20131101.1208
+;; flx-ido-20131030.1243             popup-20130901.2255
+;; frame-cmds-20130921.1622          projectile-20131203.2055
+;; frame-fns-20131028.2235           protobuf-mode-20091217.1955
+;; fringe-helper-20130519.1641       s-20130905.558
+;; ghc-20131120.1428                 slime-20131117.759
+;; git-commit-mode-20131124.2132     smart-mode-line-20131204.1651
+;; gitconfig-mode-20131124.1840      smart-tab-20130317.1157
 ;; git-gutter+-20130918.1335         smex-20130707.1255
 ;; git-gutter-fringe+-20130902.1129  undo-tree-20131119.144
-;; gitignore-mode-20130831.828       yasnippet-20131129.2134
+;; gitignore-mode-20131124.1840      yasnippet-20131203.1520
 
 ;; process the post-package-init stuff (eg. always-load requires)
 (org-babel-load-file (concat dotfile-dir ".emacs.d/post-package-init.org"))
