@@ -856,24 +856,6 @@ see https://github.com/alexott/emacs-configs/blob/master/rc/emacs-rc-cedet.el
 (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
 (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
 #+end_src
-* Package management
-** Use GNU, ELPA, Marmalade and MELPA
-#+begin_src emacs-lisp
-(setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
-                         ("elpa" . "http://tromey.com/elpa/")
-                         ("marmalade" . "http://marmalade-repo.org/packages/")
-                         ("melpa" . "http://melpa.milkbox.net/packages/")))
-#+end_src
-** Fix for MELPA backwards dependencies
-#+begin_src emacs-lisp
-(defadvice package-compute-transaction
-  (before
-   package-compute-transaction-reverse (package-list requirements)
-   activate compile)
-  "reverse the requirements"
-  (setq requirements (reverse requirements))
-  (print requirements))
-#+end_src
 * Window layouts
 ** For screencasting
 #+begin_src emacs-lisp
@@ -1016,4 +998,154 @@ see https://github.com/alexott/emacs-configs/blob/master/rc/emacs-rc-cedet.el
                                         ; ~/.emacs.d/server is unsafe"
                                         ; on windows.
 (server-start)
+#+end_src
+* Colors
+** Color themes
+#+begin_src emacs-lisp
+(require 'color-theme)
+(color-theme-initialize)
+(normal-color-theme)
+#+end_src
+* SLIME
+#+begin_src emacs-lisp
+(require 'slime)
+#+end_src
+** Ignore protocol mismatches
+#+begin_src emacs-lisp
+(setq slime-protocol-version 'ignore)
+#+end_src
+** Fancy completion
+#+begin_src emacs-lisp
+(setq slime-complete-symbol*-fancy t)
+(setq slime-complete-symbol-function 'slime-fuzzy-complete-symbol)
+#+end_src
+** Load SLIME
+#+begin_src emacs-lisp
+(slime-setup '(slime-fancy slime-asdf slime-banner))
+#+end_src
+* Cygwin mount points
+#+begin_src emacs-lisp
+(if (eq system-type 'windows-nt)
+    (progn
+      (require 'cygwin-mount)
+      (cygwin-mount-activate)))
+(if (eq system-type 'cygwin)
+    (progn
+      (require 'windows-path)
+      (windows-path-activate)))
+#+end_src
+* Undo-tree
+#+begin_src emacs-lisp
+(require 'undo-tree)
+(global-undo-tree-mode 1)
+#+end_src
+* IDO
+** Use flx-ido
+#+begin_src emacs-lisp
+(require 'flx-ido)
+(ido-mode 1)
+(setq ido-everywhere t)
+(setq ido-use-filename-at-point nil) ;'guess)
+(setq ido-create-new-buffer 'always)
+(flx-ido-mode 1)
+(setq ido-use-faces nil)
+;(setq flx-ido-use-faces nil)
+#+end_src
+** Ubiqitous
+#+begin_src emacs-lisp
+(require 'ido-ubiquitous)
+(ido-ubiquitous-mode)
+#+end_src
+** IDO support for M-x
+#+begin_src emacs-lisp
+(require 'smex)
+(smex-initialize)
+(global-set-key (kbd "M-x") 'smex)
+#+end_src
+* Nyancat mode-line!
+#+begin_src emacs-lisp
+;(nyan-mode)
+;(nyan-start-animation)
+#+end_src
+* Yasnippet config
+#+begin_src emacs-lisp
+(require 'yasnippet)
+(yas-global-mode 1)
+
+(require 'dropdown-list)
+(setq yas-prompt-functions '(yas-dropdown-prompt
+                             yas-ido-prompt
+                             yas-completing-prompt))
+#+end_src
+* Autocomplete
+#+begin_src emacs-lisp
+(require 'auto-complete-config)
+(add-to-list 'ac-dictionary-directories "~/.emacs.d/ac-dict")
+(ac-config-default)
+(ac-set-trigger-key "TAB")
+(ac-set-trigger-key "<tab>")
+#+end_src
+* Projectile
+#+begin_src emacs-lisp
+(require 'projectile)
+(projectile-global-mode)
+(setq projectile-enable-caching t)
+(if (eq system-type 'gnu/linux)
+    (setq projectile-tags-command "ctags-exuberant -Re %s %s"))
+#+end_src
+* Tags
+** Use etags stuff
+#+begin_src emacs-lisp
+(require 'etags-select)
+(require 'etags-table)
+(setq tags-revert-without-query 1)
+(setq etags-table-search-up-depth 10)
+#+end_src
+** Find tag or include
+#+begin_src emacs-lisp
+(defun find-tag-or-include ()
+  "If the point is on an include line, visit that file. Else do a
+normal find-tag."
+  (interactive)
+  (condition-case nil
+      (semantic-decoration-include-visit)
+    (error (etags-select-find-tag-at-point))))
+(global-set-key "\M-." 'find-tag-or-include)
+#+end_src
+* git-gutter-fringe
+#+begin_src emacs-lisp
+(require 'git-gutter-fringe+)
+(global-git-gutter+-mode 1)
+(setq git-gutter-fr+-side 'right-fringe)
+#+end_src
+* ecb
+#+begin_src emacs-lisp
+(require 'ecb)
+(require 'ecb-autoloads)
+(setq ecb-show-sources-in-directories-buffer 'always)
+
+;;; activate and deactivate ecb
+(defun my/ecb-activate ()
+  (interactive)
+  (ecb-activate)
+  (set-frame-size (selected-frame) (+ column-wrap-hard 48) default-frame-height))
+(defun my/ecb-deactivate ()
+  (interactive)
+  (ecb-deactivate)
+  (set-frame-size (selected-frame) column-wrap-hard default-frame-height))
+(global-set-key (kbd "C-c C-;") 'my/ecb-activate)
+(global-set-key (kbd "C-c C-'") 'my/ecb-deactivate)
+
+;;; quick navigation between ecb windows
+(global-set-key (kbd "C-)") 'ecb-goto-window-edit1)
+(global-set-key (kbd "C-!") 'ecb-goto-window-directories)
+(global-set-key (kbd "C-\"") 'ecb-goto-window-sources)
+(global-set-key (kbd "C-£") 'ecb-goto-window-methods)
+(global-set-key (kbd "C-$") 'ecb-goto-window-compilation)
+#+end_src
+* smart mode line
+#+begin_src emacs-lisp
+(require 'smart-mode-line)
+(sml/setup)
+(sml/apply-theme 'light)
 #+end_src

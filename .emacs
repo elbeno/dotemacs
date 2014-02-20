@@ -11,28 +11,11 @@
 ;; extra binaries (if needed) are in site-bin
 (add-to-list 'exec-path (concat dotfile-dir ".emacs.d/site-bin/"))
 
-;; for some reason we need to set these ahead of loading org-mode!
-;(setq org-emphasis-alist (quote (("*" bold "<b>" "</b>")
-;                                 ("/" italic "<i>" "</i>")
-;                                 ("_" underline "<span style=\"text-decoration:underline;\">" "</span>")
-;                                 ("=" org-code "<code>" "</code>" verbatim)
-;                                 ("~" org-verbatim "<code>" "</code>" verbatim)
-;                                 ("-" (:strike-through t) "<del>" "</del>")
-;                                 ("@" org-warning "<b>" "</b>"))))
-;(setq org-export-latex-emphasis-alist (quote
-;                                       (("*" "\\textbf{%s}" nil)
-;                                        ("/" "\\emph{%s}" nil)
-;                                        ("_" "\\underline{%s}" nil)
-;                                        ("+" "\\texttt{%s}" nil)
-;                                        ("-" "\\st{%s}" nil)
-;                                        ("=" "\\verb=%s=" nil)
-;                                        ("~" "\\verb~%s~" t)
-;                                        ("@" "\\alert{%s}" nil))))
-
 ;; apply custom variables
 (setq custom-file "~/.emacs-custom.el")
 (load custom-file)
 
+;; set up package archives
 (setq package-archives '(("org" . "http://orgmode.org/elpa/")
                          ("gnu" . "http://elpa.gnu.org/packages/")
                          ("elpa" . "http://tromey.com/elpa/")
@@ -83,11 +66,8 @@
 (require 'org-install)
 (require 'ob-tangle)
 
-;; process the pre-package stuff
-(org-babel-load-file (concat dotfile-dir ".emacs.d/pre-package-init.org"))
-
-;; process the post-package-init stuff (eg. always-load requires)
-(org-babel-load-file (concat dotfile-dir ".emacs.d/post-package-init.org"))
+;; process the main init file
+(org-babel-load-file (concat dotfile-dir ".emacs.d/init.org"))
 
 ;; load any further custom stuff
 (defun files-in-below-directory (directory)
@@ -129,5 +109,8 @@
     ;; return the filenames
     el-files-list))
 
-(mapcar 'load (files-in-below-directory (concat dotfile-dir ".emacs.d/custom/")))
+;; autoloads are general extra stuff that I've written
 (mapcar 'load (files-in-below-directory (concat dotfile-dir ".emacs.d/autoloads/")))
+
+;; custom stuff is per-installation/work private
+(mapcar 'load (files-in-below-directory (concat dotfile-dir ".emacs.d/custom/")))
