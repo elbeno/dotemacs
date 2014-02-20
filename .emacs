@@ -12,33 +12,39 @@
 (add-to-list 'exec-path (concat dotfile-dir ".emacs.d/site-bin/"))
 
 ;; for some reason we need to set these ahead of loading org-mode!
-(setq org-emphasis-alist (quote (("*" bold "<b>" "</b>")
-                                 ("/" italic "<i>" "</i>")
-                                 ("_" underline "<span style=\"text-decoration:underline;\">" "</span>")
-                                 ("=" org-code "<code>" "</code>" verbatim)
-                                 ("~" org-verbatim "<code>" "</code>" verbatim)
-                                 ("-" (:strike-through t) "<del>" "</del>")
-                                 ("@" org-warning "<b>" "</b>"))))
-(setq org-export-latex-emphasis-alist (quote
-                                       (("*" "\\textbf{%s}" nil)
-                                        ("/" "\\emph{%s}" nil)
-                                        ("_" "\\underline{%s}" nil)
-                                        ("+" "\\texttt{%s}" nil)
-                                        ("-" "\\st{%s}" nil)
-                                        ("=" "\\verb=%s=" nil)
-                                        ("~" "\\verb~%s~" t)
-                                        ("@" "\\alert{%s}" nil))))
+;(setq org-emphasis-alist (quote (("*" bold "<b>" "</b>")
+;                                 ("/" italic "<i>" "</i>")
+;                                 ("_" underline "<span style=\"text-decoration:underline;\">" "</span>")
+;                                 ("=" org-code "<code>" "</code>" verbatim)
+;                                 ("~" org-verbatim "<code>" "</code>" verbatim)
+;                                 ("-" (:strike-through t) "<del>" "</del>")
+;                                 ("@" org-warning "<b>" "</b>"))))
+;(setq org-export-latex-emphasis-alist (quote
+;                                       (("*" "\\textbf{%s}" nil)
+;                                        ("/" "\\emph{%s}" nil)
+;                                        ("_" "\\underline{%s}" nil)
+;                                        ("+" "\\texttt{%s}" nil)
+;                                        ("-" "\\st{%s}" nil)
+;                                        ("=" "\\verb=%s=" nil)
+;                                        ("~" "\\verb~%s~" t)
+;                                        ("@" "\\alert{%s}" nil))))
 
 ;; apply custom variables
 (setq custom-file "~/.emacs-custom.el")
 (load custom-file)
 
-;; load up org-mode and org-babel
-(require 'org-install)
-(require 'ob-tangle)
-
-;; process the pre-package stuff
-(org-babel-load-file (concat dotfile-dir ".emacs.d/pre-package-init.org"))
+(setq package-archives '(("org" . "http://orgmode.org/elpa/")
+                         ("gnu" . "http://elpa.gnu.org/packages/")
+                         ("elpa" . "http://tromey.com/elpa/")
+                         ("marmalade" . "http://marmalade-repo.org/packages/")
+                         ("melpa" . "http://melpa.milkbox.net/packages/")))
+(defadvice package-compute-transaction
+  (before
+   package-compute-transaction-reverse (package-list requirements)
+   activate compile)
+  "reverse the requirements"
+  (setq requirements (reverse requirements))
+  (print requirements))
 
 ;; initialize package system (only once)
 (package-initialize)
@@ -72,6 +78,13 @@
 ;; git-gutter+-20130918.1335         smex-20130707.1255
 ;; git-gutter-fringe+-20130902.1129  undo-tree-20131119.144
 ;; gitignore-mode-20131124.1840      yasnippet-20131203.1520
+
+;; load up org-mode and org-babel
+(require 'org-install)
+(require 'ob-tangle)
+
+;; process the pre-package stuff
+(org-babel-load-file (concat dotfile-dir ".emacs.d/pre-package-init.org"))
 
 ;; process the post-package-init stuff (eg. always-load requires)
 (org-babel-load-file (concat dotfile-dir ".emacs.d/post-package-init.org"))

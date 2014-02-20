@@ -766,10 +766,16 @@ http://stackoverflow.com/questions/880625
 (setq org-src-fontify-natively t)
 (setq org-completion-use-ido t)
 
-(require 'org-latex)
-(add-to-list 'org-export-latex-packages-alist '("" "minted"))
-(setq org-export-latex-listings 'minted)
-(setq org-export-latex-minted-options
+(require 'ox-latex)
+(require 'ox-beamer)
+(add-to-list 'org-latex-packages-alist '("" "minted" nil))
+(setq org-latex-listings 'minted)
+(setq org-latex-pdf-process
+      '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+
+(setq org-latex-minted-options
            '(("frame" "lines")
              ("fontsize" "\\scriptsize")
              ("linenos" "")))
