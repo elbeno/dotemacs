@@ -1,6 +1,8 @@
-;; this file's directory
+;; this file's true directory
 (setq dotfile-dir (file-name-directory
-                   (or load-file-name (buffer-file-name))))
+                   (file-chase-links
+                    (or load-file-name
+                        (buffer-file-name)))))
 
 ;; my stuff is in .emacs.d
 (add-to-list 'load-path (concat dotfile-dir ".emacs.d/"))
@@ -12,7 +14,7 @@
 (add-to-list 'exec-path (concat dotfile-dir ".emacs.d/site-bin/"))
 
 ;; apply custom variables
-(setq custom-file "~/.emacs-custom.el")
+(setq custom-file (concat dotfile-dir ".emacs.d/custom.el"))
 (load custom-file)
 
 ;; set up package archives

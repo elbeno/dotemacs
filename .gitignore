@@ -3,16 +3,5 @@
 .emacs.d/elpa
 .emacs.d/site-bin/ghc-mod
 .emacs.d/site-bin/hoogle
-.emacs.d/ede-projects.el
-.emacs.d/backups
-.emacs.d/auto-save-list
-.emacs.d/autosaves
-.emacs.d/url
 .emacs.d/custom
-.emacs.d/.mc-lists.el
-.emacs.d/eshell
-.emacs.d/projectile-bookmarks.eld
-.emacs.d/projectile.cache
-.emacs.d/semanticdb
 .emacs.d/snippets
-.emacs.d/ac-comphist.dat
