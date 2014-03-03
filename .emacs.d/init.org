@@ -541,7 +541,22 @@ Uses `current-date-time-format' for the formatting the date/time."
 #+end_src
 ** Haskell
 #+begin_src emacs-lisp
+(eval-after-load "haskell-mode"
+  '(define-key haskell-mode-map (kbd "M-k") 'haskell-compile))
+(eval-after-load "haskell-cabal"
+  '(define-key haskell-cabal-mode-map (kbd "M-k") 'haskell-compile))
+(eval-after-load "haskell-mode"
+  '(define-key haskell-mode-map (kbd "C-c v c") 'haskell-cabal-visit-file))
+(eval-after-load "haskell-mode"
+  '(progn
+    (define-key haskell-mode-map (kbd "C-c C-z") 'haskell-interactive-switch)
+    (define-key haskell-mode-map (kbd "C-c C-l") 'haskell-process-load-file)
+    (define-key haskell-mode-map (kbd "C-c C-b") 'haskell-interactive-switch)
+    (define-key haskell-mode-map (kbd "C-c C-t") 'haskell-process-do-type)
+    (define-key haskell-mode-map (kbd "C-c C-i") 'haskell-process-do-info)))
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
+(add-hook 'haskell-mode-hook 'flycheck-mode)
+(add-hook 'flycheck-mode-hook #'flycheck-haskell-setup)
 #+end_src
 * Compiling
 ** Scroll compilation window to end
@@ -744,7 +759,7 @@ http://stackoverflow.com/questions/880625
 #+end_src
 ** Run test on successful compilation
 #+begin_src emacs-lisp
-(setq compilation-finish-functions 'compile-autoclose)
+;(setq compilation-finish-functions 'compile-autoclose)
 (defun compile-autoclose (buffer string)
   (cond ((string-match "finished" string)
          (message "Build maybe successful: running tests.")

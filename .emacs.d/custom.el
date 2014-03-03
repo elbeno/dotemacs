@@ -17,6 +17,7 @@
  '(ecb-layout-name "left3")
  '(ecb-options-version "2.40")
  '(ecb-tip-of-the-day nil)
+ '(haskell-tags-on-save t)
  '(highlight-symbol-idle-delay 0)
  '(highlight-symbol-on-navigation-p t)
  '(minimap-dedicated-window t)
