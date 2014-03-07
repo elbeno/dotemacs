@@ -275,7 +275,7 @@ Remove backups older than one week
 #+end_src
 ** Tab behaviour
 #+begin_src emacs-lisp
-(global-set-key [(tab)] 'smart-tab)
+(global-set-key (kbd "TAB") 'smart-tab)
 #+end_src
 ** Minimap toggle
 #+begin_src emacs-lisp
@@ -675,6 +675,10 @@ http://stackoverflow.com/questions/880625
 (global-set-key "\C-x\ \C-r" 'recentf-open-files)
 #+end_src
 * Shell things
+** Make C-c s a prefix for shells
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-c s") (make-sparse-keymap))
+#+end_src
 ** Names of shell buffers
 #+begin_src emacs-lisp
 (defvar my-local-shells
@@ -706,7 +710,7 @@ http://stackoverflow.com/questions/880625
   (let ((explicit-shell-file-name "bash")
         (explicit-bash-args '("--login" "-i")))
     (call-interactively 'shell)))
-(global-set-key (kbd "C-c s") 'bash-shell)
+(global-set-key (kbd "C-c s b") 'bash-shell)
 #+end_src
 ** Open an MSVC 2010 shell
 #+begin_src emacs-lisp
@@ -716,7 +720,19 @@ http://stackoverflow.com/questions/880625
   (let ((explicit-shell-file-name "cmd")
         (explicit-cmd-args '("/k" "C:\\Program Files (x86)\\Microsoft Visual Studio 10.0\\VC\\vcvarsall.bat" "x86")))
     (call-interactively 'shell)))
-(global-set-key (kbd "C-c v") 'msvc-2010-shell)
+(global-set-key (kbd "C-c s m") 'msvc-2010-shell)
+#+end_src
+** Open an ansi-term shell
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-c s a") (lambda () (interactive) (ansi-term "/bin/bash")))
+#+end_src
+** Open a term shell
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-c s t") (lambda () (interactive) (term "/bin/bash")))
+#+end_src
+** Open an eshell
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-c s e") 'eshell)
 #+end_src
 ** Repeat last shell buffer input
 #+begin_src emacs-lisp
@@ -764,6 +780,36 @@ http://stackoverflow.com/questions/880625
   (cond ((string-match "finished" string)
          (message "Build maybe successful: running tests.")
          (run-with-timer 1 nil 'repeat-last-command-in-shell))))
+#+end_src
+** Open shell at current buffer's directory
+#+begin_src emacs-lisp
+(defun eshell-here ()
+  "Opens up a new shell in the directory associated with the current buffer's file."
+  (interactive)
+  (let* ((parent (file-name-directory (buffer-file-name)))
+         (name   (car
+                  (last
+                   (split-string parent "/" t)))))
+    (split-window-vertically)
+    (other-window 1)
+    (eshell "new")
+    (rename-buffer (concat "*eshell: " name "*"))
+    (insert (concat "ls"))
+    (eshell-send-input)))
+(global-set-key (kbd "C-c s E") 'eshell-here)
+
+(defun delete-single-window (&optional window)
+  "Remove WINDOW from the display.  Default is `selected-window'."
+  (interactive)
+  (save-current-buffer
+    (setq window (or window (selected-window)))
+    (select-window window)
+    (kill-buffer)
+    (if (not (one-window-p t))
+        (delete-window (selected-window)))))
+
+(defun eshell/x (&rest args)
+  (delete-single-window))
 #+end_src
 * Org mode
 #+begin_src emacs-lisp
@@ -1163,4 +1209,12 @@ normal find-tag."
 (require 'smart-mode-line)
 (sml/setup)
 (sml/apply-theme 'light)
+#+end_src
+* ediff
+#+begin_src emacs-lisp
+(require 'ediff)
+(add-hook 'ediff-before-setup-hook 'new-frame)
+(add-hook 'ediff-quit-hook 'delete-frame)
+(setq ediff-window-setup-function 'ediff-setup-windows-plain)
+(setq ediff-split-window-function 'split-window-vertically)
 #+end_src
