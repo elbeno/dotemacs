@@ -918,6 +918,16 @@ see https://github.com/alexott/emacs-configs/blob/master/rc/emacs-rc-cedet.el
 (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
 #+end_src
 * Window layouts
+** Layout alists
+#+begin_src emacs-lisp
+(defun make-layout-alist (cols)
+  (let* ((f (selected-frame))
+         (pw (display-pixel-width))
+         (cw (frame-char-width f))
+         (l (- pw (* cols cw) 37)))
+    `((top . 0) (left . ,l) (user-position . t)
+      (width . ,cols) (height . ,default-frame-height))))
+#+end_src
 ** For screencasting
 #+begin_src emacs-lisp
 (setq fullscreen-screencast nil)
@@ -953,16 +963,8 @@ see https://github.com/alexott/emacs-configs/blob/master/rc/emacs-rc-cedet.el
   (interactive)
   (delete-other-windows)
   (text-scale-set 0)
-  (set-frame-size (selected-frame) column-wrap-hard default-frame-height))
-#+end_src
-** Double-wide mode, split
-#+begin_src emacs-lisp
-(defun setup-doublewide-layout ()
-  (interactive)
-  (delete-other-windows)
-  (text-scale-set 0)
-  (set-frame-size (selected-frame) (+ 3 (* 2 column-wrap-hard)) default-frame-height)
-  (split-window-horizontally))
+  (modify-frame-parameters (selected-frame)
+    (make-layout-alist column-wrap-hard)))
 #+end_src
 ** With compilation/shell buffers
 #+begin_src emacs-lisp
@@ -981,40 +983,33 @@ see https://github.com/alexott/emacs-configs/blob/master/rc/emacs-rc-cedet.el
 #+end_src
 ** Expand to double wide, keep split if already
 #+begin_src emacs-lisp
-(defun setup-doublewide-layout-keep-split ()
+(defun setup-doublewide-layout-split ()
   (interactive)
-  (set-frame-size (selected-frame) (+ 3 (* 2 column-wrap-hard)) default-frame-height)
+  (modify-frame-parameters (selected-frame)
+    (make-layout-alist (+ 3 (* 2 column-wrap-hard))))
   (when (= (length (window-list)) 1)
     (split-window-horizontally)))
 #+end_src
 ** Dock frame to screen edge
 #+begin_src emacs-lisp
-(defun dock-frame-right ()
-  (interactive)
-  (if (eq system-type 'gnu/linux)
-    (progn (require 'frame-fns)
-      (shell-command
-        (concat dotfile-dir ".emacs.d/site-bin/dockwindow.sh "
-               (car (split-string (get-frame-name))) " right")))
-    (set-frame-position (selected-frame) -1 0)))
 (defun dock-frame-left ()
   (interactive)
-  (if (eq system-type 'gnu/linux)
-    (progn (require 'frame-fns)
-      (shell-command
-        (concat dotfile-dir ".emacs.d/site-bin/dockwindow.sh "
-               (car (split-string (get-frame-name))) " left")))
-    (set-frame-position (selected-frame) 0 0)))
+  (modify-frame-parameters (selected-frame) '((top . 0) (left . 0) (user-position . t))))
+
+(defun dock-frame-right ()
+  (interactive)
+  (let* ((f (selected-frame))
+         (pw (frame-pixel-width f)))
+    (modify-frame-parameters f
+      `((top . 0 ) (left . ,(- (display-pixel-width) pw 16)) (user-position . t)))))
 #+end_src
 ** Key bindings
 #+begin_src emacs-lisp
 (global-set-key "\C-cw" 'setup-screencasting-layout)
 (global-set-key "\C-cm" 'setup-dev-layout)
 (global-set-key "\C-cn" 'setup-normal-layout)
-(global-set-key "\C-c1"
-  (lambda () (interactive) (setup-normal-layout) (dock-frame-right)))
-(global-set-key "\C-c2"
-  (lambda () (interactive) (setup-doublewide-layout-keep-split) (dock-frame-right)))
+(global-set-key "\C-c1" 'setup-normal-layout)
+(global-set-key "\C-c2" 'setup-doublewide-layout-split)
 (global-set-key "\C-c9" 'dock-frame-left)
 (global-set-key "\C-c0" 'dock-frame-right)
 #+end_src
@@ -1131,7 +1126,7 @@ see https://github.com/alexott/emacs-configs/blob/master/rc/emacs-rc-cedet.el
 * Yasnippet config
 #+begin_src emacs-lisp
 (require 'yasnippet)
-(yas-global-mode 1)
+;(yas-global-mode 1)
 
 (require 'dropdown-list)
 (setq yas-prompt-functions '(yas-dropdown-prompt
@@ -1213,8 +1208,15 @@ normal find-tag."
 * ediff
 #+begin_src emacs-lisp
 (require 'ediff)
-(add-hook 'ediff-before-setup-hook 'new-frame)
-(add-hook 'ediff-quit-hook 'delete-frame)
+
+(defun start-ediff ()
+  (delete-other-windows)
+  (modify-frame-parameters (selected-frame)
+    (make-layout-alist (+ 3 (* 2 column-wrap-hard)))))
+
+(add-hook 'ediff-before-setup-hook 'start-ediff)
+(add-hook 'ediff-quit-hook 'setup-normal-layout)
+(add-hook 'ediff-cleanup-hook (lambda () (ediff-janitor nil nil)))
 (setq ediff-window-setup-function 'ediff-setup-windows-plain)
-(setq ediff-split-window-function 'split-window-vertically)
+(setq ediff-split-window-function 'split-window-horizontally)
 #+end_src
