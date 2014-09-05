@@ -14,9 +14,11 @@
  '(comint-prompt-read-only nil)
  '(comint-scroll-show-maximum-output t)
  '(comint-scroll-to-bottom-on-input t)
+ '(custom-safe-themes (quote ("756597b162f1be60a12dbd52bab71d40d6a2845a3e3c2584c6573ee9c332a66e" default)))
  '(ecb-layout-name "left3")
  '(ecb-options-version "2.40")
  '(ecb-tip-of-the-day nil)
+ '(haskell-process-log t)
  '(haskell-tags-on-save t)
  '(highlight-symbol-idle-delay 0)
  '(highlight-symbol-on-navigation-p t)
@@ -24,8 +26,7 @@
  '(minimap-width-fraction 0.2)
  '(minimap-window-location (quote right))
  '(protect-buffer-bury-p nil)
- '(sml/hidden-modes (quote (" hl-p" " yas" " Undo-Tree" " GitGutter" " AC" " Abbrev")))
- '(sml/theme (quote respectful)))
+ '(sml/hidden-modes (quote (" hl-p" " yas" " Undo-Tree" " GitGutter" " AC" " Abbrev"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

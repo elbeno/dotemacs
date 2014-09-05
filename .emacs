@@ -1,3 +1,6 @@
+;; debugging
+(setq debug-on-error t)
+
 ;; this file's true directory
 (setq dotfile-dir (file-name-directory
                    (file-chase-links
@@ -69,6 +72,7 @@
 (require 'ob-tangle)
 
 ;; process the main init file
+;(load (concat dotfile-dir ".emacs.d/init.el"))
 (org-babel-load-file (concat dotfile-dir ".emacs.d/init.org"))
 
 ;; load any further custom stuff

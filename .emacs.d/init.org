@@ -511,6 +511,22 @@ Uses `current-date-time-format' for the formatting the date/time."
 #+begin_src emacs-lisp
 (setq js-indent-level 2)
 #+end_src
+*** JSLint via Flycheck
+#+begin_src emacs-lisp
+(require 'flycheck)
+(flycheck-define-checker javascript-jslint-reporter
+  "A JavaScript syntax and style checker based on JSLint Reporter.
+
+See URL `https://github.com/FND/jslint-reporter'."
+  :command ("~/.emacs.d/jslint-reporter" source)
+  :error-patterns
+  ((error line-start (1+ nonl) ":" line ":" column ":" (message) line-end))
+  :modes (js-mode js2-mode js3-mode))
+(if (eq system-type 'gnu/linux)
+  (add-hook 'js-mode-hook (lambda ()
+                            (flycheck-select-checker 'javascript-jslint-reporter)
+                            (flycheck-mode))))
+#+end_src
 ** SQL
 #+begin_src emacs-lisp
 (font-lock-add-keywords 'sql-mode
@@ -552,7 +568,8 @@ Uses `current-date-time-format' for the formatting the date/time."
 (eval-after-load "haskell-mode"
   '(progn
     (define-key haskell-mode-map (kbd "C-c C-z") 'haskell-interactive-switch)
-    (define-key haskell-mode-map (kbd "C-c C-l") 'haskell-process-load-file)
+    ;;(define-key haskell-mode-map (kbd "C-c C-l") 'haskell-process-load-file)
+    (define-key haskell-mode-map (kbd "C-c C-l") 'inferior-haskell-load-file)
     (define-key haskell-mode-map (kbd "C-c C-b") 'haskell-interactive-switch)
     (define-key haskell-mode-map (kbd "C-c C-t") 'haskell-process-do-type)
     (define-key haskell-mode-map (kbd "C-c C-i") 'haskell-process-do-info)))
@@ -574,12 +591,12 @@ Uses `current-date-time-format' for the formatting the date/time."
 *** Map compile errors from build dir to src dir
 #+begin_src emacs-lisp
 ;; SCons builds into a 'build' subdir, but we want to find the errors
-;; in the regular source dir.  So we remove build/XXX/YYY/{dbg,final}/ from the
+;; in the regular source dir.  So we remove build/XXX/YYY/{debug,release}/ from the
 ;; filenames.
 (defun process-error-filename (filename)
   (let ((case-fold-search t))
     (setq f (replace-regexp-in-string
-             "[Ss]?[Bb]uild[\\/].*\\(final\\|dbg\\)[^\\/]*[\\/]" "" filename))
+             "\\(build\\|export\\)\\/.*\\(debug\\|release\\)\\/" "src/" filename))
     (cond ((file-exists-p f)
            f)
           (t filename))))
