@@ -47,7 +47,8 @@
 ;;------------------------------------------------------------------------------
 ;; Startup profiling
 (use-package esup
-  :ensure t)
+  :ensure t
+  :defer 5)
 
 ;;------------------------------------------------------------------------------
 ;; OS specifics
@@ -307,9 +308,13 @@
   :ensure t)
 (autoload 'column-marker-1 "column-marker" "Highlight a column." t)
 (autoload 'column-marker-2 "column-marker" "Highlight a column." t)
-(add-hook 'c++-mode-hook (lambda () (interactive) (column-marker-1 column-wrap-soft)))
-(add-hook 'c++-mode-hook (lambda () (interactive) (column-marker-2 column-wrap-hard)))
+(add-hook 'c-mode-common-hook (lambda () (interactive) (column-marker-1 column-wrap-soft)))
+(add-hook 'c-mode-common-hook (lambda () (interactive) (column-marker-2 column-wrap-hard)))
 (setq-default fill-column column-wrap-soft)
+
+(use-package fill-column-indicator
+  :ensure t)
+(add-hook 'c-mode-common-hook 'fci-mode)
 
 ;;------------------------------------------------------------------------------
 ;; Auto modes
@@ -407,6 +412,24 @@ See URL `https://github.com/FND/jslint-reporter'."
 
 ;;------------------------------------------------------------------------------
 ;; Autocomplete
+;; (use-package company
+;;   :ensure t
+;;   :config
+;;   (global-company-mode)
+;;   :bind
+;;   (("<tab>" . company-complete)))
+
+;; (use-package company-ghc
+;;   :ensure t)
+
+;; (use-package company-ghci
+;;   :ensure t)
+
+;; (use-package company-c-headers
+;;   :ensure t
+;;   :config
+;;   (add-to-list 'company-backends 'company-c-headers))
+
 (use-package auto-complete
   :ensure t
   :defer 1
@@ -474,7 +497,7 @@ See URL `https://github.com/FND/jslint-reporter'."
     (if (> space-count tab-count) (normal-indent-rules))
     (if (> tab-count space-count) (tabbed-indent-rules))))
 
-(add-hook 'c++-mode-hook 'infer-indentation-style)
+(add-hook 'c-mode-common-hook 'infer-indentation-style)
 
 ;;------------------------------------------------------------------------------
 ;; Compilation
