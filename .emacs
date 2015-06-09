@@ -636,12 +636,25 @@ See URL `https://github.com/FND/jslint-reporter'."
 ;; customisation of modes
 (defun my-c-mode-cedet-hook ()
   (require 'eassist)
-  (local-set-key "\C-c#" 'semantic-decoration-include-visit)
-  (local-set-key "\C-x\C-h" 'eassist-switch-h-cpp)
+  ;(local-set-key "\C-c#" 'semantic-decoration-include-visit)
+  ;(local-set-key "\C-x\C-h" 'eassist-switch-h-cpp)
   (local-set-key "\C-cm" 'eassist-list-methods)
   (local-set-key "\C-c\C-r" 'semantic-symref))
 
 (add-hook 'c-mode-common-hook 'my-c-mode-cedet-hook)
+
+;;------------------------------------------------------------------------------
+;; Projectile
+(use-package projectile
+  :ensure t
+  :config
+  (projectile-global-mode)
+  (setq projectile-enable-caching t)
+  :bind
+  (("\C-xf" . projectile-find-file)
+   ("\C-x\C-g" . projectile-grep)
+   ("\C-c#" . projectile-find-file-dwim)
+   ("\C-x\C-h" . projectile-find-other-file)))
 
 ;;------------------------------------------------------------------------------
 ;; Python mode

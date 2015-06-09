@@ -29,7 +29,7 @@
  '(highlight-symbol-on-navigation-p t)
  '(package-selected-packages
    (quote
-    (abbrev company-ghci company-ghc yasnippet company-irony irony company-c-headers company fill-column-indicator smartparens multiple-cursors cygwin-mount use-package flycheck-haskell js2-mode json-mode nxml-mode protobuf-mode objc-mode haskell-mode auto-complete auto-complete-config magit column-marker flycheck dash etags-table etags-select vlf mo-git-blame git-gutter-fringe+ ace-jump-mode google-this org-plus-contrib undo-tree smex ido-ubiquitous flx-ido bm esup)))
+    (projectile abbrev company-ghci company-ghc yasnippet company-irony irony company-c-headers company fill-column-indicator smartparens multiple-cursors cygwin-mount use-package flycheck-haskell js2-mode json-mode nxml-mode protobuf-mode objc-mode haskell-mode auto-complete auto-complete-config magit column-marker flycheck dash etags-table etags-select vlf mo-git-blame git-gutter-fringe+ ace-jump-mode google-this org-plus-contrib undo-tree smex ido-ubiquitous flx-ido bm esup)))
  '(protect-buffer-bury-p nil)
  '(sml/hidden-modes
    (quote
