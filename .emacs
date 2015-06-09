@@ -214,7 +214,8 @@
   (smartparens-global-mode t)
   (show-smartparens-global-mode t)
   (require 'smartparens-config)
-  :demand)
+  :demand
+  :diminish smartparens-mode)
 
 ;; Show column numbers
 (column-number-mode)
@@ -312,9 +313,10 @@
 (add-hook 'c-mode-common-hook (lambda () (interactive) (column-marker-2 column-wrap-hard)))
 (setq-default fill-column column-wrap-soft)
 
-(use-package fill-column-indicator
-  :ensure t)
-(add-hook 'c-mode-common-hook 'fci-mode)
+;; fci-mode doesn't play well with company
+;; (use-package fill-column-indicator
+;;   :ensure t)
+;; (add-hook 'c-mode-common-hook 'fci-mode)
 
 ;;------------------------------------------------------------------------------
 ;; Auto modes
@@ -369,7 +371,8 @@
 (use-package undo-tree
   :ensure t
   :config
-  (global-undo-tree-mode 1))
+  (global-undo-tree-mode 1)
+  :diminish undo-tree-mode)
 
 ;;------------------------------------------------------------------------------
 ;; Google-this
@@ -411,33 +414,99 @@ See URL `https://github.com/FND/jslint-reporter'."
          ("C-c C-<" . mc/mark-all-like-this)))
 
 ;;------------------------------------------------------------------------------
-;; Autocomplete
-;; (use-package company
-;;   :ensure t
-;;   :config
-;;   (global-company-mode)
-;;   :bind
-;;   (("<tab>" . company-complete)))
-
-;; (use-package company-ghc
-;;   :ensure t)
-
-;; (use-package company-ghci
-;;   :ensure t)
-
-;; (use-package company-c-headers
-;;   :ensure t
-;;   :config
-;;   (add-to-list 'company-backends 'company-c-headers))
-
-(use-package auto-complete
+;; YASnippet
+(use-package yasnippet
   :ensure t
-  :defer 1
+  :pin melpa
   :config
-  (add-to-list 'ac-dictionary-directories "~/.emacs.d/ac-dict")
-  (ac-config-default)
-  (ac-set-trigger-key "TAB")
-  (ac-set-trigger-key "<tab>"))
+  (add-hook 'prog-mode-hook #'yas-minor-mode))
+
+;;------------------------------------------------------------------------------
+;; Autocomplete: irony
+(use-package irony
+  :ensure t
+  :config
+  (add-hook 'c++-mode-hook 'irony-mode)
+  (add-hook 'c-mode-hook 'irony-mode)
+  (add-hook 'objc-mode-hook 'irony-mode)
+  ;; replace the `completion-at-point' and `complete-symbol' bindings in
+  ;; irony-mode's buffers by irony-mode's function
+  (defun my-irony-mode-hook ()
+    (define-key irony-mode-map [remap completion-at-point]
+      'irony-completion-at-point-async)
+    (define-key irony-mode-map [remap complete-symbol]
+      'irony-completion-at-point-async))
+  (add-hook 'irony-mode-hook 'my-irony-mode-hook)
+  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+  )
+
+(use-package company-irony
+  :ensure t
+  :config
+  ;; (optional) adds CC special commands to `company-begin-commands' in order to
+  ;; trigger completion at interesting places, such as after scope operator
+  ;;     std::|
+  (add-hook 'irony-mode-hook 'company-irony-setup-begin-commands))
+
+;; On first install, run M-x irony-install-server
+;; To set compilation database, use M-x irony-cdb-json-add-compile-commands-path
+;; Use cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON to generate compile_commands.json
+;; The compilation db list is in ~/.emacs.d/irony/cdb-json-projects
+
+;;------------------------------------------------------------------------------
+;; Autocomplete: company
+(use-package company
+  :ensure t
+  :config
+  (global-company-mode)
+  (add-to-list 'company-backends 'company-irony))
+
+(use-package company-ghc
+  :ensure t)
+
+(use-package company-ghci
+  :ensure t)
+
+(use-package company-c-headers
+  :ensure t
+  :config
+  (add-to-list 'company-backends 'company-c-headers))
+
+;;------------------------------------------------------------------------------
+;; Autocomplete: auto-complete
+;; (use-package auto-complete
+;;   :ensure t
+;;   :defer 1
+;;   :config
+;;   (add-to-list 'ac-dictionary-directories "~/.emacs.d/ac-dict")
+;;   (ac-config-default)
+;;   (ac-set-trigger-key "<tab>"))
+
+;;------------------------------------------------------------------------------
+;; Make sure tab works with indenting, completion, yasnippet
+(defun check-expansion ()
+  (save-excursion
+    (if (looking-at "\\_>") t
+      (backward-char 1)
+      (if (looking-at "\\.") t
+        (backward-char 1)
+        (if (looking-at "->") t nil)))))
+
+(defun do-yas-expand ()
+  (let ((yas-fallback-behavior 'return-nil))
+    (yas-expand)))
+
+(defun tab-indent-or-complete ()
+  (interactive)
+  (if (minibufferp)
+      (minibuffer-complete)
+    (if (or (not yas-minor-mode)
+            (null (do-yas-expand)))
+        (if (check-expansion)
+            (company-complete-common)
+          (indent-for-tab-command)))))
+
+(global-set-key [tab] 'tab-indent-or-complete)
 
 ;;------------------------------------------------------------------------------
 ;; Basic offset = 2
@@ -645,7 +714,8 @@ See URL `https://github.com/FND/jslint-reporter'."
   :defer 5
   :config
   (setq git-gutter-fr+-side 'right-fringe)
-  (global-git-gutter+-mode 1))
+  (global-git-gutter+-mode 1)
+  :diminish git-gutter+-mode)
 
 ;; mo-git-blame
 (use-package mo-git-blame

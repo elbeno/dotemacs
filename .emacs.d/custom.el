@@ -14,6 +14,9 @@
  '(comint-prompt-read-only nil)
  '(comint-scroll-show-maximum-output t)
  '(comint-scroll-to-bottom-on-input t)
+ '(company-c-headers-path-system
+   (quote
+    ("/usr/include/" "/usr/local/include/" "/usr/include/c++/v1/")))
  '(custom-safe-themes
    (quote
     ("756597b162f1be60a12dbd52bab71d40d6a2845a3e3c2584c6573ee9c332a66e" default)))
@@ -26,7 +29,7 @@
  '(highlight-symbol-on-navigation-p t)
  '(package-selected-packages
    (quote
-    (company-c-headers company fill-column-indicator smartparens multiple-cursors cygwin-mount use-package flycheck-haskell js2-mode json-mode nxml-mode protobuf-mode objc-mode haskell-mode auto-complete auto-complete-config magit column-marker flycheck dash etags-table etags-select vlf mo-git-blame git-gutter-fringe+ ace-jump-mode google-this org-plus-contrib undo-tree smex ido-ubiquitous flx-ido bm esup)))
+    (abbrev company-ghci company-ghc yasnippet company-irony irony company-c-headers company fill-column-indicator smartparens multiple-cursors cygwin-mount use-package flycheck-haskell js2-mode json-mode nxml-mode protobuf-mode objc-mode haskell-mode auto-complete auto-complete-config magit column-marker flycheck dash etags-table etags-select vlf mo-git-blame git-gutter-fringe+ ace-jump-mode google-this org-plus-contrib undo-tree smex ido-ubiquitous flx-ido bm esup)))
  '(protect-buffer-bury-p nil)
  '(sml/hidden-modes
    (quote
