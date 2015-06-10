@@ -27,7 +27,9 @@
 (setq package-archives '(("org" . "http://orgmode.org/elpa/")
                          ("gnu" . "http://elpa.gnu.org/packages/")
                          ("elpa" . "http://tromey.com/elpa/")
+                         ("marmalade" . "http://marmalade-repo.org/packages/")
                          ("melpa" . "http://melpa.org/packages/")))
+
 (package-initialize)
 (setq package-enable-at-startup nil)
 
@@ -124,8 +126,15 @@
 (setq sentence-end-double-space nil)
 (setq-default indent-tabs-mode nil)
 (setq tab-width 2)
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
+
+;; whitespace
 (setq require-final-newline t)
+(use-package ws-butler
+  :ensure t
+  :config
+  (ws-butler-global-mode)
+  :diminish
+  ws-butler-mode)
 
 ;;------------------------------------------------------------------------------
 ;; Set up the frame
@@ -220,10 +229,26 @@
 ;; Show column numbers
 (column-number-mode)
 
+;; Auto-revert buffers
+(global-auto-revert-mode)
+
+;; Rainbow delimiters
+(use-package rainbow-delimiters
+  :ensure t
+  :config
+  (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
+
+;; Rainbow hex colors & color names
+(use-package rainbow-mode
+  :ensure t
+  :config
+  (add-hook 'prog-mode-hook #'rainbow-mode)
+  :diminish rainbow-mode)
+
 ;;------------------------------------------------------------------------------
 ;; Colors
 (set-face-foreground 'font-lock-comment-face "gray")
-(set-face-foreground 'font-lock-string-face "FireBrick")
+(set-face-foreground 'font-lock-string-face "firebrick")
 (set-face-foreground 'font-lock-warning-face "black")
 (set-face-background 'font-lock-warning-face "orange")
 (set-face-background 'region "moccasin")
@@ -238,21 +263,6 @@
 ;; SQL comments
 (font-lock-add-keywords 'sql-mode
                         '(("\\s-*//.*$" 0 font-lock-comment-face prepend)))
-
-;; Hex colors for HTML etc
-(defvar hexcolour-keywords
-  '(("#[abcdef[:digit:]]\\{6\\}"
-     (0 (put-text-property
-         (match-beginning 0)
-         (match-end 0)
-         'face (list :background
-                     (match-string-no-properties 0)))))))
-(defun hexcolour-add-to-font-lock ()
-  (font-lock-add-keywords nil hexcolour-keywords))
-
-(add-hook 'css-mode-hook 'hexcolour-add-to-font-lock)
-(add-hook 'php-mode-hook 'hexcolour-add-to-font-lock)
-(add-hook 'html-mode-hook 'hexcolour-add-to-font-lock)
 
 ;;------------------------------------------------------------------------------
 ;; Global key bindings
@@ -290,6 +300,7 @@
 (global-set-key (kbd "C-c <up>")    'windmove-up)
 (global-set-key (kbd "C-c <down>")  'windmove-down)
 
+;;------------------------------------------------------------------------------
 ;; Highlight symbols
 (global-set-key [f3] 'highlight-symbol-at-point)
 (global-set-key [(shift f3)] 'hi-lock-mode)
@@ -321,6 +332,8 @@
 ;;------------------------------------------------------------------------------
 ;; Auto modes
 (setq auto-mode-alist (append '(("\\.mm$" . objc-mode)
+                                ("\\.h$" . c++-mode)
+                                ("\\.lua$" . lua-mode)
                                 ("\\.js$" . js2-mode)
                                 ("\\.qml$" . js2-mode)
                                 ("\\.json$" . json-mode)
@@ -351,12 +364,26 @@
   (setq ido-use-filename-at-point nil)
   (setq ido-create-new-buffer 'always)
   (flx-ido-mode 1)
-  (setq ido-use-faces nil))
+  (setq ido-use-faces t))
 
 (use-package ido-ubiquitous
   :ensure t
   :config
   (ido-ubiquitous-mode))
+
+(use-package ido-vertical-mode
+  :ensure t
+  :config
+  (setq ido-vertical-show-count t)
+  (ido-vertical-mode 1)
+  (set-face-attribute 'ido-vertical-first-match-face nil
+                      :background "#e5b7c0")
+  (set-face-attribute 'ido-vertical-only-match-face nil
+                      :background "#e52b50"
+                      :foreground "white")
+  (set-face-attribute 'ido-vertical-match-face nil
+                      :foreground "#b00000")
+  (setq ido-vertical-define-keys 'C-n-C-p-up-and-down))
 
 (use-package smex
   :ensure t
@@ -382,6 +409,14 @@
   (("\C-cr" . google-this-cpp-reference)))
 
 ;;------------------------------------------------------------------------------
+;; Diffing things
+(use-package ztree-diff
+  :ensure ztree
+  :bind
+  (("\C-c\C-z" . ztree-diff)
+   ("\C-cz" . ztree-dir)))
+
+;;------------------------------------------------------------------------------
 ;; Ace-jump-mode
 (use-package ace-jump-mode
   :ensure t
@@ -396,14 +431,15 @@
   :ensure t
   :defer 2
   :config
-  (flycheck-define-checker javascript-jslint-reporter
-    "A JavaScript syntax and style checker based on JSLint Reporter.
+  (cond ((eq system-type 'gnu/linux)
+         (flycheck-define-checker javascript-jslint-reporter
+           "A JavaScript syntax and style checker based on JSLint Reporter.
 
 See URL `https://github.com/FND/jslint-reporter'."
-    :command ("~/.emacs.d/jslint-reporter" source)
-    :error-patterns
-    ((error line-start (1+ nonl) ":" line ":" column ":" (message) line-end))
-    :modes (js-mode js2-mode js3-mode)))
+           :command ("~/.emacs.d/jslint-reporter" source)
+           :error-patterns
+           ((error line-start (1+ nonl) ":" line ":" column ":" (message) line-end))
+           :modes (js-mode js2-mode js3-mode)))))
 
 ;;------------------------------------------------------------------------------
 ;; Multiple cursors
@@ -419,39 +455,97 @@ See URL `https://github.com/FND/jslint-reporter'."
   :ensure t
   :pin melpa
   :config
-  (add-hook 'prog-mode-hook #'yas-minor-mode))
+  (add-hook 'prog-mode-hook #'yas-minor-mode)
+  :diminish yas-minor-mode)
 
 ;;------------------------------------------------------------------------------
-;; Autocomplete: irony
-(use-package irony
-  :ensure t
-  :config
-  (add-hook 'c++-mode-hook 'irony-mode)
-  (add-hook 'c-mode-hook 'irony-mode)
-  (add-hook 'objc-mode-hook 'irony-mode)
-  ;; replace the `completion-at-point' and `complete-symbol' bindings in
-  ;; irony-mode's buffers by irony-mode's function
-  (defun my-irony-mode-hook ()
-    (define-key irony-mode-map [remap completion-at-point]
-      'irony-completion-at-point-async)
-    (define-key irony-mode-map [remap complete-symbol]
-      'irony-completion-at-point-async))
-  (add-hook 'irony-mode-hook 'my-irony-mode-hook)
-  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
-  )
+;; Tags
+(defun my/find-tags-file-r (path)
+  "find the tags file from the parent directories"
+  (let* ((parent (file-name-directory path))
+         (possible-tags-file (concat parent ".git/TAGS")))
+    (cond
+     ((file-exists-p possible-tags-file) (throw 'found-it possible-tags-file))
+     ((string= "/.git/TAGS" possible-tags-file) (error "no tags file found"))
+     (t (my/find-tags-file-r (directory-file-name parent))))))
 
-(use-package company-irony
-  :ensure t
-  :config
-  ;; (optional) adds CC special commands to `company-begin-commands' in order to
-  ;; trigger completion at interesting places, such as after scope operator
-  ;;     std::|
-  (add-hook 'irony-mode-hook 'company-irony-setup-begin-commands))
+(defun my/find-tags-file ()
+  "recursively searches each parent directory for a file named
+'TAGS' in the bare .git repo and returns the path to that file or
+nil if a tags file is not found. Returns nil if the buffer is not
+visiting a file"
+  (if (buffer-file-name)
+      (catch 'found-it
+        (my/find-tags-file-r (buffer-file-name)))
+    (error "buffer is not visiting a file")))
+
+(defun my/set-tags-file-path ()
+  "calls `my/find-tags-file' to recursively search up the
+directory tree to find a file named '.git/TAGS'. If found, set
+'tags-table-list' with that path as an argument otherwise raises
+an error."
+  (interactive)
+  (condition-case nil
+      (add-to-list 'tags-table-list (my/find-tags-file))
+    (error nil)))
+
+;; find the TAGS file after opening the source file
+(add-hook 'find-file-hook
+          '(lambda () (my/set-tags-file-path)))
+
+(use-package etags-select
+  :ensure t)
+
+(use-package etags-table
+  :ensure t)
+
+(setq tags-revert-without-query 1
+      etags-table-search-up-depth 10)
+(global-set-key "\M-." 'etags-select-find-tag-at-point)
+
+;; prevent prompt on opening large TAGS file
+(setq large-file-warning-threshold 100000000)
+
+;;------------------------------------------------------------------------------
+;; C++ autocomplete on linux: irony
 
 ;; On first install, run M-x irony-install-server
 ;; To set compilation database, use M-x irony-cdb-json-add-compile-commands-path
 ;; Use cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON to generate compile_commands.json
 ;; The compilation db list is in ~/.emacs.d/irony/cdb-json-projects
+
+(when (eq system-type 'gnu/linux)
+  (use-package irony
+    :ensure t
+    :config
+    (add-hook 'c++-mode-hook 'irony-mode)
+    (add-hook 'c-mode-hook 'irony-mode)
+    (add-hook 'objc-mode-hook 'irony-mode)
+    ;; replace the `completion-at-point' and `complete-symbol' bindings in
+    ;; irony-mode's buffers by irony-mode's function
+    (defun my-irony-mode-hook ()
+      (define-key irony-mode-map [remap completion-at-point]
+        'irony-completion-at-point-async)
+      (define-key irony-mode-map [remap complete-symbol]
+        'irony-completion-at-point-async))
+    (add-hook 'irony-mode-hook 'my-irony-mode-hook)
+    (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+    )
+
+  (use-package company-irony
+    :ensure t
+    :config
+    ;; (optional) adds CC special commands to `company-begin-commands' in order to
+    ;; trigger completion at interesting places, such as after scope operator
+    ;;     std::|
+    (add-hook 'irony-mode-hook 'company-irony-setup-begin-commands))
+
+  (use-package flycheck-irony
+    :ensure t
+    :config
+    (eval-after-load 'flycheck
+      '(add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
+    (add-hook 'irony-mode-hook 'flycheck-mode)))
 
 ;;------------------------------------------------------------------------------
 ;; Autocomplete: company
@@ -459,13 +553,12 @@ See URL `https://github.com/FND/jslint-reporter'."
   :ensure t
   :config
   (global-company-mode)
-  (add-to-list 'company-backends 'company-irony))
-
-(use-package company-ghc
-  :ensure t)
-
-(use-package company-ghci
-  :ensure t)
+  (delete 'company-semantic company-backends)
+  ;; Use irony for linux completion, plain dabbrev-code for windows
+  (cond ((eq system-type 'gnu/linux)
+         (add-to-list 'company-backends 'company-irony))
+        ((eq system-type 'cygwin)
+         (add-to-list 'company-backends 'company-dabbrev-code))))
 
 (use-package company-c-headers
   :ensure t
@@ -473,14 +566,16 @@ See URL `https://github.com/FND/jslint-reporter'."
   (add-to-list 'company-backends 'company-c-headers))
 
 ;;------------------------------------------------------------------------------
-;; Autocomplete: auto-complete
-;; (use-package auto-complete
+;; Company backend for haskell
+;; (use-package company-ghc
 ;;   :ensure t
-;;   :defer 1
+;;   :init
+;;   (require 'cl)
+;;   (use-package ghc
+;;     :ensure t)
 ;;   :config
-;;   (add-to-list 'ac-dictionary-directories "~/.emacs.d/ac-dict")
-;;   (ac-config-default)
-;;   (ac-set-trigger-key "<tab>"))
+;;   (ghc-comp-init)
+;;   (add-to-list 'company-backends '(company-ghc :with company-dabbrev-code)))
 
 ;;------------------------------------------------------------------------------
 ;; Make sure tab works with indenting, completion, yasnippet
@@ -589,7 +684,6 @@ See URL `https://github.com/FND/jslint-reporter'."
 
 (setq compilation-parse-errors-filename-function 'process-error-filename)
 
-;; inspired by jds-find-tags-file in http://www.emacswiki.org/emacs/EmacsTags
 (defun find-sconstruct ()
   "recursively searches upwards from buffer's current dir for file named SConstruct and returns that dir. Or nil if not found or if buffer is not visiting a file"
   (cl-labels
@@ -643,6 +737,11 @@ See URL `https://github.com/FND/jslint-reporter'."
 
 (add-hook 'c-mode-common-hook 'my-c-mode-cedet-hook)
 
+;; speedbar
+(setq speedbar-use-images nil)
+(global-set-key "\C-cs" 'speedbar)
+(setq speedbar-directory-unshown-regexp "^$")
+
 ;;------------------------------------------------------------------------------
 ;; Projectile
 (use-package projectile
@@ -663,13 +762,20 @@ See URL `https://github.com/FND/jslint-reporter'."
                           (flycheck-mode)))
 
 ;;------------------------------------------------------------------------------
+;; Lua mode
+(use-package lua-mode
+  :ensure t
+  :mode "\\.lua$")
+
+;;------------------------------------------------------------------------------
 ;; Javascript
 (use-package js2-mode
   :ensure t
-  :defer 5)
+  :mode ("\\.js$" "\\.qml$"))
+
 (use-package json-mode
   :ensure t
-  :defer 5)
+  :mode "\\.json$")
 
 (if (eq system-type 'gnu/linux)
   (add-hook 'js2-mode-hook (lambda ()
@@ -677,42 +783,42 @@ See URL `https://github.com/FND/jslint-reporter'."
                             (flycheck-mode))))
 
 ;;------------------------------------------------------------------------------
-;; XML
+;; For Qt ui files
 (use-package nxml-mode
   :ensure t
-  :defer 5)
+  :mode "\\.ui$")
 
 ;;------------------------------------------------------------------------------
 ;; Protobufs
-;; there is a bug in protobuf mode that requires cl
-(require 'cl)
+;; protobuf mode requires cl
 (use-package protobuf-mode
   :ensure t
-  :defer 1)
+  :init
+  (require 'cl)
+  :mode ("\\.proto$" "\\.pb$"))
 
 ;;------------------------------------------------------------------------------
 ;; Haskell mode
 (use-package haskell-mode
   :ensure t
-  :defer 1)
-(use-package flycheck-haskell
-  :ensure t
-  :defer 1)
+  :init
+  (use-package flycheck-haskell
+    :ensure t)
+  :config
+  (setq ghc-interactive-command "ghci")
+  (setq ghc-debug t)
+  :mode "\\.hs$")
 
-(eval-after-load "haskell-mode"
-  '(define-key haskell-mode-map (kbd "M-k") 'haskell-compile))
 (eval-after-load "haskell-cabal"
   '(define-key haskell-cabal-mode-map (kbd "M-k") 'haskell-compile))
 (eval-after-load "haskell-mode"
-  '(define-key haskell-mode-map (kbd "C-c v c") 'haskell-cabal-visit-file))
-(eval-after-load "haskell-mode"
   '(progn
-    (define-key haskell-mode-map (kbd "C-c C-z") 'haskell-interactive-switch)
-    ;;(define-key haskell-mode-map (kbd "C-c C-l") 'haskell-process-load-file)
-    (define-key haskell-mode-map (kbd "C-c C-l") 'inferior-haskell-load-file)
-    (define-key haskell-mode-map (kbd "C-c C-b") 'haskell-interactive-switch)
-    (define-key haskell-mode-map (kbd "C-c C-t") 'haskell-process-do-type)
-    (define-key haskell-mode-map (kbd "C-c C-i") 'haskell-process-do-info)))
+     (define-key haskell-mode-map (kbd "M-k") 'haskell-compile)
+     (define-key haskell-mode-map (kbd "C-c v c") 'haskell-cabal-visit-file)
+     (define-key haskell-mode-map (kbd "C-c C-l") 'inferior-haskell-load-file)
+     (define-key haskell-mode-map (kbd "C-c C-t") 'inferior-haskell-type)
+     (define-key haskell-mode-map (kbd "C-c C-i") 'inferior-haskell-info)
+     (define-key haskell-mode-map (kbd "C-c M-.") 'inferior-haskell-find-definition)))
 
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
 (add-hook 'haskell-mode-hook 'flycheck-mode)
@@ -734,22 +840,38 @@ See URL `https://github.com/FND/jslint-reporter'."
 (use-package mo-git-blame
   :ensure t
   :bind
-  (("\C-cb" . mo-git-blame-current)))
+  (("\C-c\C-b" . mo-git-blame-current)))
 
 ;; magit
 (use-package magit
   :ensure t
   :bind
-  (("\C-cg" . magit-status)))
+  (("\C-cg" . magit-status))
+  :config
+  (setq magit-last-seen-setup-instructions "1.4.0"))
 
-(setq magit-last-seen-setup-instructions "1.4.0")
+;; git time machine
+(use-package git-timemachine
+  :ensure t
+  :bind
+  (("\C-ch" . git-timemachine-toggle)))
+
+;; git messenger
+(use-package git-messenger
+  :ensure t
+  :bind
+  (("\C-cb" . git-messenger:popup-message))
+  :config
+  (define-key git-messenger-map (kbd "m") 'git-messenger:copy-message)
+  ;; Enable magit-commit-mode after typing 's', 'S', 'd'
+  (add-hook 'git-messenger:popup-buffer-hook 'magit-commit-mode))
 
 ;;------------------------------------------------------------------------------
 ;; Org-mode
 (use-package org
   :ensure org-plus-contrib
   :commands (org-mode)
-  :mode ("\\.org\\'" . org-mode)
+  :mode ("\\.org$" . org-mode)
   :pin org
   :config
   (setq org-log-done t)
@@ -783,54 +905,6 @@ See URL `https://github.com/FND/jslint-reporter'."
             (require 'ox-beamer)
             (add-to-list 'org-beamer-environments-extra
              '("onlyenv" "O" "\\begin{onlyenv}%a" "\\end{onlyenv}"))))
-
-;;------------------------------------------------------------------------------
-;; Tags
-(defun my/find-tags-file-r (path)
-  "find the tags file from the parent directories"
-  (let* ((parent (file-name-directory path))
-         (possible-tags-file (concat parent ".git/TAGS")))
-    (cond
-     ((file-exists-p possible-tags-file) (throw 'found-it possible-tags-file))
-     ((string= "/.git/TAGS" possible-tags-file) (error "no tags file found"))
-     (t (my/find-tags-file-r (directory-file-name parent))))))
-
-(defun my/find-tags-file ()
-  "recursively searches each parent directory for a file named
-'TAGS' in the bare .git repo and returns the path to that file or
-nil if a tags file is not found. Returns nil if the buffer is not
-visiting a file"
-  (if (buffer-file-name)
-      (catch 'found-it
-        (my/find-tags-file-r (buffer-file-name)))
-    (error "buffer is not visiting a file")))
-
-(defun my/set-tags-file-path ()
-  "calls `my/find-tags-file' to recursively search up the
-directory tree to find a file named '.git/TAGS'. If found, set
-'tags-table-list' with that path as an argument otherwise raises
-an error."
-  (interactive)
-  (condition-case nil
-      (add-to-list 'tags-table-list (my/find-tags-file))
-    (error nil)))
-
-;; find the TAGS file after opening the source file
-(add-hook 'find-file-hook
-          '(lambda () (my/set-tags-file-path)))
-
-(use-package etags-select
-  :ensure t)
-
-(use-package etags-table
-  :ensure t)
-
-(setq tags-revert-without-query 1
-      etags-table-search-up-depth 10)
-(global-set-key "\M-." 'etags-select-find-tag-at-point)
-
-;; prevent prompt on opening large TAGS file
-(setq large-file-warning-threshold 100000000)
 
 ;;------------------------------------------------------------------------------
 ;; Other lesser-used modes
@@ -1039,3 +1113,4 @@ Example of an XCode UUID: a513b85041a3535fc3520c3d."
     default-frame-alist))
 
 (size-frame-default)
+
