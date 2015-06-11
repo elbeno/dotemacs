@@ -827,6 +827,12 @@ an error."
 ;;------------------------------------------------------------------------------
 ;; Git interactions
 
+;; modes
+(use-package gitconfig-mode :ensure t)
+(use-package gitignore-mode :ensure t)
+(use-package git-commit-mode :ensure t)
+(use-package git-rebase-mode :ensure t)
+
 ;; git-gutter-fringe
 (use-package git-gutter-fringe+
   :ensure t
