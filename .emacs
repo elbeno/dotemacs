@@ -663,6 +663,13 @@ an error."
 
 (add-hook 'c-mode-common-hook 'infer-indentation-style)
 
+;; Auto insertion of headers
+(defun cpp-auto-headers ()
+  (require 'cpp-auto-include)
+  (local-set-key (kbd "\C-c i") 'cpp-auto-include)
+  (local-set-key (kbd "\C-c o") 'cpp-auto-include-for-current-line))
+(add-hook 'c++-mode-hook 'cpp-auto-headers)
+
 ;;------------------------------------------------------------------------------
 ;; Compilation
 
