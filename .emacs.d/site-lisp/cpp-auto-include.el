@@ -20,13 +20,24 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-;; How to output include lines
-(defvar cpp-auto-include/std-header-format "#include <%s>")
+;; How to output include lines: the outer %s values are replaced with <> or ""
+(defvar cpp-auto-include/std-header-format "#include %s%s%s")
+
 ;; How to match include lines
 (defvar cpp-auto-include/std-header-regexp "^\\s-*#\\s-*include\\s-*[<\"]\\([^>\"]+\\)[>\"]")
 
+;; When the buffer's file extension is in this list, put "using namespace std;"
+;; after the header block
+(defvar cpp-auto-include/ensure-using-namespace-std '("cpp"))
+
+;; When true, ensure standard #include lines use angle brackets (rather than quotes)
+(defvar cpp-auto-include/ensure-brackets t)
+
 (require 'cl-lib)
 (require 'rx)
+
+;; Regexes for how to match things that correspond to each standard header. The
+;; section of the standard for each is given in ;; [brackets].
 
 (defvar cpp-auto-include/header-regexp
   `(;; [support.types]
@@ -1057,9 +1068,9 @@
 (defun cpp-auto-include/include-line (header)
   (save-excursion
     (goto-char (point-min))
-    (and (or (re-search-forward (concat "<" header ">") nil t)
-             (re-search-forward (concat "\"" header "\"") nil t))
-         (line-number-at-pos))))
+    (cond ((re-search-forward (concat "<" header ">") nil t) (cons (line-number-at-pos) nil))
+          ((re-search-forward (concat "\"" header "\"") nil t)  (cons (line-number-at-pos) t))
+          (t '(nil . nil)))))
 
 (defsubst cpp-auto-include/in-string-or-comment-p ()
   (nth 8 (syntax-ppss)))
@@ -1094,14 +1105,14 @@
            for info in cpp-auto-include/header-regexp
            for header = (nth 0 info)
            for regexp = (nth 1 info)
-           for included-line = (cpp-auto-include/include-line header)
+           for (included-line . uses-quotes) = (cpp-auto-include/include-line header)
            for has-keyword = (cpp-auto-include/buffer-has-keyword-p regexp included-line)
 
            ;; remove all standard includes, we will replace them in alpha order
            do
            (progn
              (when has-keyword
-               (cl-pushnew header added :test 'equal))
+               (cl-pushnew (cons header uses-quotes) added :test 'equal))
              (when included-line
                (cl-pushnew (cons header included-line) removed :test 'equal)))
 
@@ -1116,16 +1127,16 @@
            for info in cpp-auto-include/header-regexp
            for header = (nth 0 info)
            for regexp = (nth 1 info)
-           for included-line = (cpp-auto-include/include-line header)
+           for (included-line . uses-quotes) = (cpp-auto-include/include-line header)
            for has-keyword = (cpp-auto-include/line-has-keyword-p regexp line)
 
            ;; remove all standard includes, we will replace them in alpha order
            do
            (progn
              (when has-keyword
-               (cl-pushnew header added :test 'equal))
+               (cl-pushnew (cons header uses-quotes) added :test 'equal))
              (when included-line
-               (cl-pushnew header added :test 'equal)
+               (cl-pushnew (cons header uses-quotes) added :test 'equal)
                (cl-pushnew (cons header included-line) removed :test 'equal)))
 
            finally
@@ -1147,16 +1158,27 @@
       (forward-line 1)
       (point))))
 
-(defun cpp-auto-include/add-headers (headers)
+(defun cpp-auto-include/add-headers (headers use-std)
   (save-excursion
     (let ((insert-point (or (cpp-auto-include/header-insert-point) (point-min))))
       (goto-char insert-point)
       (unless (eq (line-number-at-pos) 1)
         (cpp-auto-include/ensure-blank-line-at (line-number-at-pos))
         (forward-line))
-      (dolist (header headers)
-        (insert (format (concat cpp-auto-include/std-header-format "\n") header)))
-      (cpp-auto-include/ensure-blank-line-at (line-number-at-pos)))))
+      (dolist (h headers)
+        (let* ((header (car h))
+               (uses-quotes (cdr h))
+               (surround-char-left
+                (if (and uses-quotes (not cpp-auto-include/ensure-brackets)) "\"" "<"))
+               (surround-char-right
+                (if (and uses-quotes (not cpp-auto-include/ensure-brackets)) "\"" ">")))
+          (insert (format (concat cpp-auto-include/std-header-format "\n")
+                          surround-char-left header surround-char-right))))
+      (cpp-auto-include/ensure-blank-line-at (line-number-at-pos))
+      (forward-line)
+      (when use-std
+        (insert "using namespace std;\n")
+        (cpp-auto-include/ensure-blank-line-at (line-number-at-pos))))))
 
 (defun cpp-auto-include/remove-headers (headers)
   (save-excursion
@@ -1172,17 +1194,32 @@
                  (delete-region beg (point))
                  (cl-incf deleted-lines))))))
 
+(defun cpp-auto-include/should-use-namespace-std ()
+  (member (file-name-extension (buffer-file-name))
+          cpp-auto-include/ensure-using-namespace-std))
+
+(defun cpp-auto-include/remove-using-namespace-std ()
+  (save-excursion
+    (goto-char (point-max))
+    (when (re-search-backward "^\\s-*using\\s-*namespace\\s-*std\\s-*;\\s-*$" nil t)
+      (let ((beg (point)))
+        (forward-line 1)
+        (delete-region beg (point))))))
+
 ;;;###autoload
 (defun cpp-auto-include ()
   (interactive)
   (let* ((info (cpp-auto-include/parse-file))
          (added (plist-get info :added))
-         (removed (plist-get info :removed)))
+         (removed (plist-get info :removed))
+         (use-std (cpp-auto-include/should-use-namespace-std)))
     (when removed
       (cpp-auto-include/remove-headers removed))
+    (when use-std
+      (cpp-auto-include/remove-using-namespace-std))
     (when added
-      (setq added (sort added 'string<))
-      (cpp-auto-include/add-headers added))))
+      (setq added (sort added (lambda (x y) (string< (car x) (car y)))))
+      (cpp-auto-include/add-headers added use-std))))
 
 ;;;###autoload
 (defun cpp-auto-include-for-current-line ()
@@ -1193,8 +1230,8 @@
     (when removed
       (cpp-auto-include/remove-headers removed))
     (when added
-      (setq added (sort added 'string<))
-      (cpp-auto-include/add-headers added))))
+      (setq added (sort added (lambda (x y) (string< (car x) (car y)))))
+      (cpp-auto-include/add-headers added nil))))
 
 (provide 'cpp-auto-include)
 
