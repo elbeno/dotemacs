@@ -33,6 +33,9 @@
 ;; When true, ensure standard #include lines use angle brackets (rather than quotes)
 (defvar cpp-auto-include/ensure-brackets t)
 
+;; When true, omit headers that are known to be included by others
+(defvar cpp-auto-include/minimal-headers t)
+
 (require 'cl-lib)
 (require 'rx)
 
@@ -300,7 +303,7 @@
                                    "wrong_protocol_type")))
                          symbol-end)))))
     ;; [utility]
-    ("utility" ("std::")
+    ("utility" ("std::") ;; ("initializer_list")
      ,(rx (and symbol-start
                (or (and (or "swap" "exchange" "move" "move_if_noexcept")
                         (* space) (or "(" "<"))
@@ -322,7 +325,7 @@
                    (and (or "tuple" "tuple_size" "tuple_element")
                         (* space) "<")))))
     ;; [template.bitset]
-    ("bitset" ("std::")
+    ("bitset" ("std::") ;; ("string" "iosfwd")
      ,(rx (and symbol-start
                "bitset"
                (* space) "<")))
@@ -383,6 +386,7 @@
                         (* space) "<")
                    (and "bad_function_call"
                         symbol-end)))))
+    ;; deprecated stuff omitted
     ("functional" ("placeholders::" "std::")
      ,(rx (and symbol-start
                (or "_1" "_2" "_3" "_4" "_5" "_6")
@@ -467,7 +471,7 @@
                "type_index"
                symbol-end)))
     ;; [string.classes]
-    ("string" ("std::")
+    ("string" ("std::") ;; ("initializer_list")
      ,(rx (and symbol-start
                (or (and (or "to_string" "to_wstring"
                             "stoi" "stol" "stoul" "stoll" "stoull"
@@ -586,53 +590,53 @@
                    "LC_MONETARY" "LC_NUMERIC")
                symbol-end)))
     ;; [sequences.general]
-    ("array" ("std::")
+    ("array" ("std::") ;; ("initializer_list")
      ,(rx (and symbol-start
                "array"
                (* space) "<")))
-    ("deque" ("std::")
+    ("deque" ("std::") ;; ("initializer_list")
      ,(rx (and symbol-start
                "deque"
                (* space) "<")))
-    ("forward_list" ("std::")
+    ("forward_list" ("std::") ;; ("initializer_list")
      ,(rx (and symbol-start
                "forward_list"
                (* space) "<")))
-    ("list" ("std::")
+    ("list" ("std::") ;; ("initializer_list")
      ,(rx (and symbol-start
                "list"
                (* space) "<")))
-    ("vector" ("std::")
+    ("vector" ("std::") ;; ("initializer_list")
      ,(rx (and symbol-start
                "vector"
                (* space) "<")))
     ;; [associative.map.syn]
-    ("map" ("std::")
+    ("map" ("std::") ;; ("initializer_list")
      ,(rx (and symbol-start
                (or "map" "multimap")
                (* space) "<")))
     ;; [associative.set.syn]
-    ("set" ("std::")
+    ("set" ("std::") ;; ("initializer_list")
      ,(rx (and symbol-start
                (or "set" "multiset")
                (* space) "<")))
     ;; [unord.map.syn]
-    ("unordered_map" ("std::")
+    ("unordered_map" ("std::") ;; ("initializer_list")
      ,(rx (and symbol-start
                (or "unordered_map" "unordered_multimap")
                (* space) "<")))
     ;; [unord.set.syn]
-    ("unordered_set" ("std::")
+    ("unordered_set" ("std::") ;; ("initializer_list")
      ,(rx (and symbol-start
                (or "unordered_set" "unordered_multiset")
                (* space) "<")))
     ;; [queue.syn]
-    ("queue" ("std::")
+    ("queue" ("std::") ;; ("initializer_list")
      ,(rx (and symbol-start
                (or "queue" "priority_queue")
                (* space) "<")))
     ;; [stack.syn]
-    ("stack" ("std::")
+    ("stack" ("std::") ;; ("initializer_list")
      ,(rx (and symbol-start
                "stack"
                (* space) "<")))
@@ -664,7 +668,7 @@
                              "random_access_iterator_tag")
                          symbol-end))))))
     ;; [algorithms.general]
-    ("algorithm" ("std::")
+    ("algorithm" ("std::") ;; ("initializer_list")
      ,(rx (and (not (in "\\.>[a-zA-Z_0-9]"))
                (or (and
                     (or "all_of" "any_of" "none_of"
@@ -741,7 +745,7 @@
                "complex"
                (* space) "<")))
     ;; [rand.synopsis]
-    ("random" ("std::")
+    ("random" ("std::") ;; ("initializer_list")
      ,(rx (and symbol-start
                (or (and (or "linear_congruential_engine"
                             "mersenne_twister_engine"
@@ -780,7 +784,7 @@
                             "bernoulli_distribution")
                         symbol-end)))))
     ;; [valarray.syn]
-    ("valarray" ("std::")
+    ("valarray" ("std::") ;; ("initializer_list")
      ,(rx (and symbol-start
                (or (and (or "valarray"
                             "slice_array" "gslice_array"
@@ -838,13 +842,13 @@
                "RAND_MAX"
                symbol-end)))
     ;; [iostream.objects.overview]
-    ("iostream" ("std::")
+    ("iostream" ("std::") ;; ("ios" "streambuf" "istream" "ostream")
      ,(rx (and symbol-start
                (or "cin" "cout" "cerr" "clog"
                    "wcin" "wcout" "wcerr" "wclog")
                symbol-end)))
     ;; [iostreams.base.overview]
-    ("ios" ("std::")
+    ("ios" ("std::") ;; ("iosfwd")
      ,(rx (and symbol-start
                (or (and (or "fpos" "basic_ios")
                         (* space) "<")
@@ -955,7 +959,7 @@
                              (or "8" "16" "32" "64"))))
                symbol-end)))
     ;; [re.syn]
-    ("regex" ("std::")
+    ("regex" ("std::") ;; ("initializer_list")
      ,(rx (and symbol-start
                (or (and (or "regex_traits"
                             "basic_regex"
@@ -1057,13 +1061,14 @@
     ;; [thread.threads]
     ("thread" ("std::")
      ,(rx (and symbol-start
+               "thread"
+               symbol-end)))
+    ("thread" ("this_thread::" "std::")
+     ,(rx (and symbol-start
                (or (and (or "sleep_until" "sleep_for")
                         (* space) (or "<" "("))
-                   (and "get_id"
-                        (* space) "(")
-                   (and (or "thread" "this_thread"
-                            "thread::id")
-                        symbol-end)))))
+                   (and (or "get_id" "yield")
+                        (* space) "(")))))
     ;; [thread.mutex]
     ("mutex" ("std::")
      ,(rx (and symbol-start
@@ -1115,6 +1120,19 @@
                                      "timeout"
                                      "deferred")))
                         symbol-end)))))))
+
+;; Headers that are included by other headers
+(defvar cpp-auto-include/subsumed-headers
+  '(("initializer_list" . ("utility" "string"
+                           "array" "deque" "forward_list" "list" "vector"
+                           "map" "set" "unordered_map" "unordered_set"
+                           "queue" "stack"
+                           "algorithm" "random" "valarray" "regex"))
+    ("string" . ("bitset"))
+    ("streambuf" . ("iostream"))
+    ("istream" . ("iostream"))
+    ("ostream" . ("iostream"))
+    ("ios" . ("iostream"))))
 
 ;; Insert a blank line at line, if it's not already blank
 (defun cpp-auto-include/ensure-blank-line-at (line)
@@ -1256,6 +1274,28 @@
                  (delete-region beg (point))
                  (cl-incf deleted-lines))))))
 
+;; Is a header superfluous because the list already contains another header that
+;; includes it?
+(defun cpp-auto-include/header-is-subsumed (h headers)
+  (let* ((hname (car h))
+         (parents (cdr (assoc hname cpp-auto-include/subsumed-headers))))
+    (when parents
+      (cl-some (lambda (x) (assoc x headers))
+               parents))))
+
+;; Boil down the list of headers to the minimum by eliminating those which are
+;; included by others
+(defun cpp-auto-include/minimize-headers (headers)
+  (if cpp-auto-include/minimal-headers
+      (cl-loop with min-headers = nil
+               for h in headers
+               do
+               (unless (cpp-auto-include/header-is-subsumed h headers)
+                 (setq min-headers (cons h min-headers)))
+               finally
+               return min-headers)
+    headers))
+
 ;; Should we have a using directive in this file?
 (defun cpp-auto-include/should-use-namespace-std ()
   (member (file-name-extension (buffer-file-name))
@@ -1320,8 +1360,10 @@
     (when use-std
       (cpp-auto-include/remove-using-namespace-std))
     (when added
-      (setq added (sort added (lambda (x y) (string< (car x) (car y)))))
-      (cpp-auto-include/add-headers added use-std))))
+      (let ((min-headers (cpp-auto-include/minimize-headers added)))
+        (cpp-auto-include/add-headers
+         (sort min-headers (lambda (x y) (string< (car x) (car y))))
+         use-std)))))
 
 ;;;###autoload
 (defun cpp-auto-include-for-current-line ()
@@ -1332,8 +1374,10 @@
     (when removed
       (cpp-auto-include/remove-headers removed))
     (when added
-      (setq added (sort added (lambda (x y) (string< (car x) (car y)))))
-      (cpp-auto-include/add-headers added nil))))
+      (let ((min-headers (cpp-auto-include/minimize-headers added)))
+        (cpp-auto-include/add-headers
+         (sort min-headers (lambda (x y) (string< (car x) (car y))))
+         nil)))))
 
 (provide 'cpp-auto-include)
 
