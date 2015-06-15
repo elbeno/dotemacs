@@ -666,6 +666,7 @@ an error."
 ;; Auto insertion of headers
 (defun cpp-auto-headers ()
   (require 'cpp-auto-include)
+  (local-set-key (kbd "\C-c q") 'cpp-auto-include/namespace-qualify-file)  
   (local-set-key (kbd "\C-c i") 'cpp-auto-include)
   (local-set-key (kbd "\C-c o") 'cpp-auto-include-for-current-line))
 (add-hook 'c++-mode-hook 'cpp-auto-headers)
