@@ -31,6 +31,9 @@
 ;; after the header block
 (defvar cpp-auto-include/ensure-using-namespace-std '("cpp"))
 
+;; The namespace to use in a "using namespace" directive
+(defvar cpp-auto-include/using-namespace "std")
+
 ;; When true, ensure standard #include lines use angle brackets (rather than quotes)
 (defvar cpp-auto-include/ensure-brackets t)
 
@@ -1263,7 +1266,7 @@
       (cpp-auto-include/ensure-blank-line-at (line-number-at-pos))
       (forward-line)
       (when use-std
-        (insert "using namespace std;\n")
+        (insert (concat "using namespace " cpp-auto-include/using-namespace ";\n"))
         (cpp-auto-include/ensure-blank-line-at (line-number-at-pos))))))
 
 ;; Remove stl headers from the file
@@ -1312,10 +1315,12 @@
 (defun cpp-auto-include/remove-using-namespace-std ()
   (save-excursion
     (goto-char (point-max))
-    (when (re-search-backward "^\\s-*using\\s-*namespace\\s-*std\\s-*;\\s-*$" nil t)
-      (let ((beg (point)))
-        (forward-line 1)
-        (delete-region beg (point))))))
+    (let ((regexp (format "^\\s-*using\\s-*namespace\\s-*%s\\s-*;\\s-*$"
+                          cpp-auto-include/using-namespace)))
+      (when (re-search-backward regexp nil t)
+        (let ((beg (point)))
+          (forward-line 1)
+          (delete-region beg (point)))))))
 
 ;; Ensure there is a namespace qualifier at point
 (defun cpp-auto-include/ensure-qualifier-at-point (nslist)
