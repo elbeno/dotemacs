@@ -23,8 +23,9 @@
 ;; How to output include lines: the outer %s values are replaced with <> or ""
 (defvar cpp-auto-include/std-header-format "#include %s%s%s")
 
-;; How to match include lines
-(defvar cpp-auto-include/std-header-regexp "^\\s-*#\\s-*include\\s-*[<\"]\\([^>\"]+\\)[>\"]")
+;; How to match include lines: this should match an include produced by
+;; cpp-auto-include/std-header-format
+(defvar cpp-auto-include/std-header-regexp "^\\s-*#\\s-*include\\s-*\\([<\"]\\)%s[>\"]")
 
 ;; When the buffer's file extension is in this list, put "using namespace std;"
 ;; after the header block
@@ -1142,14 +1143,15 @@
     (unless (re-search-forward "^\\s-*$" (line-end-position) t)
       (insert "\n"))))
 
-;; Find the line where a certain header is included, and whether or not is uses
+;; Find the line where a certain header is included, and whether or not it uses
 ;; quotes or angle brackets around the include
 (defun cpp-auto-include/include-line (header)
   (save-excursion
     (goto-char (point-min))
-    (cond ((re-search-forward (concat "<" header ">") nil t) (cons (line-number-at-pos) nil))
-          ((re-search-forward (concat "\"" header "\"") nil t)  (cons (line-number-at-pos) t))
-          (t '(nil . nil)))))
+    (let ((regexp (format cpp-auto-include/std-header-regexp header)))
+      (cond ((re-search-forward regexp nil t)
+             (cons (line-number-at-pos) (equal "\"" (match-string 1))))
+            (t '(nil . nil))))))
 
 ;; Is point in a string or comment?
 (defsubst cpp-auto-include/in-string-or-comment-p ()
@@ -1229,12 +1231,17 @@
            return (list :added added :removed removed)))
 
 ;; Find the insertion point for stl headers: after the last #include in the file
-(defun cpp-auto-include/header-insert-point ()
+;; or, if none, after #pragma once (if any)
+(defun cpp-auto-include/header-insert-point-by-regexp (regexp)
   (save-excursion
     (goto-char (point-max))
-    (when (re-search-backward "^#\\s-*include\\s-*[<\"]" nil t)
+    (when (re-search-backward regexp nil t)
       (forward-line 1)
       (point))))
+
+(defun cpp-auto-include/header-insert-point ()
+  (cl-some 'cpp-auto-include/header-insert-point-by-regexp
+           '("^#\\s-*include\\s-*[<\"]" "#pragma once")))
 
 ;; Add the headers we need to the file, and the using namespace std; directive
 (defun cpp-auto-include/add-headers (headers use-std)
