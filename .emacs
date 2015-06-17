@@ -27,7 +27,8 @@
 (setq package-archives '(("org" . "http://orgmode.org/elpa/")
                          ("gnu" . "http://elpa.gnu.org/packages/")
                          ("elpa" . "http://tromey.com/elpa/")
-                         ("marmalade" . "http://marmalade-repo.org/packages/")
+                         ;;("marmalade" . "http://marmalade-repo.org/packages/")
+                         ("stable-melpa" . "http://stable.melpa.org/packages/")
                          ("melpa" . "http://melpa.org/packages/")))
 
 (package-initialize)
@@ -356,6 +357,18 @@
 
 ;;------------------------------------------------------------------------------
 ;; IDO & smex
+(use-package ido
+  :ensure t
+  :preface
+  (defvar ido-cur-item               nil)
+  (defvar ido-default-item           nil)
+  (defvar predicate                  nil)
+  (defvar inherit-input-method       nil)
+  (defvar ido-cur-list               nil)
+  (defvar ido-context-switch-command nil)
+  (defvar ido-cr+-enable-next-call   nil)
+  (defvar ido-cr+-replace-completely nil))
+
 (use-package flx-ido
   :ensure t
   :config
@@ -368,6 +381,8 @@
 
 (use-package ido-ubiquitous
   :ensure t
+  :preface
+  (defvar ido-ubiquitous-debug-mode nil)
   :config
   (ido-ubiquitous-mode))
 
@@ -564,18 +579,6 @@ an error."
   :ensure t
   :config
   (add-to-list 'company-backends 'company-c-headers))
-
-;;------------------------------------------------------------------------------
-;; Company backend for haskell
-;; (use-package company-ghc
-;;   :ensure t
-;;   :init
-;;   (require 'cl)
-;;   (use-package ghc
-;;     :ensure t)
-;;   :config
-;;   (ghc-comp-init)
-;;   (add-to-list 'company-backends '(company-ghc :with company-dabbrev-code)))
 
 ;;------------------------------------------------------------------------------
 ;; Make sure tab works with indenting, completion, yasnippet
@@ -812,9 +815,17 @@ an error."
   :init
   (use-package flycheck-haskell
     :ensure t)
+  (use-package ghc
+    :pin stable-melpa
+    :ensure t)
+  (use-package company-ghc
+    :ensure t)
   :config
-  (setq ghc-interactive-command "ghci")
-  (setq ghc-debug t)
+  (add-to-list 'company-backends '(company-ghc :with company-dabbrev-code))
+  (setq ghc-interactive-command "ghci"
+        ghc-debug t
+        company-ghc-show-info t)
+  (ghc-comp-init)
   :mode "\\.hs$")
 
 (eval-after-load "haskell-cabal"
@@ -919,6 +930,8 @@ an error."
             (require 'ox-beamer)
             (add-to-list 'org-beamer-environments-extra
              '("onlyenv" "O" "\\begin{onlyenv}%a" "\\end{onlyenv}"))))
+
+(setq initial-major-mode 'org-mode)
 
 ;;------------------------------------------------------------------------------
 ;; Other lesser-used modes
@@ -1128,3 +1141,6 @@ Example of an XCode UUID: a513b85041a3535fc3520c3d."
 
 (size-frame-default)
 
+;; Local Variables:
+;; byte-compile-warnings: (not free-vars)
+;; End:
