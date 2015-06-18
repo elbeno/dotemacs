@@ -47,7 +47,7 @@
 ;; section of the standard for each is given in ;; [brackets].
 (defvar cpp-auto-include/header-regexp
   `(;; [support.types]
-    ("cstddef" ("std::")
+    ("cstddef" ("*")
      ,(rx (and symbol-start
                (or "size_t" "ptrdiff_t" "nullptr_t" "max_align_t")
                symbol-end)))
@@ -56,7 +56,7 @@
                (or (and "offsetof" (* space) "(")
                    (and "NULL" symbol-end)))))
     ;; [limits.syn]
-    ("limits" ("std::")
+    ("limits" ("*")
      ,(rx (and symbol-start
                (or (and "numeric_limits" (* space) "<")
                    (and  (or "round_indeterminate"
@@ -92,7 +92,7 @@
                    "FLT_ROUNDS" "FLT_EVAL_METHOD")
                symbol-end)))
     ;; [cstdint.syn]
-    ("cstdint" ("std::")
+    ("cstdint" ("*")
      ,(rx (and symbol-start
                (or (and (zero-or-one "u")
                         "int"
@@ -129,7 +129,7 @@
                                  (or "_MAX" "_MIN")))
                         symbol-end)))))
     ;; [support.start.term]
-    ("cstdlib" ("std::")
+    ("cstdlib" ("*")
      ,(rx (and symbol-start
                (or "_Exit" "at_quick_exit" "quick_exit"
                    "abort" "exit" "at_exit")
@@ -139,7 +139,7 @@
                (or "EXIT_FAILURE" "EXIT_SUCCESS")
                symbol-end)))
     ;; [support.dynamic]
-    ("new" ("std::")
+    ("new" ("*")
      ,(rx (and symbol-start
                (or (and (or "get_new_handler" "set_new_handler")
                         (* space) "(")
@@ -148,12 +148,12 @@
                             "bad_alloc" "bad_array_new_length")
                         symbol-end)))))
     ;; [support.rtti]
-    ("typeinfo" ("std::")
+    ("typeinfo" ("*")
      ,(rx (and symbol-start
                (or "type_info" "bad_cast" "bad_typeid")
                symbol-end)))
     ;; [support.exception]
-    ("exception" ("std::")
+    ("exception" ("*")
      ,(rx (and symbol-start
                (or (and (or "get_unexpected" "set_unexpected" "unexpected"
                             "get_terminate" "set_terminate" "terminate"
@@ -170,12 +170,12 @@
                             "exception" "exception_ptr")
                         symbol-end)))))
     ;; [support.initlist]
-    ("initializer_list" ("std::")
+    ("initializer_list" ("*")
      ,(rx (and symbol-start
                "initializer_list"
                (* space) "<")))
     ;; [support.runtime]
-    ("csetjmp" ("std::")
+    ("csetjmp" ("*")
      ,(rx (and symbol-start
                (or (and "longjmp"
                         (* space) "(")
@@ -185,7 +185,7 @@
      ,(rx (and symbol-start
                "setjmp"
                (* space) "(")))
-    ("csignal" ("std::")
+    ("csignal" ("*")
      ,(rx (and symbol-start
                (or (and (or "signal" "raise")
                         (* space) "(")
@@ -202,7 +202,7 @@
      ,(rx (and symbol-start
                "__alignas_is_defined"
                symbol-end)))
-    ("cstdarg" ("std::")
+    ("cstdarg" ("*")
      ,(rx (and symbol-start
                "va_list"
                symbol-end)))
@@ -214,11 +214,11 @@
      ,(rx (and symbol-start
                "__bool_true_false_are_defined"
                symbol-end)))
-    ("cstdlib" ("std::")
+    ("cstdlib" ("*")
      ,(rx (and symbol-start
                (or "system" "getenv")
                (* space) "(")))
-    ("ctime" ("std::")
+    ("ctime" ("*")
      ,(rx (and symbol-start
                (or (and (or "clock" "time" "difftime"
                             "ctime" "asctime" "strftime"
@@ -231,7 +231,7 @@
                "CLOCKS_PER_SEC"
                symbol-end)))
     ;; [std.exceptions]
-    ("stdexcept" ("std::")
+    ("stdexcept" ("*")
      ,(rx (and symbol-start
                (or "logic_error" "domain_error"
                    "invalid_argument" "length_error"
@@ -260,7 +260,7 @@
                    "ETIMEDOUT" "ETXTBSY" "EWOULDBLOCK" "EXDEV" "errno")
                symbol-end)))
     ;; [syserr]
-    ("system_error" ("std::")
+    ("system_error" ("*")
      ,(rx (and symbol-start
                (or  (and (or "generic_category" "system_category"
                              "make_error_code" "make_error_condition")
@@ -307,7 +307,7 @@
                                    "wrong_protocol_type")))
                          symbol-end)))))
     ;; [utility]
-    ("utility" ("std::") ;; ("initializer_list")
+    ("utility" ("*") ;; ("initializer_list")
      ,(rx (and symbol-start
                (or (and (or "swap" "exchange" "move" "move_if_noexcept")
                         (* space) (or "(" "<"))
@@ -319,7 +319,7 @@
                    (and  (or "piecewise_construct" "piecewise_construct_t")
                          symbol-end)))))
     ;; [tuple]
-    ("tuple" ("std::")
+    ("tuple" ("*")
      ,(rx (and symbol-start
                (or (and (or "ignore")
                         (* space) "(")
@@ -329,12 +329,12 @@
                    (and (or "tuple" "tuple_size" "tuple_element")
                         (* space) "<")))))
     ;; [template.bitset]
-    ("bitset" ("std::") ;; ("string" "iosfwd")
+    ("bitset" ("*") ;; ("string" "iosfwd")
      ,(rx (and symbol-start
                "bitset"
                (* space) "<")))
     ;; [memory.syn]
-    ("memory" ("std::")
+    ("memory" ("*")
      ,(rx (and symbol-start
                (or (and (or "align" "declare_reachable"
                             "declare_no_pointers" "undeclare_no_pointers"
@@ -362,16 +362,16 @@
                             "bad_weak_ptr")
                         symbol-end)))))
     ;; [c.malloc]
-    ("cstdlib" ("std::")
+    ("cstdlib" ("*")
      ,(rx (and symbol-start
                (or "calloc" "free" "malloc" "realloc")
                (* space) "(")))
-    ("cstring" ("std::")
+    ("cstring" ("*")
      ,(rx (and symbol-start
                (or "memchr" "memcmp" "memmove" "memset")
                (* space) "(")))
     ;; [functional]
-    ("functional" ("std::")
+    ("functional" ("*")
      ,(rx (and symbol-start
                (or (and (or "ref" "cref"
                             "not1" "not2"
@@ -391,12 +391,12 @@
                    (and "bad_function_call"
                         symbol-end)))))
     ;; deprecated stuff omitted
-    ("functional" ("placeholders::" "std::")
+    ("functional" ("placeholders::" "*")
      ,(rx (and symbol-start
                (or "_1" "_2" "_3" "_4" "_5" "_6")
                symbol-end)))
     ;; [meta.type.synop]
-    ("type_traits" ("std::")
+    ("type_traits" ("*")
      ,(rx (and symbol-start
                (or (and (or "integral_constant"
                             "is_void" "is_null_pointer"
@@ -438,7 +438,7 @@
                    (and (or "true_type" "false_type")
                         symbol-end)))))
     ;; [ratio.syn]
-    ("ratio" ("std::")
+    ("ratio" ("*")
      ,(rx (and symbol-start
                (or (and "ratio"
                         (zero-or-one (or "_add" "_subtract"
@@ -453,7 +453,7 @@
                             "tera" "peta" "exa" "zetta" "yotta")
                         symbol-end)))))
     ;; [time.syn]
-    ("chrono" ("chrono::" "std::")
+    ("chrono" ("chrono::" "*")
      ,(rx (and symbol-start
                (or (and (or "duration_cast" "time_point_cast")
                         (* space) (or "(" "<"))
@@ -465,17 +465,17 @@
                             "system_clock" "steady_clock" "high_resolution_clock")
                         symbol-end)))))
     ;; [allocator.adaptor.syn]
-    ("scoped_allocator" ("std::")
+    ("scoped_allocator" ("*")
      ,(rx (and symbol-start
                "scoped_allocator_adaptor"
                (* space) "<")))
     ;; [type.index.synopsis]
-    ("typeindex" ("std::")
+    ("typeindex" ("*")
      ,(rx (and symbol-start
                "type_index"
                symbol-end)))
     ;; [string.classes]
-    ("string" ("std::") ;; ("initializer_list")
+    ("string" ("*") ;; ("initializer_list")
      ,(rx (and symbol-start
                (or (and (or "to_string" "to_wstring"
                             "stoi" "stol" "stoul" "stoll" "stoull"
@@ -486,13 +486,13 @@
                    (and (or "string" "wstring" "u16string" "u32string")
                         symbol-end)))))
     ;; [c.strings]
-    ("cctype" ("std::")
+    ("cctype" ("*")
      ,(rx (and symbol-start
                (or "isalnum" "tolower" "toupper" "isblank" "isalpha"
                    "iscntrl" "isdigit" "isgraph" "islower" "isprint"
                    "ispunct" "isspace" "isupper" "isxdigit")
                (* space) "(")))
-    ("cwctype" ("std::")
+    ("cwctype" ("*")
      ,(rx (and symbol-start
                (or (and (or "iswalnum" "iswalpha" "iswblank" "iswcntrl" "iswctype"
                             "iswdigit" "iswgraph" "iswlower" "iswprint" "iswpunct"
@@ -505,7 +505,7 @@
      ,(rx (and symbol-start
                "WEOF"
                symbol-end)))
-    ("cwctype" ("std::")
+    ("cwctype" ("*")
      ,(rx (and symbol-start
                (or (and (or "memchr" "strcat" "strcspn" "strncpy" "strtok"
                             "memcmp" "strchr" "strerror" "strpbrk" "strxfrm"
@@ -513,7 +513,7 @@
                             "memmove" "strcoll" "strncat" "strspn"
                             "memset" "strcpy" "strncmp" "strstr")
                         (* space) "(")))))
-    ("cwchar" ("std::")
+    ("cwchar" ("*")
      ,(rx (and symbol-start
                (or (and (or "btowc" "mbsinit" "vwscanf" "wcsncpy" "wcstoull"
                             "fgetwc" "mbsrtowcs" "wcrtomb" "wcspbrk" "wcstoul"
@@ -534,7 +534,7 @@
      ,(rx (and symbol-start
                (or "WCHAR_MAX" "WCHAR_MIN")
                symbol-end)))
-    ("cstdlib" ("std::")
+    ("cstdlib" ("*")
      ,(rx (and symbol-start
                (or "atof" "mblen" "strtof" "strtoul"
                    "atoi" "mbtowc" "strtol" "strtoull"
@@ -545,7 +545,7 @@
      ,(rx (and symbol-start
                "MB_CUR_MAX"
                symbol-end)))
-    ("cuchar" ("std::")
+    ("cuchar" ("*")
      ,(rx (and symbol-start
                (or "mbrtoc16" "c16rtomb" "mbrtoc32" "c32rtomb")
                (* space) "(")))
@@ -554,7 +554,7 @@
                (or "__STDC_UTF_16__" "__STDC_UTF_32__")
                symbol-end)))
     ;; [locale.syn]
-    ("locale" ("std::")
+    ("locale" ("*")
      ,(rx (and symbol-start
                (or (and (or "use_facet" "has_facet"
                             "wstring_convert"
@@ -571,7 +571,7 @@
                             "money_base" "messages_base")
                         symbol-end)))))
     ;; [locale.stdcvt]
-    ("codecvt" ("std::")
+    ("codecvt" ("*")
      ,(rx (and symbol-start
                (or (and (or "codecvt_utf8"
                             "codecvt_utf16"
@@ -581,7 +581,7 @@
                             "consume_header" "generate_header" "little_endian")
                         symbol-end)))))
     ;; [c.locales]
-    ("clocale" ("std::")
+    ("clocale" ("*")
      ,(rx (and symbol-start
                (or (and (or "localeconv" "setlocale")
                         (* space) "(")
@@ -594,58 +594,58 @@
                    "LC_MONETARY" "LC_NUMERIC")
                symbol-end)))
     ;; [sequences.general]
-    ("array" ("std::") ;; ("initializer_list")
+    ("array" ("*") ;; ("initializer_list")
      ,(rx (and symbol-start
                "array"
                (* space) "<")))
-    ("deque" ("std::") ;; ("initializer_list")
+    ("deque" ("*") ;; ("initializer_list")
      ,(rx (and symbol-start
                "deque"
                (* space) "<")))
-    ("forward_list" ("std::") ;; ("initializer_list")
+    ("forward_list" ("*") ;; ("initializer_list")
      ,(rx (and symbol-start
                "forward_list"
                (* space) "<")))
-    ("list" ("std::") ;; ("initializer_list")
+    ("list" ("*") ;; ("initializer_list")
      ,(rx (and symbol-start
                "list"
                (* space) "<")))
-    ("vector" ("std::") ;; ("initializer_list")
+    ("vector" ("*") ;; ("initializer_list")
      ,(rx (and symbol-start
                "vector"
                (* space) "<")))
     ;; [associative.map.syn]
-    ("map" ("std::") ;; ("initializer_list")
+    ("map" ("*") ;; ("initializer_list")
      ,(rx (and symbol-start
                (or "map" "multimap")
                (* space) "<")))
     ;; [associative.set.syn]
-    ("set" ("std::") ;; ("initializer_list")
+    ("set" ("*") ;; ("initializer_list")
      ,(rx (and symbol-start
                (or "set" "multiset")
                (* space) "<")))
     ;; [unord.map.syn]
-    ("unordered_map" ("std::") ;; ("initializer_list")
+    ("unordered_map" ("*") ;; ("initializer_list")
      ,(rx (and symbol-start
                (or "unordered_map" "unordered_multimap")
                (* space) "<")))
     ;; [unord.set.syn]
-    ("unordered_set" ("std::") ;; ("initializer_list")
+    ("unordered_set" ("*") ;; ("initializer_list")
      ,(rx (and symbol-start
                (or "unordered_set" "unordered_multiset")
                (* space) "<")))
     ;; [queue.syn]
-    ("queue" ("std::") ;; ("initializer_list")
+    ("queue" ("*") ;; ("initializer_list")
      ,(rx (and symbol-start
                (or "queue" "priority_queue")
                (* space) "<")))
     ;; [stack.syn]
-    ("stack" ("std::") ;; ("initializer_list")
+    ("stack" ("*") ;; ("initializer_list")
      ,(rx (and symbol-start
                "stack"
                (* space) "<")))
     ;; [iterator.syn]
-    ("iterator" ("std::")
+    ("iterator" ("*")
      ,(rx (and symbol-start
                (or (and (or "iterator_traits" "iterator"
                             "reverse_iterator" "move_iterator"
@@ -669,7 +669,7 @@
                             "random_access_iterator_tag")
                         symbol-end)))))
     ;; [algorithms.general]
-    ("algorithm" ("std::") ;; ("initializer_list")
+    ("algorithm" ("*") ;; ("initializer_list")
      ,(rx (and
            (or "all_of" "any_of" "none_of"
                "for_each"
@@ -716,12 +716,12 @@
                "next_permutation" "prev_permutation")
            (* space) (or "<" "("))))
     ;; [alg.c.library]
-    ("cstdlib" ("std::")
+    ("cstdlib" ("*")
      ,(rx (and symbol-start
                (or "bsearch" "qsort")
                (* space) "(")))
     ;; [cfenv.syn]
-    ("cfenv" ("std::")
+    ("cfenv" ("*")
      ,(rx (and symbol-start
                (or (and (or "feclearexcept" "fegetexceptflag"
                             "feraiseexcept" "fesetexceptflag" "fetestexcept"
@@ -740,12 +740,12 @@
                    "FE_DFL_ENV")
                symbol-end)))
     ;; [complex.syn]
-    ("complex" ("std::")
+    ("complex" ("*")
      ,(rx (and symbol-start
                "complex"
                (* space) "<")))
     ;; [rand.synopsis]
-    ("random" ("std::") ;; ("initializer_list")
+    ("random" ("*") ;; ("initializer_list")
      ,(rx (and symbol-start
                (or (and (or "linear_congruential_engine"
                             "mersenne_twister_engine"
@@ -784,7 +784,7 @@
                             "bernoulli_distribution")
                         symbol-end)))))
     ;; [valarray.syn]
-    ("valarray" ("std::") ;; ("initializer_list")
+    ("valarray" ("*") ;; ("initializer_list")
      ,(rx (and symbol-start
                (or (and (or "valarray"
                             "slice_array" "gslice_array"
@@ -793,7 +793,7 @@
                    (and (or "slice" "gslice")
                         symbol-end)))))
     ;; [numeric.ops.overview]
-    ("numeric" ("std::")
+    ("numeric" ("*")
      ,(rx (and symbol-start
                (or "accumulate"
                    "inner_product"
@@ -802,7 +802,7 @@
                    "iota")
                (* space) (or "<" "("))))
     ;; [c.math]
-    ("cmath" ("std::")
+    ("cmath" ("*")
      ,(rx (and symbol-start
                (or (and (or "abs" "cosh" "fmod" "logb" "remquo"
                             "acos" "erf" "frexp" "lrint" "rint"
@@ -829,7 +829,7 @@
                    "FP_FAST_FMAL" "FP_NAN HUGE_VAL" "NAN" "math_errhandling"
                    "FP_ILOGB0" "FP_NORMAL" "HUGE_VALF")
                symbol-end)))
-    ("cstdlib" ("std::")
+    ("cstdlib" ("*")
      ,(rx (and symbol-start
                (or (and (or "ldiv" "lldiv"
                             "labs" "llabs"
@@ -842,13 +842,13 @@
                "RAND_MAX"
                symbol-end)))
     ;; [iostream.objects.overview]
-    ("iostream" ("std::") ;; ("ios" "streambuf" "istream" "ostream")
+    ("iostream" ("*") ;; ("ios" "streambuf" "istream" "ostream")
      ,(rx (and symbol-start
                (or "cin" "cout" "cerr" "clog"
                    "wcin" "wcout" "wcerr" "wclog")
                symbol-end)))
     ;; [iostreams.base.overview]
-    ("ios" ("std::") ;; ("iosfwd")
+    ("ios" ("*") ;; ("iosfwd")
      ,(rx (and symbol-start
                (or (and (or "fpos" "basic_ios")
                         (* space) "<")
@@ -862,14 +862,14 @@
                                      "skipws" "uppercase" "unitbuf")))
                         symbol-end)))))
     ;; [stream.buffers.overview]
-    ("streambuf" ("std::")
+    ("streambuf" ("*")
      ,(rx (and symbol-start
                (or (and (or "basic_streambuf")
                         (* space) "<")
                    (and (or "streambuf" "wstreambuf")
                         symbol-end)))))
     ;; [iostream.format.overview]
-    ("istream" ("std::")
+    ("istream" ("*")
      ,(rx (or
            (and (not (in "<[a-zA-Z_0-9]"))
                 "iostream"
@@ -880,13 +880,13 @@
                          (* space) "<")
                     (and (or "istream" "wistream" "wiostream" "ws")
                          symbol-end))))))
-    ("ostream" ("std::")
+    ("ostream" ("*")
      ,(rx (and symbol-start
                (or (and (or "basic_ostream")
                         (* space) "<")
                    (and (or "ostream" "wostream" "endl" "ends" "flush")
                         symbol-end)))))
-    ("iomanip" ("std::")
+    ("iomanip" ("*")
      ,(rx (and symbol-start
                (or (and (or "resetiosflags" "setiosflags"
                             "setbase" "setprecision" "setw")
@@ -897,7 +897,7 @@
                             "quoted")
                         (* space) (or "<" "("))))))
     ;; [string.streams.overview]
-    ("sstream" ("std::")
+    ("sstream" ("*")
      ,(rx (and symbol-start
                (or (and (or "basic_stringbuf"
                             "basic_istringstream"
@@ -910,7 +910,7 @@
                             "ostringstream" "wostringstream")
                         symbol-end)))))
     ;; [fstreams]
-    ("fstream" ("std::")
+    ("fstream" ("*")
      ,(rx (and symbol-start
                (or (and (or "basic_filebuf"
                             "basic_ifstream"
@@ -923,7 +923,7 @@
                             "ofstream" "wofstream")
                         symbol-end)))))
     ;; [c.files]
-    ("cstdio" ("std::")
+    ("cstdio" ("*")
      ,(rx (and symbol-start
                (or (and (or "clearerr" "fopen" "fsetpos" "putchar" "snprintf" "vscanf"
                             "fclose" "fprintf" "ftell" "puts" "sprintf" "vsnprintf"
@@ -942,7 +942,7 @@
                    "EOF" "L_tmpnam" "SEEK_END" "_IOFBF" "stderr"
                    "FILENAME_MAX" "SEEK_SET" "_IOLBF" "stdin")
                symbol-end)))
-    ("cinttypes" ("std::")
+    ("cinttypes" ("*")
      ,(rx (and symbol-start
                (or (and (or "imaxabs" "strtoimax" "wcstoimax"
                             "imaxdiv" "strtoumax" "wcstoumax")
@@ -959,7 +959,7 @@
                              (or "8" "16" "32" "64"))))
                symbol-end)))
     ;; [re.syn]
-    ("regex" ("std::") ;; ("initializer_list")
+    ("regex" ("*") ;; ("initializer_list")
      ,(rx (and symbol-start
                (or (and (or "regex_traits"
                             "basic_regex"
@@ -997,7 +997,7 @@
                             "error_badrepeat" "error_complexity" "error_stack")
                         symbol-end)))))
     ;; [atomics.syn]
-    ("atomic" ("std::")
+    ("atomic" ("*")
      ,(rx (and symbol-start
                (or (and (or "kill_dependency"
                             "atomic")
@@ -1059,18 +1059,18 @@
                         "_LOCK_FREE"
                         symbol-end)))))
     ;; [thread.threads]
-    ("thread" ("std::")
+    ("thread" ("*")
      ,(rx (and symbol-start
                "thread"
                symbol-end)))
-    ("thread" ("this_thread::" "std::")
+    ("thread" ("this_thread::" "*")
      ,(rx (and symbol-start
                (or (and (or "sleep_until" "sleep_for")
                         (* space) (or "<" "("))
                    (and (or "get_id" "yield")
                         (* space) "(")))))
     ;; [thread.mutex]
-    ("mutex" ("std::")
+    ("mutex" ("*")
      ,(rx (and symbol-start
                (or (and (or "lock" "try_lock" "call_once")
                         (* space) (or "<" "("))
@@ -1082,13 +1082,13 @@
                             "defer_lock" "try_to_lock" "adopt_lock"
                             "once_flag")
                         symbol-end)))))
-    ("shared_mutex" ("std::")
+    ("shared_mutex" ("*")
      ,(rx (and symbol-start
                (or (and "shared_lock"
                         (* space) "<")
                    (and "shared_timed_mutex"
                         symbol-end)))))
-    ("condition_variable" ("std::")
+    ("condition_variable" ("*")
      ,(rx (and symbol-start
                (or (and "notify_all_at_thread_exit"
                         (* space) "(")
@@ -1098,7 +1098,7 @@
                                      "timeout")))
                         symbol-end)))))
     ;; [futures.overview]
-    ("future" ("std::")
+    ("future" ("*")
      ,(rx (and symbol-start
                (or (and (or "async")
                         (* space) (or "<" "("))
@@ -1334,7 +1334,9 @@
     (backward-char (length ns))
     (when (not (looking-at ns))
       (forward-char (length ns))
-      (insert ns)
+      (if (equal ns "*")
+          (insert (concat cpp-auto-include/using-namespace "::"))
+        (insert ns))
       (backward-char (length ns)))))
 
 ;; Qualify all occurrences of a regexp using the namespace list
