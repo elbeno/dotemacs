@@ -1369,7 +1369,7 @@
              (cpp-auto-include/ns-qualify-regexp-occurrences regexp nslist included-line))))
 
 ;;;###autoload
-(defun cpp-auto-include ()
+(defun cpp-auto-include/ensure-includes-for-file ()
   (interactive)
   (let* ((info (cpp-auto-include/parse-file))
          (added (plist-get info :added))
@@ -1386,7 +1386,7 @@
          use-std)))))
 
 ;;;###autoload
-(defun cpp-auto-include-for-current-line ()
+(defun cpp-auto-include/ensure-includes-for-current-line ()
   (interactive)
   (let* ((info (cpp-auto-include/parse-line (line-number-at-pos (point))))
          (added (plist-get info :added))
