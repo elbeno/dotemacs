@@ -646,79 +646,75 @@
                (* space) "<")))
     ;; [iterator.syn]
     ("iterator" ("std::")
-     ,(rx (or
-           (and (not (in "\\.>[a-zA-Z_0-9]"))
-                (or "begin" "end" "cbegin" "cend"
-                    "rbegin" "rend" "crbegin" "crend"
-                    "size" "empty" "data")
-                (* space) (or "<" "("))
-           (and symbol-start
-                (or (and (or "iterator_traits" "iterator"
-                             "reverse_iterator" "move_iterator"
-                             "istream_iterator" "ostream_iterator"
-                             "istreambuf_iterator" "ostreambuf_iterator")
-                         (* space) "<")
-                    (and (or "advance" "distance" "next" "prev"
-                             "make_reverse_iterator"
-                             "back_inserter"
-                             "front_inserter"
-                             "inserter"
-                             "make_move_iterator")
-                         (* space) (or "<" "("))
-                    (and (or "input_iterator_tag"
-                             "output_iterator_tag"
-                             "forward_iterator_tag"
-                             "bidirectional_iterator_tag"
-                             "random_access_iterator_tag")
-                         symbol-end))))))
+     ,(rx (and symbol-start
+               (or (and (or "iterator_traits" "iterator"
+                            "reverse_iterator" "move_iterator"
+                            "istream_iterator" "ostream_iterator"
+                            "istreambuf_iterator" "ostreambuf_iterator")
+                        (* space) "<")
+                   (and (or "advance" "distance" "next" "prev"
+                            "make_reverse_iterator"
+                            "back_inserter"
+                            "front_inserter"
+                            "inserter"
+                            "make_move_iterator"
+                            "begin" "end" "cbegin" "cend"
+                            "rbegin" "rend" "crbegin" "crend"
+                            "size" "empty" "data")
+                        (* space) (or "<" "("))
+                   (and (or "input_iterator_tag"
+                            "output_iterator_tag"
+                            "forward_iterator_tag"
+                            "bidirectional_iterator_tag"
+                            "random_access_iterator_tag")
+                        symbol-end)))))
     ;; [algorithms.general]
     ("algorithm" ("std::") ;; ("initializer_list")
-     ,(rx (and (not (in "\\.>[a-zA-Z_0-9]"))
-               (or (and
-                    (or "all_of" "any_of" "none_of"
-                        "for_each"
-                        "find" "find_if" "find_if_not"
-                        "find_end" "find_first_of"
-                        "adjacent_find"
-                        "count" "count_if"
-                        "mismatch" "equal"
-                        "is_permutation"
-                        "search" "search_n"
-                        "copy" "copy_n"
-                        "copy_if" "copy_backward"
-                        "move" "move_backward"
-                        "swap_ranges" "iter_swap"
-                        "transform"
-                        "replace" "replace_if"
-                        "replace_copy" "replace_copy_if"
-                        "fill" "fill_n"
-                        "generate" "generate_n"
-                        "remove" "remove_if"
-                        "remove_copy" "remove_copy_if"
-                        "unique" "unique_copy"
-                        "reverse" "reverse_copy"
-                        "rotate" "shuffle"
-                        "is_partitioned"
-                        "partition" "stable_partition"
-                        "partition_copy" "partition_point"
-                        "sort" "stable_sort"
-                        "partial_sort" "partial_sort_copy"
-                        "is_sorted" "is_sorted_until"
-                        "nth_element"
-                        "lower_bound" "upper_bound"
-                        "equal_range" "binary_search"
-                        "merge" "inplace_merge"
-                        "includes"
-                        "set_union" "set_intersection"
-                        "set_difference" "set_symmetric_difference"
-                        "push_heap" "pop_heap"
-                        "make_heap" "sort_heap"
-                        "is_heap" "is_heap_until"
-                        "min" "max" "minmax"
-                        "min_element" "max_element" "minmax_element"
-                        "lexicographical_compare"
-                        "next_permutation" "prev_permutation")
-                    (* space) (or "<" "("))))))
+     ,(rx (and
+           (or "all_of" "any_of" "none_of"
+               "for_each"
+               "find" "find_if" "find_if_not"
+               "find_end" "find_first_of"
+               "adjacent_find"
+               "count" "count_if"
+               "mismatch" "equal"
+               "is_permutation"
+               "search" "search_n"
+               "copy" "copy_n"
+               "copy_if" "copy_backward"
+               "move" "move_backward"
+               "swap_ranges" "iter_swap"
+               "transform"
+               "replace" "replace_if"
+               "replace_copy" "replace_copy_if"
+               "fill" "fill_n"
+               "generate" "generate_n"
+               "remove" "remove_if"
+               "remove_copy" "remove_copy_if"
+               "unique" "unique_copy"
+               "reverse" "reverse_copy"
+               "rotate" "shuffle"
+               "is_partitioned"
+               "partition" "stable_partition"
+               "partition_copy" "partition_point"
+               "sort" "stable_sort"
+               "partial_sort" "partial_sort_copy"
+               "is_sorted" "is_sorted_until"
+               "nth_element"
+               "lower_bound" "upper_bound"
+               "equal_range" "binary_search"
+               "merge" "inplace_merge"
+               "includes"
+               "set_union" "set_intersection"
+               "set_difference" "set_symmetric_difference"
+               "push_heap" "pop_heap"
+               "make_heap" "sort_heap"
+               "is_heap" "is_heap_until"
+               "min" "max" "minmax"
+               "min_element" "max_element" "minmax_element"
+               "lexicographical_compare"
+               "next_permutation" "prev_permutation")
+           (* space) (or "<" "("))))
     ;; [alg.c.library]
     ("cstdlib" ("std::")
      ,(rx (and symbol-start
@@ -1138,6 +1134,9 @@
     ("ostream" . ("iostream"))
     ("ios" . ("iostream"))))
 
+(defvar cpp-auto-include/member-access-regexp
+  (rx (and (or "." "->") (* space))))
+
 ;; Insert a blank line at line, if it's not already blank
 (defun cpp-auto-include/ensure-blank-line-at (line)
   (save-excursion
@@ -1160,6 +1159,13 @@
 (defsubst cpp-auto-include/in-string-or-comment-p ()
   (nth 8 (syntax-ppss)))
 
+;; Is point really at a match?
+(defun cpp-auto-include/false-match ()
+  (or (cpp-auto-include/in-string-or-comment-p)
+      (save-excursion
+        (goto-char (match-beginning 0))
+        (looking-back cpp-auto-include/member-access-regexp))))
+
 ;; Does the buffer contain a regexp? Start searching from line (so as not to
 ;; generate false positives on includes) and omit strings and comments.
 (defun cpp-auto-include/buffer-has-keyword-p (regexp line)
@@ -1169,7 +1175,7 @@
       (forward-line line))
     (let (finish)
       (while (and (not finish) (re-search-forward regexp nil t))
-        (unless (cpp-auto-include/in-string-or-comment-p)
+        (unless (cpp-auto-include/false-match)
           (setq finish t)))
       finish)))
 
@@ -1181,7 +1187,7 @@
       (forward-line (- line 1)))
     (let (finish)
       (while (and (not finish) (re-search-forward regexp (line-end-position) t))
-        (unless (cpp-auto-include/in-string-or-comment-p)
+        (unless (cpp-auto-include/false-match)
           (setq finish t)))
       finish)))
 
@@ -1338,7 +1344,7 @@
     (when line
       (forward-line line))
     (while (re-search-forward regexp nil t)
-      (unless (cpp-auto-include/in-string-or-comment-p)
+      (unless (cpp-auto-include/false-match)
         (save-excursion
           (goto-char (match-beginning 0))
           (cpp-auto-include/ensure-qualifier-at-point nslist))))))
