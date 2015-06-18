@@ -1152,7 +1152,7 @@
     (goto-char (point-min))
     (let ((regexp (format cpp-auto-include/std-header-regexp header)))
       (cond ((re-search-forward regexp nil t)
-             (cons (line-number-at-pos) (equal "\"" (match-string 1))))
+             (cons (line-number-at-pos) (string= "\"" (match-string 1))))
             (t '(nil . nil))))))
 
 ;; Is point in a string or comment?
@@ -1331,13 +1331,14 @@
 ;; Ensure there is a namespace qualifier at point
 (defun cpp-auto-include/ensure-qualifier-at-point (nslist)
   (dolist (ns nslist)
-    (backward-char (length ns))
-    (when (not (looking-at ns))
-      (forward-char (length ns))
-      (if (equal ns "*")
-          (insert (concat cpp-auto-include/using-namespace "::"))
-        (insert ns))
-      (backward-char (length ns)))))
+    (let ((real-ns (if (string= ns "*")
+                       (concat cpp-auto-include/using-namespace "::")
+                     ns)))
+      (backward-char (length real-ns))
+      (when (not (looking-at real-ns))
+        (forward-char (length real-ns))
+        (insert real-ns))
+      (backward-char (length real-ns)))))
 
 ;; Qualify all occurrences of a regexp using the namespace list
 (defun cpp-auto-include/ns-qualify-regexp-occurrences (regexp nslist line)
