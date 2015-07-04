@@ -1,6 +1,6 @@
 ;;------------------------------------------------------------------------------
 ;; debugging
-(setq debug-on-error t)
+(setq debug-on-error nil)
 
 ;; this file's true directory
 (setq dotfile-dir (file-name-directory
@@ -703,14 +703,17 @@ an error."
   (interactive)
   (gud-gdb (concat "gdb --fullname " (cppcm-get-exe-path-current-buffer))))
 
+(defun cpp-debug-setup ()
+  (local-set-key (kbd "\C-c \C-g") 'my/gdb-exec))
+(add-hook 'c++-mode-hook 'cpp-debug-setup)
+
 (use-package cpputils-cmake
   :ensure t
   :config
   (add-hook 'c-mode-common-hook
             (lambda ()
               (if (derived-mode-p 'c-mode 'c++-mode)
-                  (cppcm-reload-all))))
-  :bind (("C-c C-g" . my/gdb-exec)))
+                  (cppcm-reload-all)))))
 
 ;;------------------------------------------------------------------------------
 ;; Compilation
