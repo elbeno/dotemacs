@@ -246,6 +246,25 @@
   (add-hook 'prog-mode-hook #'rainbow-mode)
   :diminish rainbow-mode)
 
+;; Highlight numbers, quoted things, escape sequences
+(use-package highlight-numbers
+  :ensure t
+  :config
+  (highlight-numbers-mode)
+  :diminish highlight-numbers-mode)
+
+(use-package highlight-quoted
+  :ensure t
+  :config
+  (highlight-quoted-mode)
+  :diminish highlight-quoted-mode)
+
+(use-package highlight-escape-sequences
+  :ensure t
+  :config
+  (hes-mode)
+  :diminish hes-mode)
+
 ;;------------------------------------------------------------------------------
 ;; Colors
 (set-face-foreground 'font-lock-comment-face "gray")
