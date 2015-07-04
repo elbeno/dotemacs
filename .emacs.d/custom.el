@@ -29,11 +29,8 @@
  '(highlight-symbol-on-navigation-p t)
  '(package-selected-packages
    (quote
-    (git-rebase-mode git-commit-mode ghc gitignore-mode gitconfig-mode ghc-mod flycheck-irony elisp--witness--lisp git-messenger git-timemachine lua-mode zone-matrix ztree ido-vertical-mode rainbow-mode rainbow-delimiters ws-butler projectile abbrev company-ghci company-ghc yasnippet company-irony irony company-c-headers company fill-column-indicator smartparens multiple-cursors cygwin-mount use-package flycheck-haskell js2-mode json-mode nxml-mode protobuf-mode objc-mode haskell-mode auto-complete auto-complete-config magit column-marker flycheck dash etags-table etags-select vlf mo-git-blame git-gutter-fringe+ ace-jump-mode google-this org-plus-contrib undo-tree smex ido-ubiquitous flx-ido bm esup)))
+    (vlf org-plus-contrib git-messenger git-timemachine magit mo-git-blame git-commit git-commit-mode gitignore-mode gitconfig-mode company-ghc ghc flycheck-haskell protobuf-mode nxml-mode json-mode js2-mode lua-mode projectile cpputils-cmake cmake-mode company-c-headers flycheck-irony company-irony irony etags-table etags-select yasnippet multiple-cursors flycheck ace-jump-mode ztree google-this undo-tree smex ido-vertical-mode ido-ubiquitous flx-ido bm column-marker highlight-escape-sequences highlight-quoted highlight-numbers rainbow-mode rainbow-delimiters smartparens dash ws-butler cygwin-mount esup use-package)))
  '(protect-buffer-bury-p nil)
- '(sml/hidden-modes
-   (quote
-    (" hl-p" " yas" " Undo-Tree" " GitGutter" " AC" " Abbrev")))
  '(vc-follow-symlinks nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

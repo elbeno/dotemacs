@@ -887,17 +887,7 @@ an error."
 ;; modes
 (use-package gitconfig-mode :ensure t)
 (use-package gitignore-mode :ensure t)
-(use-package git-commit-mode :ensure t)
-(use-package git-rebase-mode :ensure t)
-
-;; git-gutter-fringe
-(use-package git-gutter-fringe+
-  :ensure t
-  :defer 5
-  :config
-  (setq git-gutter-fr+-side 'right-fringe)
-  (global-git-gutter+-mode 1)
-  :diminish git-gutter+-mode)
+(use-package git-commit :ensure t)
 
 ;; mo-git-blame
 (use-package mo-git-blame
