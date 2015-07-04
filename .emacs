@@ -891,7 +891,7 @@ an error."
   :ensure t
   :bind
   (("\C-cg" . magit-status))
-  :config
+  :init
   (setq magit-last-seen-setup-instructions "1.4.0"))
 
 ;; git time machine
