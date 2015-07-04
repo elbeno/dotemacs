@@ -694,6 +694,25 @@ an error."
 (add-hook 'c++-mode-hook 'cpp-auto-headers)
 
 ;;------------------------------------------------------------------------------
+;; CMake
+
+(use-package cmake-mode
+  :ensure t)
+
+(defun my/gdb-exec ()
+  (interactive)
+  (gud-gdb (concat "gdb --fullname " (cppcm-get-exe-path-current-buffer))))
+
+(use-package cpputils-cmake
+  :ensure t
+  :config
+  (add-hook 'c-mode-common-hook
+            (lambda ()
+              (if (derived-mode-p 'c-mode 'c++-mode)
+                  (cppcm-reload-all))))
+  :bind (("C-c C-g" . my/gdb-exec)))
+
+;;------------------------------------------------------------------------------
 ;; Compilation
 
 ;; Compilation
