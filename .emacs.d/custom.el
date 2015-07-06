@@ -5,6 +5,7 @@
  ;; If there is more than one, they won't work right.
  '(bm-cycle-all-buffers t)
  '(bm-marker (quote bm-marker-right) t)
+ '(case-fold-search t) 
  '(comint-buffer-maximum-size 20000)
  '(comint-completion-addsuffix t)
  '(comint-get-old-input (lambda nil "") t)
