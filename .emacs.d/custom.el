@@ -29,7 +29,7 @@
  '(highlight-symbol-on-navigation-p t)
  '(package-selected-packages
    (quote
-    (vlf org-plus-contrib git-messenger git-timemachine magit mo-git-blame git-commit git-commit-mode gitignore-mode gitconfig-mode company-ghc ghc flycheck-haskell protobuf-mode nxml-mode json-mode js2-mode lua-mode projectile cpputils-cmake cmake-mode company-c-headers flycheck-irony company-irony irony etags-table etags-select yasnippet multiple-cursors flycheck ace-jump-mode ztree google-this undo-tree smex ido-vertical-mode ido-ubiquitous flx-ido bm column-marker highlight-escape-sequences highlight-quoted highlight-numbers rainbow-mode rainbow-delimiters smartparens dash ws-butler cygwin-mount esup use-package)))
+    (flycheck-haskell flycheck-irony flycheck vlf org-plus-contrib git-messenger git-timemachine magit mo-git-blame git-gutter-fringe+ git-commit git-commit-mode gitignore-mode gitconfig-mode company-ghc ghc protobuf-mode nxml-mode json-mode js2-mode lua-mode projectile cpputils-cmake cmake-mode company-c-headers company-irony irony etags-table etags-select yasnippet multiple-cursors ace-jump-mode ztree google-this undo-tree smex ido-vertical-mode ido-ubiquitous flx-ido bm column-marker highlight-escape-sequences highlight-quoted highlight-numbers rainbow-mode rainbow-delimiters smartparens dash ws-butler cygwin-mount esup use-package)))
  '(protect-buffer-bury-p nil)
  '(vc-follow-symlinks nil))
 (custom-set-faces

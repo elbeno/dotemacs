@@ -1,6 +1,6 @@
 ;;------------------------------------------------------------------------------
 ;; debugging
-(setq debug-on-error nil)
+(setq debug-on-error t)
 
 ;; this file's true directory
 (setq dotfile-dir (file-name-directory
@@ -381,7 +381,6 @@
   :preface
   (defvar ido-cur-item               nil)
   (defvar ido-default-item           nil)
-  (defvar predicate                  nil)
   (defvar inherit-input-method       nil)
   (defvar ido-cur-list               nil)
   (defvar ido-context-switch-command nil)
