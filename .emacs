@@ -360,6 +360,7 @@
                                 ("\\.ui$" . nxml-mode)
                                 ("SConstruct" . python-mode)
                                 ("SConscript" . python-mode)
+                                ("\\.tmpl$" . jinja2-mode)                                
                                 ("\\.ml[iyl]?$" . caml-mode)
                                 ("\\.pb$" . protobuf-mode)
                                 ("\\.proto$" . protobuf-mode)
@@ -811,6 +812,10 @@ an error."
 (add-hook 'python-mode-hook (lambda ()
                           (flycheck-select-checker 'python-flake8)
                           (flycheck-mode)))
+
+(use-package jinja2-mode
+  :ensure t
+  :mode "\\.tmpl$")
 
 ;;------------------------------------------------------------------------------
 ;; Lua mode
