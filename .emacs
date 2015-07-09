@@ -865,6 +865,9 @@ an error."
     :ensure t)
   (use-package company-ghc
     :ensure t)
+  (use-package hindent
+    :ensure t
+    :diminish hindent-mode)
   :config
   (add-to-list 'company-backends '(company-ghc :with company-dabbrev-code))
   (setq ghc-interactive-command "ghci"
@@ -886,7 +889,9 @@ an error."
 
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
 (add-hook 'haskell-mode-hook 'flycheck-mode)
+(add-hook 'haskell-mode-hook 'hindent-mode)
 (add-hook 'flycheck-mode-hook #'flycheck-haskell-setup)
+(setq hindent-style "chris-done")
 
 ;;------------------------------------------------------------------------------
 ;; Git interactions
