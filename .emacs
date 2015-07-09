@@ -803,7 +803,7 @@ an error."
   (setq projectile-enable-caching t)
   :bind
   (("\C-xf" . projectile-find-file)
-   ("\C-x\C-g" . projectile-grep)
+   ("\C-xg" . projectile-grep)
    ("\C-c#" . projectile-find-file-dwim)
    ("\C-x\C-h" . projectile-find-other-file)))
 
