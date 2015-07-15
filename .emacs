@@ -78,9 +78,7 @@
   (setq frame-title-format "%b [cygwin emacs]")
   ;; Windows paths
   (require 'windows-path)
-  (windows-path-activate)
-  ;; Misc
-  (setq haskell-process-path-ghci "ghcii.sh"))
+  (windows-path-activate))
 
 (defun my/linux-setup ()
   ;; font: inconsolata
