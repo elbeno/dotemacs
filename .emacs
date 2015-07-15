@@ -263,6 +263,20 @@
   (hes-mode)
   :diminish hes-mode)
 
+;; Check spelling in comments and strings
+(add-hook 'prog-mode-hook 'flyspell-prog-mode)
+
+(defun flyspell-check-next-highlighted-word ()
+  "Custom function to spell check next highlighted word"
+  (interactive)
+  (flyspell-goto-next-error)
+  (ispell-word))
+
+(global-set-key (kbd "C-<f9>") 'ispell-word)
+(global-set-key (kbd "C-M-<f9>") 'flyspell-buffer)
+(global-set-key (kbd "S-<f9>") 'flyspell-check-previous-highlighted-word)
+(global-set-key (kbd "<f9>") 'flyspell-check-next-highlighted-word)
+
 ;;------------------------------------------------------------------------------
 ;; Colors
 (set-face-foreground 'font-lock-comment-face "gray")
