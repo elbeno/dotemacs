@@ -604,7 +604,8 @@ an error."
   (cond ((eq system-type 'gnu/linux)
          (add-to-list 'company-backends 'company-irony))
         ((eq system-type 'cygwin)
-         (add-to-list 'company-backends 'company-dabbrev-code))))
+         (add-to-list 'company-backends 'company-dabbrev-code)))
+   (setq company-tooltip-align-annotations t))
 
 (use-package company-c-headers
   :ensure t
@@ -867,26 +868,42 @@ an error."
 
 ;;------------------------------------------------------------------------------
 ;; Haskell mode
-(use-package haskell-mode
+(defun populate-ghc-completions (ghc-mod-arg)
+  (split-string (shell-command-to-string (concat "ghc-mod " ghc-mod-arg))))
+
+(use-package ghc
+  :pin stable-melpa
   :ensure t
-  :init
-  (use-package flycheck-haskell
-    :ensure t)
-  (use-package ghc
-    :pin stable-melpa
-    :ensure t)
-  (use-package company-ghc
-    :ensure t)
-  (use-package hindent
-    :ensure t
-    :diminish hindent-mode)
+  :config
+  (setq ghc-option-flags (populate-ghc-completions "flag"))
+  (setq ghc-language-extensions (populate-ghc-completions "lang"))
+  (setq ghc-module-names (populate-ghc-completions "list")))
+
+(use-package company-ghc
+  :ensure t
   :config
   (add-to-list 'company-backends '(company-ghc :with company-dabbrev-code))
   (setq ghc-interactive-command "ghci"
         ghc-debug t
         company-ghc-show-info t)
-  (ghc-comp-init)
+  (add-hook 'haskell-mode-hook 'ghc-init))
+
+(use-package haskell-mode
+  :ensure t
   :mode "\\.hs$")
+
+(use-package flycheck-haskell
+  :ensure t
+  :config
+  (add-hook 'haskell-mode-hook 'flycheck-mode)
+  (add-hook 'haskell-mode-hook 'flycheck-haskell-setup))
+
+(use-package hindent
+  :ensure t
+  :config
+  (setq hindent-style "chris-done")
+  (add-hook 'haskell-mode-hook 'haskell-indentation-mode)
+  (add-hook 'haskell-mode-hook 'hindent-mode))
 
 (eval-after-load "haskell-cabal"
   '(define-key haskell-cabal-mode-map (kbd "M-k") 'haskell-compile))
@@ -898,12 +915,6 @@ an error."
      (define-key haskell-mode-map (kbd "C-c C-t") 'inferior-haskell-type)
      (define-key haskell-mode-map (kbd "C-c C-i") 'inferior-haskell-info)
      (define-key haskell-mode-map (kbd "C-c M-.") 'inferior-haskell-find-definition)))
-
-(add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
-(add-hook 'haskell-mode-hook 'flycheck-mode)
-(add-hook 'haskell-mode-hook 'hindent-mode)
-(add-hook 'flycheck-mode-hook #'flycheck-haskell-setup)
-(setq hindent-style "chris-done")
 
 ;;------------------------------------------------------------------------------
 ;; Git interactions
