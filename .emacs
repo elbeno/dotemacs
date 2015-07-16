@@ -605,7 +605,8 @@ an error."
          (add-to-list 'company-backends 'company-irony))
         ((eq system-type 'cygwin)
          (add-to-list 'company-backends 'company-dabbrev-code)))
-   (setq company-tooltip-align-annotations t))
+  (setq company-tooltip-align-annotations t
+        company-show-numbers t))
 
 (use-package company-c-headers
   :ensure t
@@ -868,25 +869,19 @@ an error."
 
 ;;------------------------------------------------------------------------------
 ;; Haskell mode
-(defun populate-ghc-completions (ghc-mod-arg)
-  (split-string (shell-command-to-string (concat "ghc-mod " ghc-mod-arg))))
-
 (use-package ghc
   :pin stable-melpa
   :ensure t
   :config
-  (setq ghc-option-flags (populate-ghc-completions "flag"))
-  (setq ghc-language-extensions (populate-ghc-completions "lang"))
-  (setq ghc-module-names (populate-ghc-completions "list")))
+  (setq ghc-interactive-command "ghc-modi"
+        ghc-debug t)
+  (add-hook 'haskell-mode-hook 'ghc-init))
 
 (use-package company-ghc
   :ensure t
   :config
   (add-to-list 'company-backends '(company-ghc :with company-dabbrev-code))
-  (setq ghc-interactive-command "ghci"
-        ghc-debug t
-        company-ghc-show-info t)
-  (add-hook 'haskell-mode-hook 'ghc-init))
+  (setq company-ghc-show-info 'oneline))
 
 (use-package haskell-mode
   :ensure t
