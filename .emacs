@@ -883,9 +883,23 @@ an error."
   (add-to-list 'company-backends '(company-ghc :with company-dabbrev-code))
   (setq company-ghc-show-info 'oneline))
 
+(eval-after-load "haskell-cabal"
+  '(define-key haskell-cabal-mode-map (kbd "M-k") 'haskell-compile))
+
+(defun find-haskell-definition-at-point ()
+  (interactive)
+  (inferior-haskell-find-definition (haskell-ident-at-point)))
+
 (use-package haskell-mode
   :ensure t
-  :mode "\\.hs$")
+  :mode "\\.hs$"
+  :config
+  (setq haskell-tags-on-save t)
+  (define-key haskell-mode-map (kbd "M-k") 'haskell-compile)
+  (define-key haskell-mode-map (kbd "M-.") 'find-haskell-definition-at-point)
+  (define-key haskell-mode-map (kbd "C-c M-.") 'inferior-haskell-find-definition)
+  (define-key haskell-mode-map (kbd "C-c v c") 'haskell-cabal-visit-file)
+  (define-key haskell-mode-map (kbd "C-c C-l") 'inferior-haskell-load-file))
 
 (use-package flycheck-haskell
   :ensure t
@@ -899,17 +913,6 @@ an error."
   (setq hindent-style "chris-done")
   (add-hook 'haskell-mode-hook 'haskell-indentation-mode)
   (add-hook 'haskell-mode-hook 'hindent-mode))
-
-(eval-after-load "haskell-cabal"
-  '(define-key haskell-cabal-mode-map (kbd "M-k") 'haskell-compile))
-(eval-after-load "haskell-mode"
-  '(progn
-     (define-key haskell-mode-map (kbd "M-k") 'haskell-compile)
-     (define-key haskell-mode-map (kbd "C-c v c") 'haskell-cabal-visit-file)
-     (define-key haskell-mode-map (kbd "C-c C-l") 'inferior-haskell-load-file)
-     (define-key haskell-mode-map (kbd "C-c C-t") 'inferior-haskell-type)
-     (define-key haskell-mode-map (kbd "C-c C-i") 'inferior-haskell-info)
-     (define-key haskell-mode-map (kbd "C-c M-.") 'inferior-haskell-find-definition)))
 
 ;;------------------------------------------------------------------------------
 ;; Git interactions
