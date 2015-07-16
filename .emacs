@@ -51,7 +51,7 @@
 ;; Startup profiling
 (use-package esup
   :ensure t
-  :defer 5)
+  :defer t)
 
 ;;------------------------------------------------------------------------------
 ;; OS specifics
@@ -445,6 +445,8 @@
   :ensure t
   :config
   (global-undo-tree-mode 1)
+  (setq undo-tree-visualizer-timestamps t)
+  (setq undo-tree-visualizer-diff t)
   :diminish undo-tree-mode)
 
 ;;------------------------------------------------------------------------------
@@ -470,6 +472,13 @@
 	 ("C-c DEL" . ace-jump-mode-pop-mark))
   :functions ace-jump-mode-enable-mark-sync
   :config (ace-jump-mode-enable-mark-sync))
+
+;;------------------------------------------------------------------------------
+;; smart-scan: use M-n and M-p to jump to next/prev thing at point
+(use-package smartscan
+  :ensure t
+  :defer t
+  :config (global-smartscan-mode t))
 
 ;;------------------------------------------------------------------------------
 ;; Flycheck
@@ -790,8 +799,7 @@ an error."
         ))
   (semantic-mode 1)
   (semanticdb-enable-gnu-global-databases 'c-mode t)
-  (semanticdb-enable-gnu-global-databases 'c++-mode t)
-  )
+  (semanticdb-enable-gnu-global-databases 'c++-mode t))
 
 ;; customisation of modes
 (defun my-c-mode-cedet-hook ()
