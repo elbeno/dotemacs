@@ -299,10 +299,11 @@
 ;;------------------------------------------------------------------------------
 ;; Global key bindings
 (setq personal-keybindings nil)
-(global-set-key "\C-z" 'undo)
-(global-set-key "\C-o" 'goto-line)
-(global-set-key "\M-r" 'replace-string)
-(global-set-key "\M-k" 'compile)
+(bind-key "C-z" 'undo)
+(bind-key "C-o" 'goto-line)
+(bind-key "M-r" 'replace-string)
+(bind-key "M-k" 'compile)
+(bind-key "M-SPC" 'cycle-spacing)
 
 ;; Action of home key
 (defun beginning-of-line-or-indentation ()
@@ -477,7 +478,6 @@
 ;; smart-scan: use M-n and M-p to jump to next/prev thing at point
 (use-package smartscan
   :ensure t
-  :defer t
   :config (global-smartscan-mode t))
 
 ;;------------------------------------------------------------------------------
