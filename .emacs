@@ -1,6 +1,6 @@
 ;;------------------------------------------------------------------------------
 ;; debugging
-(setq debug-on-error t)
+(setq debug-on-error nil)
 
 ;; this file's true directory
 (setq dotfile-dir (file-name-directory
@@ -44,9 +44,9 @@
 
 (require 'use-package)
 (setq use-package-minimum-reported-time 0
-      use-package-verbose t
-      use-package-always-ensure t)
+      use-package-verbose t)
 
+(setq personal-keybindings nil)
 ;;------------------------------------------------------------------------------
 ;; Startup profiling
 (use-package esup
@@ -180,9 +180,9 @@
   (set-frame-parameter nil 'width column-wrap-hard)
   (frame-max-height))
 
-(global-set-key (kbd "<C-S-f11>") 'frame-max-height)
-(global-set-key (kbd "<C-f11>") 'dock-frame-left)
-(global-set-key (kbd "<C-f12>") 'dock-frame-right)
+(bind-key "C-S-<f11>" 'frame-max-height)
+(bind-key "C-<f11>" 'dock-frame-left)
+(bind-key "C-<f12>" 'dock-frame-right)
 
 ;;------------------------------------------------------------------------------
 ;; Autosaves/backups
@@ -272,10 +272,10 @@
   (flyspell-goto-next-error)
   (ispell-word))
 
-(global-set-key (kbd "C-<f9>") 'ispell-word)
-(global-set-key (kbd "C-M-<f9>") 'flyspell-buffer)
-(global-set-key (kbd "S-<f9>") 'flyspell-check-previous-highlighted-word)
-(global-set-key (kbd "<f9>") 'flyspell-check-next-highlighted-word)
+(bind-key "C-<f9>" 'ispell-word)
+(bind-key "C-M-<f9>" 'flyspell-buffer)
+(bind-key "S-<f9>" 'flyspell-check-previous-highlighted-word)
+(bind-key "<f9>" 'flyspell-check-next-highlighted-word)
 
 ;;------------------------------------------------------------------------------
 ;; Colors
@@ -298,7 +298,6 @@
 
 ;;------------------------------------------------------------------------------
 ;; Global key bindings
-(setq personal-keybindings nil)
 (bind-key "C-z" 'undo)
 (bind-key "C-o" 'goto-line)
 (bind-key "M-r" 'replace-string)
@@ -312,31 +311,36 @@
   (if (bolp)
       (back-to-indentation)
     (beginning-of-line)))
-(global-set-key [home] 'beginning-of-line-or-indentation)
+(bind-key "<home>" 'beginning-of-line-or-indentation)
 
 ;; Turn off insert
-(global-set-key [insert] (lambda () (interactive)))
-(global-set-key [insertchar] (lambda () (interactive)))
+(defun do-nothing () (interactive))
+(bind-key "<insert>" 'do-nothing)
+(bind-key "<insertchar>" 'do-nothing)
 
 ;; Kill-ring menu
-(global-set-key "\C-cy" '(lambda () (interactive) (popup-menu 'yank-menu)))
+(defun popup-kill-ring-menu ()
+  "Show the kill ring in a popup menu."
+  (interactive)
+  (popup-menu 'yank-menu))
+(bind-key "C-c y" 'popup-kill-ring-menu)
 
 ;; Cycle buffers/windows with F5-F8
-(global-set-key [f5] 'next-multiframe-window)
-(global-set-key [f6] 'previous-multiframe-window)
-(global-set-key [f7] 'previous-buffer)
-(global-set-key [f8] 'next-buffer)
+(bind-key "<f5>" 'next-multiframe-window)
+(bind-key "<f6>" 'previous-multiframe-window)
+(bind-key "<f7>" 'previous-buffer)
+(bind-key "<f8>" 'next-buffer)
 
 ;; Moving windows
-(global-set-key (kbd "C-c <left>")  'windmove-left)
-(global-set-key (kbd "C-c <right>") 'windmove-right)
-(global-set-key (kbd "C-c <up>")    'windmove-up)
-(global-set-key (kbd "C-c <down>")  'windmove-down)
+(bind-key "C-c <left>"  'windmove-left)
+(bind-key "C-c <right>" 'windmove-right)
+(bind-key "C-c <up>"    'windmove-up)
+(bind-key "C-c <down>"  'windmove-down)
 
 ;;------------------------------------------------------------------------------
 ;; Highlight symbols
-(global-set-key [f3] 'highlight-symbol-at-point)
-(global-set-key [(shift f3)] 'hi-lock-mode)
+(bind-key "<f3>" 'highlight-symbol-at-point)
+(bind-key "S-<f3>" 'hi-lock-mode)
 
 ;;------------------------------------------------------------------------------
 ;; Smooth scrolling
@@ -384,9 +388,9 @@
 ;; Bookmarks
 (use-package bm
   :ensure t
-  :bind (("<C-f2>" . bm-toggle)
+  :bind (("C-<f2>" . bm-toggle)
          ("<f2>" . bm-next)
-         ("<S-f2>" . bm-previous)))
+         ("S-<f2>" . bm-previous)))
 
 ;;------------------------------------------------------------------------------
 ;; IDO & smex
@@ -455,15 +459,15 @@
 (use-package google-this
   :ensure t
   :bind
-  (("\C-cr" . google-this-cpp-reference)))
+  (("C-c r" . google-this-cpp-reference)))
 
 ;;------------------------------------------------------------------------------
 ;; Diffing things
 (use-package ztree-diff
   :ensure ztree
   :bind
-  (("\C-c\C-z" . ztree-diff)
-   ("\C-cz" . ztree-dir)))
+  (("C-c C-z" . ztree-diff)
+   ("C-c z" . ztree-dir)))
 
 ;;------------------------------------------------------------------------------
 ;; Ace-jump-mode
@@ -556,7 +560,7 @@ an error."
 
 (setq tags-revert-without-query 1
       etags-table-search-up-depth 10)
-(global-set-key "\M-." 'etags-select-find-tag-at-point)
+(bind-key "M-." 'etags-select-find-tag-at-point)
 
 ;; prevent prompt on opening large TAGS file
 (setq large-file-warning-threshold 100000000)
@@ -646,7 +650,7 @@ an error."
             (company-complete-common)
           (indent-for-tab-command)))))
 
-(global-set-key [tab] 'tab-indent-or-complete)
+(bind-key "<tab>" 'tab-indent-or-complete)
 
 ;;------------------------------------------------------------------------------
 ;; Basic offset = 2
@@ -709,12 +713,17 @@ an error."
 (add-hook 'c-mode-common-hook 'infer-indentation-style)
 
 ;; Auto insertion of headers
-(defun cpp-auto-headers ()
-  (require 'cpp-auto-include)
-  (local-set-key (kbd "\C-c q") 'cpp-auto-include/namespace-qualify-file)  
-  (local-set-key (kbd "\C-c i") 'cpp-auto-include/ensure-includes-for-file)
-  (local-set-key (kbd "\C-c o") 'cpp-auto-include/ensure-includes-for-current-line))
-(add-hook 'c++-mode-hook 'cpp-auto-headers)
+(autoload 'cpp-auto-include/namespace-qualify-file "cpp-auto-include"
+  "Explicitly qualify uses of the standard library with their namespace(s)." t)
+(autoload 'cpp-auto-include/ensure-includes-for-file "cpp-auto-include"
+  "Auto-insert #include line(s) required for the current buffer." t)
+(autoload 'cpp-auto-include/ensure-includes-for-current-line "cpp-auto-include"
+  "Auto-insert #include line(s) required for the current line." t)
+(eval-after-load 'cc-mode
+  '(bind-keys :map c++-mode-map
+              ("C-c q" . cpp-auto-include/namespace-qualify-file)
+              ("C-c i" . cpp-auto-include/ensure-includes-for-file)
+              ("C-c o" . cpp-auto-include/ensure-includes-for-current-line)))
 
 ;;------------------------------------------------------------------------------
 ;; CMake
@@ -726,9 +735,8 @@ an error."
   (interactive)
   (gud-gdb (concat "gdb --fullname " (cppcm-get-exe-path-current-buffer))))
 
-(defun cpp-debug-setup ()
-  (local-set-key (kbd "\C-c \C-g") 'my/gdb-exec))
-(add-hook 'c++-mode-hook 'cpp-debug-setup)
+(eval-after-load 'cc-mode
+  '(bind-key "C-c C-g" 'my/gdb-exec c++-mode-map))
 
 (use-package cpputils-cmake
   :ensure t
@@ -742,8 +750,8 @@ an error."
 ;; Compilation
 
 ;; Compilation
-(global-set-key [\M-up] 'previous-error)
-(global-set-key [\M-down] 'next-error)
+(bind-key "M-<up>" 'previous-error)
+(bind-key "M-<down>" 'next-error)
 (setq compilation-scroll-output t)
 
 ;; SCons builds into a 'build' subdir, but we want to find the errors
@@ -801,19 +809,15 @@ an error."
   (semanticdb-enable-gnu-global-databases 'c-mode t)
   (semanticdb-enable-gnu-global-databases 'c++-mode t))
 
-;; customisation of modes
-(defun my-c-mode-cedet-hook ()
-  (require 'eassist)
-  ;(local-set-key "\C-c#" 'semantic-decoration-include-visit)
-  ;(local-set-key "\C-x\C-h" 'eassist-switch-h-cpp)
-  (local-set-key "\C-cm" 'eassist-list-methods)
-  (local-set-key "\C-c\C-r" 'semantic-symref))
-
-(add-hook 'c-mode-common-hook 'my-c-mode-cedet-hook)
+(autoload 'eassist-list-methods "eassist" "List methods in the current buffer." t)
+(eval-after-load 'cc-mode
+  '(bind-keys :map c++-mode-map
+              ("C-c m" . eassist-list-methods)
+              ("C-c C-r" . semantic-symref)))
 
 ;; speedbar
 (setq speedbar-use-images nil)
-(global-set-key "\C-cs" 'speedbar)
+(bind-key "C-c s" 'speedbar)
 (setq speedbar-directory-unshown-regexp "^$")
 
 ;;------------------------------------------------------------------------------
@@ -824,10 +828,10 @@ an error."
   (projectile-global-mode)
   (setq projectile-enable-caching t)
   :bind
-  (("\C-xf" . projectile-find-file)
-   ("\C-xg" . projectile-grep)
-   ("\C-c#" . projectile-find-file-dwim)
-   ("\C-x\C-h" . projectile-find-other-file)))
+  (("C-x f" . projectile-find-file)
+   ("C-x g" . projectile-grep)
+   ("C-c #" . projectile-find-file-dwim)
+   ("C-x C-h" . projectile-find-other-file)))
 
 ;;------------------------------------------------------------------------------
 ;; Python mode
@@ -892,7 +896,7 @@ an error."
   (setq company-ghc-show-info 'oneline))
 
 (eval-after-load "haskell-cabal"
-  '(define-key haskell-cabal-mode-map (kbd "M-k") 'haskell-compile))
+  '(bind-key "M-k" 'haskell-compile haskell-cabal-mode-map))
 
 (defun find-haskell-definition-at-point ()
   (interactive)
@@ -902,12 +906,15 @@ an error."
   :ensure t
   :mode "\\.hs$"
   :config
-  (setq haskell-tags-on-save t)
-  (define-key haskell-mode-map (kbd "M-k") 'haskell-compile)
-  (define-key haskell-mode-map (kbd "M-.") 'find-haskell-definition-at-point)
-  (define-key haskell-mode-map (kbd "C-c M-.") 'inferior-haskell-find-definition)
-  (define-key haskell-mode-map (kbd "C-c v c") 'haskell-cabal-visit-file)
-  (define-key haskell-mode-map (kbd "C-c C-l") 'inferior-haskell-load-file))
+  (setq haskell-tags-on-save t))
+
+(eval-after-load "haskell-mode"
+  '(bind-keys :map haskell-mode-map
+              ("M-k" . haskell-compile)
+              ("M-." . find-haskell-definition-at-point)
+              ("C-c M-." . inferior-haskell-find-definition)
+              ("C-c v c" . haskell-cabal-visit-file)
+              ("C-c C-l" . inferior-haskell-load-file)))
 
 (use-package flycheck-haskell
   :ensure t
@@ -934,13 +941,13 @@ an error."
 (use-package mo-git-blame
   :ensure t
   :bind
-  (("\C-c\C-b" . mo-git-blame-current)))
+  (("C-c C-b" . mo-git-blame-current)))
 
 ;; magit
 (use-package magit
   :ensure t
   :bind
-  (("\C-cg" . magit-status))
+  (("C-c g" . magit-status))
   :init
   (setq magit-last-seen-setup-instructions "1.4.0"))
 
@@ -948,15 +955,15 @@ an error."
 (use-package git-timemachine
   :ensure t
   :bind
-  (("\C-ch" . git-timemachine-toggle)))
+  (("C-c h" . git-timemachine-toggle)))
 
 ;; git messenger
 (use-package git-messenger
   :ensure t
   :bind
-  (("\C-cb" . git-messenger:popup-message))
+  (("C-c b" . git-messenger:popup-message))
   :config
-  (define-key git-messenger-map (kbd "m") 'git-messenger:copy-message)
+  (bind-key "m" 'git-messenger:copy-message git-messenger-map)
   ;; Enable magit-commit-mode after typing 's', 'S', 'd'
   (add-hook 'git-messenger:popup-buffer-hook 'magit-commit-mode))
 
@@ -986,15 +993,15 @@ an error."
           ))
   (setq org-beamer-outline-frame-title "Contents"))
 
-(define-key global-map "\C-cl" 'org-store-link)
-(define-key global-map "\C-cc" 'org-capture)
-(define-key global-map "\C-ca" 'org-agenda)
-(define-key global-map "\C-ci" 'org-iswitchb)
+(bind-key "C-c l" 'org-store-link)
+(bind-key "C-c c" 'org-capture)
+(bind-key "C-c a" 'org-agenda)
+(bind-key "C-c i" 'org-iswitchb)
 
 (add-hook 'org-mode-hook
           (lambda ()
             (add-to-list 'org-latex-packages-alist '("" "minted" nil))
-            (define-key org-mode-map "\M-Q" 'toggle-truncate-lines)
+            (bind-key "M-Q" 'toggle-truncate-lines org-mode-map)
             (require 'ox-latex)
             (require 'ox-beamer)
             (add-to-list 'org-beamer-environments-extra
@@ -1045,7 +1052,7 @@ an error."
              (current-buffer))
     (error (message "Invalid expression")
            (insert (current-kill 0)))))
-(global-set-key (kbd "C-x C-S-e") 'eval-and-replace)
+(bind-key "C-x C-S-e" 'eval-and-replace)
 
 ;;------------------------------------------------------------------------------
 ;; Insert current time/date
@@ -1072,8 +1079,8 @@ Uses `current-date-time-format' for the formatting the date/time."
   (insert "\n")
   )
 
-(global-set-key "\C-c\C-d" 'insert-current-date-time)
-(global-set-key "\C-c\C-t" 'insert-current-time)
+(bind-key "C-c C-d" 'insert-current-date-time)
+(bind-key "C-c C-t" 'insert-current-time)
 
 ;;------------------------------------------------------------------------------
 ;; Insert generated UUIDs
@@ -1098,7 +1105,7 @@ Where X is 4 and Y is one of {8,9,a,b}."
            (random (expt 16 6))
            (random (expt 16 6)))))
 
-(global-set-key "\C-cu" 'insert-random-uuid)
+(bind-key "C-c u" 'insert-random-uuid)
 
 (defun random-xcode-uuid-string ()
    (format "%04X%04X%04X%04X%04X%04X"
@@ -1116,7 +1123,7 @@ Example of an XCode UUID: a513b85041a3535fc3520c3d."
   (interactive)
   (insert (random-xcode-uuid-string)))
 
-(global-set-key "\C-cx" 'insert-random-xcode-uuid)
+(bind-key "C-c x" 'insert-random-xcode-uuid)
 
 (defun insert-xcode-header-template ()
   (interactive)
