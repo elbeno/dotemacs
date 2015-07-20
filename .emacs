@@ -277,6 +277,15 @@
 (bind-key "S-<f9>" 'flyspell-check-previous-highlighted-word)
 (bind-key "<f9>" 'flyspell-check-next-highlighted-word)
 
+;; elisp hints
+(use-package "eldoc"
+  :diminish eldoc-mode
+  :defer t
+  :init
+  (progn
+    (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
+    (add-hook 'lisp-interaction-mode-hook 'eldoc-mode)))
+
 ;;------------------------------------------------------------------------------
 ;; Colors
 (set-face-foreground 'font-lock-comment-face "gray")
