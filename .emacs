@@ -283,10 +283,16 @@
   (flyspell-goto-next-error)
   (ispell-word))
 
-(bind-key "C-<f9>" 'ispell-word)
-(bind-key "C-M-<f9>" 'flyspell-buffer)
-(bind-key "S-<f9>" 'flyspell-check-previous-highlighted-word)
-(bind-key "<f9>" 'flyspell-check-next-highlighted-word)
+(eval-after-load "flyspell"
+  '(progn
+     (diminish 'flyspell-mode)
+     (bind-keys :map flyspell-mode-map
+                ("C-<f9>" . ispell-word)
+                ("C-M-<f9>" . flyspell-buffer)
+                ("S-<f9>" . flyspell-check-previous-highlighted-word)
+                ("<f9>" . flyspell-check-next-highlighted-word))
+     (unbind-key "C-;" flyspell-mode-map)
+     (unbind-key "C-." flyspell-mode-map)))
 
 ;; elisp hints
 (use-package "eldoc"
@@ -490,13 +496,16 @@
    ("C-c z" . ztree-dir)))
 
 ;;------------------------------------------------------------------------------
-;; Ace-jump-mode
-(use-package ace-jump-mode
+;; Avy
+(use-package avy
   :ensure t
-  :bind (("C-c SPC" . ace-jump-mode)
-	 ("C-c DEL" . ace-jump-mode-pop-mark))
-  :functions ace-jump-mode-enable-mark-sync
-  :config (ace-jump-mode-enable-mark-sync))
+  :bind (("C-c SPC" . avy-goto-word-or-subword-1)
+         ("C-;" . avy-goto-word-or-subword-1)
+         ("C-." . avy-pop-mark)))
+
+(use-package ace-window
+  :ensure t
+  :bind ("C-c w" . ace-window))
 
 ;;------------------------------------------------------------------------------
 ;; smart-scan: use M-n and M-p to jump to next/prev thing at point
