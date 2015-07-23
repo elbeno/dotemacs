@@ -47,6 +47,7 @@
       use-package-verbose t)
 
 (setq personal-keybindings nil)
+
 ;;------------------------------------------------------------------------------
 ;; Startup profiling
 (use-package esup
@@ -617,8 +618,7 @@ an error."
       (define-key irony-mode-map [remap complete-symbol]
         'irony-completion-at-point-async))
     (add-hook 'irony-mode-hook 'my-irony-mode-hook)
-    (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
-    )
+    (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
 
   (use-package company-irony
     :ensure t
@@ -770,6 +770,7 @@ an error."
 (use-package cpputils-cmake
   :ensure t
   :config
+  (setq cppcm-write-flymake-makefile nil)
   (add-hook 'c-mode-common-hook
             (lambda ()
               (if (derived-mode-p 'c-mode 'c++-mode)
@@ -1051,6 +1052,23 @@ an error."
 ;; Shells
 (setq ls-lisp-use-insert-directory-program t)
 (setq insert-directory-program "/bin/ls")
+
+;; lilypond
+(when (eq system-type 'gnu/linux)
+  (add-to-list 'load-path "/home/bdeane/dev/lyqi")
+  (autoload 'lyqi-mode "lyqi" "Lilypond mode." t)
+  (add-to-list 'auto-mode-alist '("\\.ly$" . lyqi-mode))
+  (add-to-list 'auto-mode-alist '("\\.ily$" . lyqi-mode))
+  (setq lyqi:prefered-languages '(italiano english)
+        lyqi:prefered-octave-mode 'absolute
+        lyqi:keyboard-mapping 'qwerty
+        lyqi:midi-backend 'alsa
+        lyqi:pdf-command "evince"
+        lyqi:midi-command "timidity")
+  (eval-after-load "lyqi"
+    '(bind-keys :map lyqi:normal-mode-map
+                ("M-k" . lyqi:compile-ly))))
+
 
 ;;------------------------------------------------------------------------------
 ;; Byte-compile elisp on save
