@@ -299,7 +299,7 @@
      (unbind-key "C-." flyspell-mode-map)))
 
 ;; elisp hints
-(use-package "eldoc"
+(use-package eldoc
   :diminish eldoc-mode
   :defer t
   :init
