@@ -307,6 +307,11 @@
     (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
     (add-hook 'lisp-interaction-mode-hook 'eldoc-mode)))
 
+;; comment-dwim-2
+(use-package comment-dwim-2
+  :ensure t
+  :bind ("M-;" . comment-dwim-2))
+
 ;;------------------------------------------------------------------------------
 ;; Colors
 (set-face-foreground 'font-lock-comment-face "gray")
@@ -531,7 +536,12 @@ See URL `https://github.com/FND/jslint-reporter'."
            :command ("~/.emacs.d/jslint-reporter" source)
            :error-patterns
            ((error line-start (1+ nonl) ":" line ":" column ":" (message) line-end))
-           :modes (js-mode js2-mode js3-mode)))))
+           :modes (js-mode js2-mode js3-mode))))
+  (use-package flycheck-tip
+    :ensure t
+    :config
+    (flycheck-tip-use-timer 'verbose)
+    :bind ("C-c n" . flycheck-tip-cycle)))
 
 ;;------------------------------------------------------------------------------
 ;; Multiple cursors
