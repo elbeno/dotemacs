@@ -263,19 +263,19 @@
 (use-package highlight-numbers
   :ensure t
   :config
-  (highlight-numbers-mode)
+  (add-hook 'prog-mode-hook 'highlight-numbers-mode)
   :diminish highlight-numbers-mode)
 
 (use-package highlight-quoted
   :ensure t
   :config
-  (highlight-quoted-mode)
+  (add-hook 'prog-mode-hook 'highlight-quoted-mode)
   :diminish highlight-quoted-mode)
 
 (use-package highlight-escape-sequences
   :ensure t
   :config
-  (hes-mode)
+  (add-hook 'prog-mode-hook 'hes-mode)
   :diminish hes-mode)
 
 ;; Check spelling in comments and strings
