@@ -949,7 +949,8 @@ an error."
   :ensure t
   :mode "\\.hs$"
   :config
-  (setq haskell-tags-on-save t))
+  (setq haskell-tags-on-save t
+        haskell-font-lock-symbols t))
 
 (eval-after-load "haskell-mode"
   '(bind-keys :map haskell-mode-map
