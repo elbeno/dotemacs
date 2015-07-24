@@ -231,11 +231,14 @@
   :bind
   (("C-S-k" . sp-kill-hybrid-sexp))
   :config
-  (smartparens-global-mode t)
   (show-smartparens-global-mode t)
   (require 'smartparens-config)
   :demand
   :diminish smartparens-mode)
+
+;; General close
+(autoload 'general-close "general-close" "Insert closing delimiter." t)
+(bind-key "C-c ]" 'general-close)
 
 ;; Show column numbers
 (column-number-mode)
