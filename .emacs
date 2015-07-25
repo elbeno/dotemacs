@@ -973,7 +973,37 @@ an error."
   :mode "\\.hs$"
   :config
   (setq haskell-tags-on-save t
-        haskell-font-lock-symbols t))
+        haskell-font-lock-symbols t
+        haskell-font-lock-symbols-alist '(("\\" . "λ")
+                                          ("not" . "¬")
+                                          ("->" . "→")
+                                          ("<-" . "←")
+                                          ("=>" . "⇒")
+                                          ("()" . "∅")
+                                          ("==" . "≡")
+                                          ("/=" . "≠")
+                                          (">=" . "≥")
+                                          ("<=" . "≤")
+                                          ("!!" . "‼")
+                                          ("&&" . "∧")
+                                          ("||" . "∨")
+                                          ("undefined" . "⊥")
+                                          ("pi" . "π")
+                                          ("tau" . "τ")
+                                          ("~>" . "⇝")
+                                          ("-<" . "↢")
+                                          ("::" . "∷")
+                                          ("." "∘" haskell-font-lock-dot-is-not-composition)
+                                          ("`elem`" . "∈")
+                                          ("`notElem`" . "∉")
+                                          ;; ("sqrt" . "√")
+                                          ;; ("sum" . "∑")
+                                          ;; ("product" . "∏")
+                                          ;; ("`isSubsetOf`" . "⊆")
+                                          ;; ("`union`" . "∪")
+                                          ;; ("`intersect`" . "∩")
+                                          ;; ("`intersection`" . "∩")
+                                          ("forall" . "∀"))))
 
 (eval-after-load "haskell-mode"
   '(bind-keys :map haskell-mode-map
