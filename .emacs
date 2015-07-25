@@ -1125,79 +1125,81 @@ an error."
 
 ;;------------------------------------------------------------------------------
 ;; Insert current time/date
-(defvar current-date-time-format "%a %b %d %H:%M:%S %Y"
-  "Format of date to insert with `insert-current-date-time' func
-See help of `format-time-string' for possible replacements")
+(defun insert-current-time (prefix)
+  "Insert the current date. With prefix-argument, use 24h format.
+   With two prefix arguments, write out an ISO 8601 date and
+   time."
+  (interactive "P")
+  (let ((format (cond
+                 ((not prefix) "%I:%M:%S %p")
+                 ((equal prefix '(4)) "%T")
+                 ((equal prefix '(16)) "%FT%T%z"))))
+    (insert (format-time-string format))))
 
-(defvar current-time-format "%a %H:%M:%S"
-  "Format of date to insert with `insert-current-time' func.
-Note the weekly scope of the command's precision.")
+(defun insert-current-date (prefix)
+  "Insert the current date. With prefix-argument, use ISO 8601
+   format. With two prefix arguments, write out the day and month
+   name."
+  (interactive "P")
+  (let ((format (cond
+                 ((not prefix) "%x")
+                 ((equal prefix '(4)) "%F")
+                 ((equal prefix '(16)) "%A, %d %B %Y"))))
+    (insert (format-time-string format))))
 
-(defun insert-current-date-time ()
-  "insert the current date and time into current buffer.
-Uses `current-date-time-format' for the formatting the date/time."
-  (interactive)
-  (insert (format-time-string current-date-time-format (current-time)))
-  (insert "\n")
-  )
-
-(defun insert-current-time ()
-  "insert the current time (1-week scope) into the current buffer."
-  (interactive)
-  (insert (format-time-string current-time-format (current-time)))
-  (insert "\n")
-  )
-
-(bind-key "C-c C-d" 'insert-current-date-time)
-(bind-key "C-c C-t" 'insert-current-time)
+(bind-key "C-c d" 'insert-current-date)
+(bind-key "C-c t" 'insert-current-time)
 
 ;;------------------------------------------------------------------------------
 ;; Insert generated UUIDs
 (random t)
 
-(defun insert-random-uuid ()
-  "Insert a random universally unique identifier (UUID).
-A UUID is a 128-bit (16 byte) number formatted in a certain way.
+(defun random-ms-uuid ()
+  (format "%04x%04x-%04x-4%s-%s-%06x%06x"
+          (random (expt 16 4))
+          (random (expt 16 4))
+          (random (expt 16 4))
+          (substring (format "%04x" (random (expt 16 4))) 1)
+          (concat
+           (let ((n (random 4)))
+             (substring "89ab" n (1+ n)))
+           (substring (format "%04x" (random (expt 16 4))) 1))
+          (random (expt 16 6))
+          (random (expt 16 6))))
+
+(defun random-xcode-uuid ()
+  (format "%04X%04X%04X%04X%04X%04X"
+          (random (expt 16 4))
+          (random (expt 16 4))
+          (random (expt 16 4))
+          (random (expt 16 4))
+          (random (expt 16 4))
+          (random (expt 16 4))))
+
+(defun insert-uuid (prefix)
+  "Insert a random universally unique identifier (UUID). A UUID
+is a 128-bit (16 byte) number formatted in a certain way.
+
 Example of a UUID: 1df63142-a513-X850-Y1a3-535fc3520c3d
-Where X is 4 and Y is one of {8,9,a,b}."
-  (interactive)
-  (insert
-   (format "%04x%04x-%04x-4%s-%s-%06x%06x"
-           (random (expt 16 4))
-           (random (expt 16 4))
-           (random (expt 16 4))
-           (substring (format "%04x" (random (expt 16 4))) 1)
-           (concat
-            (let ((n (random 4)))
-              (substring "89ab" n (1+ n)))
-            (substring (format "%04x" (random (expt 16 4))) 1))
-           (random (expt 16 6))
-           (random (expt 16 6)))))
+Where X is 4 and Y is one of {8,9,a,b}.
 
-(bind-key "C-c u" 'insert-random-uuid)
+With a prefix argument, insert a random UUID suitable for use in
+XCode projects. An XCode UUID is a 96-bit (12 byte) number
+formatted as a hex string.
 
-(defun random-xcode-uuid-string ()
-   (format "%04X%04X%04X%04X%04X%04X"
-           (random (expt 16 4))
-           (random (expt 16 4))
-           (random (expt 16 4))
-           (random (expt 16 4))
-           (random (expt 16 4))
-           (random (expt 16 4))))
-
-(defun insert-random-xcode-uuid ()
-  "Insert a random universally unique identifier (UUID) suitable for use in XCode projects.
-An XCode UUID is a 96-bit (12 byte) number formatted as a hex string.
 Example of an XCode UUID: a513b85041a3535fc3520c3d."
-  (interactive)
-  (insert (random-xcode-uuid-string)))
+  (interactive "P")
+  (insert
+   (cond
+    ((not prefix) (random-ms-uuid))
+    ((equal prefix '(4)) (random-xcode-uuid)))))
 
-(bind-key "C-c x" 'insert-random-xcode-uuid)
+(bind-key "C-c u" 'insert-uuid)
 
 (defun insert-xcode-header-template ()
   (interactive)
-  (let ((build-file-uuid (random-xcode-uuid-string))
-        (file-ref-uuid (random-xcode-uuid-string)))
+  (let ((build-file-uuid (random-xcode-uuid))
+        (file-ref-uuid (random-xcode-uuid)))
     (insert "\t\t")
     (insert build-file-uuid)
     (insert " /* something.h in Headers */ = {isa = PBXBuildFile; fileRef = ")
@@ -1212,8 +1214,8 @@ Example of an XCode UUID: a513b85041a3535fc3520c3d."
 
 (defun insert-xcode-source-template ()
   (interactive)
-  (let ((build-file-uuid (random-xcode-uuid-string))
-        (file-ref-uuid (random-xcode-uuid-string)))
+  (let ((build-file-uuid (random-xcode-uuid))
+        (file-ref-uuid (random-xcode-uuid)))
     (insert "\t\t")
     (insert build-file-uuid)
     (insert " /* something.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ")
