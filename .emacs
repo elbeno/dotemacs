@@ -305,7 +305,8 @@
   :init
   (progn
     (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
-    (add-hook 'lisp-interaction-mode-hook 'eldoc-mode)))
+    (add-hook 'lisp-interaction-mode-hook 'eldoc-mode)
+    (add-hook 'python-mode-hook 'eldoc-mode)))
 
 ;; comment-dwim-2
 (use-package comment-dwim-2
@@ -545,11 +546,13 @@ See URL `https://github.com/FND/jslint-reporter'."
            :error-patterns
            ((error line-start (1+ nonl) ":" line ":" column ":" (message) line-end))
            :modes (js-mode js2-mode js3-mode))))
+
   (use-package flycheck-tip
     :ensure t
     :config
     (flycheck-tip-use-timer 'verbose)
-    :bind ("C-c n" . flycheck-tip-cycle)))
+    :bind ("C-c n" . flycheck-tip-cycle)
+    :demand))
 
 ;;------------------------------------------------------------------------------
 ;; Multiple cursors
@@ -612,6 +615,7 @@ an error."
 (setq tags-revert-without-query 1
       etags-table-search-up-depth 10)
 (bind-key "M-." 'etags-select-find-tag-at-point)
+(bind-key "M-*" 'pop-tag-mark)
 
 ;; prevent prompt on opening large TAGS file
 (setq large-file-warning-threshold 100000000)
@@ -888,11 +892,22 @@ an error."
 ;; Python mode
 (add-hook 'python-mode-hook (lambda ()
                           (flycheck-select-checker 'python-flake8)
-                          (flycheck-mode)))
+                          (flycheck-mode)
+                          (elpy-mode)))
 
 (use-package jinja2-mode
   :ensure t
   :mode "\\.tmpl$")
+
+(use-package elpy
+  :ensure t
+  :defer t)
+
+(eval-after-load "elpy"
+  '(progn
+     (unbind-key "M-<down>" elpy-mode-map)
+     (unbind-key "M-<up>" elpy-mode-map)
+     (bind-key "M-k" 'elpy-check elpy-mode-map)))
 
 ;;------------------------------------------------------------------------------
 ;; Lua mode
@@ -966,7 +981,7 @@ an error."
               ("M-." . find-haskell-definition-at-point)
               ("C-c M-." . inferior-haskell-find-definition)
               ("C-c v c" . haskell-cabal-visit-file)
-              ("C-c C-l" . inferior-haskell-load-file)))
+              ("C-c C-z" . inferior-haskell-load-file)))
 
 (use-package flycheck-haskell
   :ensure t
