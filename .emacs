@@ -312,6 +312,14 @@
   :ensure t
   :bind ("M-;" . comment-dwim-2))
 
+;; which-key to give help on keys
+(use-package which-key
+  :ensure t
+  :config
+  (which-key-setup-minibuffer)
+  (which-key-mode)
+  :diminish which-key-mode)
+
 ;;------------------------------------------------------------------------------
 ;; Colors
 (set-face-foreground 'font-lock-comment-face "gray")
