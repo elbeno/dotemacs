@@ -321,6 +321,30 @@
   (which-key-mode)
   :diminish which-key-mode)
 
+;; pretty mode for turning lambda into λ etc
+(require 'pretty-mode)
+(bind-key "C-c C-p" 'pretty-mode)
+(pretty-activate-groups
+ '(:greek
+   :logic-nary :logic-extended
+   :sets-operations-nary
+   :arrows-tails :arrows-tails-double
+   :arithmetic-triple :arithmetic-nary
+   :subscripts :superscripts
+   :parentheses
+   :types
+   :undefined
+   :other))
+(add-hook 'haskell-mode-hook 'turn-on-pretty-mode)
+
+;; (use-package pretty-mode
+;;   :ensure t
+;;   :bind ("C-c C-p" . pretty-mode)
+;;   :init
+;;   (add-hook 'haskell-mode-hook 'turn-on-pretty-mode)
+;;   :config
+;;   (pretty-deactivate-patterns "[]"))
+
 ;;------------------------------------------------------------------------------
 ;; Colors
 (set-face-foreground 'font-lock-comment-face "gray")
@@ -972,38 +996,26 @@ an error."
   :ensure t
   :mode "\\.hs$"
   :config
-  (setq haskell-tags-on-save t
-        haskell-font-lock-symbols t
-        haskell-font-lock-symbols-alist '(("\\" . "λ")
-                                          ("not" . "¬")
-                                          ("->" . "→")
-                                          ("<-" . "←")
-                                          ("=>" . "⇒")
-                                          ("()" . "∅")
-                                          ("==" . "≡")
-                                          ("/=" . "≠")
-                                          (">=" . "≥")
-                                          ("<=" . "≤")
-                                          ("!!" . "‼")
-                                          ("&&" . "∧")
-                                          ("||" . "∨")
-                                          ("undefined" . "⊥")
-                                          ("pi" . "π")
-                                          ("tau" . "τ")
-                                          ("~>" . "⇝")
-                                          ("-<" . "↢")
-                                          ("::" . "∷")
-                                          ("." "∘" haskell-font-lock-dot-is-not-composition)
-                                          ("`elem`" . "∈")
-                                          ("`notElem`" . "∉")
-                                          ;; ("sqrt" . "√")
-                                          ;; ("sum" . "∑")
-                                          ;; ("product" . "∏")
-                                          ;; ("`isSubsetOf`" . "⊆")
-                                          ;; ("`union`" . "∪")
-                                          ;; ("`intersect`" . "∩")
-                                          ;; ("`intersection`" . "∩")
-                                          ("forall" . "∀"))))
+  (setq font-lock-maximum-decoration '((haskell-mode . 2) (t . 0))
+        haskell-tags-on-save t))
+
+;; (eval-after-load 'haskell-font-lock
+;;   '(progn
+;;      (setf (cdr (assoc "/=" haskell-font-lock-symbols-alist)) "≠")
+;;      (add-to-list 'haskell-font-lock-symbols-alist '("tau" . "τ"))
+;;      (add-to-list 'haskell-font-lock-symbols-alist '("`elem`" . "∈"))
+;;      (add-to-list 'haskell-font-lock-symbols-alist '("`notElem`" . "∉"))
+;;      (add-to-list 'haskell-font-lock-symbols-alist '("`implies`" . "⇒"))
+;;      (add-to-list 'haskell-font-lock-symbols-alist '("`iff`" . "⇔"))
+;;      (add-to-list 'haskell-font-lock-symbols-alist '("sum" . "∑"))
+;;      (add-to-list 'haskell-font-lock-symbols-alist '("product" . "∏"))
+;;      (add-to-list 'haskell-font-lock-symbols-alist '("`isSubsetOf`" . "⊆"))
+;;      (add-to-list 'haskell-font-lock-symbols-alist '("`union`" . "∪"))
+;;      (add-to-list 'haskell-font-lock-symbols-alist '("`intersect`" . "∩"))
+;;      (add-to-list 'haskell-font-lock-symbols-alist '("`intersection`" . "∩"))
+;;      (add-to-list 'haskell-font-lock-symbols-alist '("True" . "𝑇"))
+;;      (add-to-list 'haskell-font-lock-symbols-alist '("False" . "𝐹"))
+;;      (setq haskell-font-lock-keywords (haskell-font-lock-keywords-create nil))))
 
 (eval-after-load "haskell-mode"
   '(bind-keys :map haskell-mode-map
