@@ -345,6 +345,12 @@
 ;;   :config
 ;;   (pretty-deactivate-patterns "[]"))
 
+(use-package expand-region
+  :ensure t
+  :bind (("C-'" . er/expand-region)
+         ("C-@" . er/contract-region)))
+(delete-selection-mode 1)
+
 ;;------------------------------------------------------------------------------
 ;; Colors
 (set-face-foreground 'font-lock-comment-face "gray")

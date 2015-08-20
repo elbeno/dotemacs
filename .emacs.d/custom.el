@@ -31,7 +31,7 @@
  '(highlight-symbol-on-navigation-p t)
  '(package-selected-packages
    (quote
-    (elpy which-key comment-dwim-2 flycheck-tip ace-window avy company-ghci smartscan hindent elisp--witness--lisp jinja2-mode flycheck-haskell flycheck-irony flycheck vlf org-plus-contrib git-messenger git-timemachine magit mo-git-blame git-gutter-fringe+ git-commit git-commit-mode gitignore-mode gitconfig-mode company-ghc ghc protobuf-mode nxml-mode json-mode js2-mode lua-mode projectile cpputils-cmake cmake-mode company-c-headers company-irony irony etags-table etags-select yasnippet multiple-cursors ztree google-this undo-tree smex ido-vertical-mode ido-ubiquitous flx-ido bm column-marker highlight-escape-sequences highlight-quoted highlight-numbers rainbow-mode rainbow-delimiters smartparens dash ws-butler cygwin-mount esup use-package)))
+    (expand-region elpy which-key comment-dwim-2 flycheck-tip ace-window avy company-ghci smartscan hindent elisp--witness--lisp jinja2-mode flycheck-haskell flycheck-irony flycheck vlf org-plus-contrib git-messenger git-timemachine magit mo-git-blame git-gutter-fringe+ git-commit git-commit-mode gitignore-mode gitconfig-mode company-ghc ghc protobuf-mode nxml-mode json-mode js2-mode lua-mode projectile cpputils-cmake cmake-mode company-c-headers company-irony irony etags-table etags-select yasnippet multiple-cursors ztree google-this undo-tree smex ido-vertical-mode ido-ubiquitous flx-ido bm column-marker highlight-escape-sequences highlight-quoted highlight-numbers rainbow-mode rainbow-delimiters smartparens dash ws-butler cygwin-mount esup use-package)))
  '(protect-buffer-bury-p nil)
  '(vc-follow-symlinks nil))
 (custom-set-faces
