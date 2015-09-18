@@ -1,6 +1,8 @@
 ;;------------------------------------------------------------------------------
 ;; debugging
 (setq debug-on-error nil)
+;; plenty of memory, GC threshold is 100MB
+(setq gc-cons-threshold 100000000)
 
 ;; this file's true directory
 (setq dotfile-dir (file-name-directory
