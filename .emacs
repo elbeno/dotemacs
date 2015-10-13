@@ -323,6 +323,9 @@
   (which-key-mode)
   :diminish which-key-mode)
 
+;; use ibuffer instead of list-buffers
+(defalias 'list-buffers 'ibuffer)
+
 ;; pretty mode for turning lambda into λ etc
 (require 'pretty-mode)
 (bind-key "C-c C-p" 'pretty-mode)
