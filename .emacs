@@ -222,17 +222,6 @@
 (show-paren-mode 1)
 (setq show-paren-delay 0)
 
-;; Smart parens
-(use-package smartparens
-  :ensure t
-  :bind
-  (("C-S-k" . sp-kill-hybrid-sexp))
-  :config
-  (show-smartparens-global-mode t)
-  (require 'smartparens-config)
-  :demand
-  :diminish smartparens-mode)
-
 ;; General close
 (autoload 'general-close "general-close" "Insert closing delimiter." t)
 (bind-key "C-c ]" 'general-close)
@@ -275,26 +264,6 @@
   (add-hook 'prog-mode-hook 'hes-mode)
   :diminish hes-mode)
 
-;; Check spelling in comments and strings
-(add-hook 'prog-mode-hook 'flyspell-prog-mode)
-
-(defun flyspell-check-next-highlighted-word ()
-  "Custom function to spell check next highlighted word"
-  (interactive)
-  (flyspell-goto-next-error)
-  (ispell-word))
-
-(eval-after-load "flyspell"
-  '(progn
-     (diminish 'flyspell-mode)
-     (bind-keys :map flyspell-mode-map
-                ("C-<f9>" . ispell-word)
-                ("C-M-<f9>" . flyspell-buffer)
-                ("S-<f9>" . flyspell-check-previous-highlighted-word)
-                ("<f9>" . flyspell-check-next-highlighted-word))
-     (unbind-key "C-;" flyspell-mode-map)
-     (unbind-key "C-." flyspell-mode-map)))
-
 ;; elisp hints
 (use-package eldoc
   :diminish eldoc-mode
@@ -320,30 +289,6 @@
 
 ;; use ibuffer instead of list-buffers
 (defalias 'list-buffers 'ibuffer)
-
-;; pretty mode for turning lambda into λ etc
-(require 'pretty-mode)
-(bind-key "C-c C-p" 'pretty-mode)
-(pretty-activate-groups
- '(:greek
-   :logic-nary :logic-extended
-   :sets-operations-nary
-   :arrows-tails :arrows-tails-double
-   :arithmetic-triple :arithmetic-nary
-   :subscripts :superscripts
-   :parentheses
-   :types
-   :undefined
-   :other))
-(add-hook 'haskell-mode-hook 'turn-on-pretty-mode)
-
-;; (use-package pretty-mode
-;;   :ensure t
-;;   :bind ("C-c C-p" . pretty-mode)
-;;   :init
-;;   (add-hook 'haskell-mode-hook 'turn-on-pretty-mode)
-;;   :config
-;;   (pretty-deactivate-patterns "[]"))
 
 (use-package expand-region
   :ensure t
@@ -1005,24 +950,6 @@ an error."
   (setq font-lock-maximum-decoration '((haskell-mode . 2) (t . 0))
         haskell-tags-on-save t))
 
-;; (eval-after-load 'haskell-font-lock
-;;   '(progn
-;;      (setf (cdr (assoc "/=" haskell-font-lock-symbols-alist)) "≠")
-;;      (add-to-list 'haskell-font-lock-symbols-alist '("tau" . "τ"))
-;;      (add-to-list 'haskell-font-lock-symbols-alist '("`elem`" . "∈"))
-;;      (add-to-list 'haskell-font-lock-symbols-alist '("`notElem`" . "∉"))
-;;      (add-to-list 'haskell-font-lock-symbols-alist '("`implies`" . "⇒"))
-;;      (add-to-list 'haskell-font-lock-symbols-alist '("`iff`" . "⇔"))
-;;      (add-to-list 'haskell-font-lock-symbols-alist '("sum" . "∑"))
-;;      (add-to-list 'haskell-font-lock-symbols-alist '("product" . "∏"))
-;;      (add-to-list 'haskell-font-lock-symbols-alist '("`isSubsetOf`" . "⊆"))
-;;      (add-to-list 'haskell-font-lock-symbols-alist '("`union`" . "∪"))
-;;      (add-to-list 'haskell-font-lock-symbols-alist '("`intersect`" . "∩"))
-;;      (add-to-list 'haskell-font-lock-symbols-alist '("`intersection`" . "∩"))
-;;      (add-to-list 'haskell-font-lock-symbols-alist '("True" . "𝑇"))
-;;      (add-to-list 'haskell-font-lock-symbols-alist '("False" . "𝐹"))
-;;      (setq haskell-font-lock-keywords (haskell-font-lock-keywords-create nil))))
-
 (eval-after-load "haskell-mode"
   '(bind-keys :map haskell-mode-map
               ("M-k" . haskell-compile)
@@ -1052,17 +979,12 @@ an error."
 (use-package gitignore-mode :ensure t)
 (use-package git-commit :ensure t)
 
-;; mo-git-blame
-(use-package mo-git-blame
-  :ensure t
-  :bind
-  (("C-c C-b" . mo-git-blame-current)))
-
 ;; magit
 (use-package magit
   :ensure t
   :bind
-  (("C-c g" . magit-status))
+  (("C-c g" . magit-status)
+   ("C-c C-b" . magit-blame))
   :init
   (setq magit-last-seen-setup-instructions "1.4.0"))
 
