@@ -144,12 +144,9 @@
   :ensure t)
 
 (setq frame-resize-pixelwise t)
+
 (defun monitor-width (monitor)
   (nth 3 (assq 'geometry monitor)))
-(defun frame-x (&optional frame)
-  (cdr (assq 'left (frame-parameters))))
-(defun frame-y (&optional frame)
-  (cdr (assq 'top (frame-parameters))))
 
 (defun frame-max-height (&optional frame)
   (interactive)
@@ -158,26 +155,24 @@
 (defun dock-frame-left (&optional frame monitor)
   (interactive)
   (setq frame (or frame (selected-frame)))
-  (setq monitor (or monitor (frame-monitor-attributes)))
+  (setq monitor (or monitor (frame-monitor-attributes frame)))
   (let* ((monitor-list (-take-while
                        (lambda (x) (not (equal monitor x)))
                        (display-monitor-attributes-list)))
-         (widths (mapc #'monitor-width monitor-list))
-         (x (apply '+ widths))
-         (y (frame-y frame)))
-    (set-frame-position frame x y)))
+         (widths (mapcar #'monitor-width monitor-list))
+         (x (apply '+ widths)))
+    (set-frame-parameter frame 'left x)))
 
 (defun dock-frame-right (&optional frame monitor)
   (interactive)
   (setq frame (or frame (selected-frame)))
-  (setq monitor (or monitor (frame-monitor-attributes)))
+  (setq monitor (or monitor (frame-monitor-attributes frame)))
   (let* ((monitor-list (-take-while
                        (lambda (x) (not (equal monitor x)))
                        (display-monitor-attributes-list)))
-         (widths (mapc #'monitor-width monitor-list))
-         (x (+ (apply '+ widths) (monitor-width monitor)))
-         (y (frame-y frame)))
-    (set-frame-position frame (- 0 x) y)))
+         (widths (mapcar #'monitor-width monitor-list))
+         (x (+ (apply '+ widths) (monitor-width monitor))))
+    (set-frame-parameter frame 'left (- x (frame-pixel-width frame)))))
 
 (defun size-frame-default ()
   (set-frame-parameter nil 'width column-wrap-hard)
@@ -1355,6 +1350,19 @@ Example of an XCode UUID: a513b85041a3535fc3520c3d."
     default-frame-alist))
 
 (size-frame-default)
+
+;;------------------------------------------------------------------------------
+;; which minor modes are active?
+(defun which-active-modes ()
+  "Give a message of which minor modes are enabled in the current buffer."
+  (interactive)
+  (let ((active-modes))
+    (mapc (lambda (mode) (condition-case nil
+                             (if (and (symbolp mode) (symbol-value mode))
+                                 (add-to-list 'active-modes mode))
+                           (error nil) ))
+          minor-mode-list)
+    (message "Active modes are %s" active-modes)))
 
 ;; Local Variables:
 ;; byte-compile-warnings: (not free-vars)
