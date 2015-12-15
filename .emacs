@@ -371,6 +371,10 @@
 (setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
 
 ;;------------------------------------------------------------------------------
+;; Prevent prompt on opening large TAGS file
+(setq large-file-warning-threshold 100000000)
+
+;;------------------------------------------------------------------------------
 ;; Mark the fill column
 (use-package column-marker
   :ensure t)
@@ -422,7 +426,9 @@
   (defvar ido-cur-list               nil)
   (defvar ido-context-switch-command nil)
   (defvar ido-cr+-enable-next-call   nil)
-  (defvar ido-cr+-replace-completely nil))
+  (defvar ido-cr+-replace-completely nil)
+  (defvar ido-cr+-debug-mode         nil)
+  (defvar ido-require-match          nil))
 
 (use-package flx-ido
   :ensure t
@@ -517,7 +523,7 @@
            "A JavaScript syntax and style checker based on JSLint Reporter.
 
 See URL `https://github.com/FND/jslint-reporter'."
-           :command ("~/.emacs.d/jslint-reporter" source)
+           :command ("jslint-reporter" source)
            :error-patterns
            ((error line-start (1+ nonl) ":" line ":" column ":" (message) line-end))
            :modes (js-mode js2-mode js3-mode))))
@@ -547,53 +553,56 @@ See URL `https://github.com/FND/jslint-reporter'."
   :diminish yas-minor-mode)
 
 ;;------------------------------------------------------------------------------
+;; Speedbar
+(setq speedbar-use-images nil)
+(bind-key "C-c s" 'speedbar)
+(setq speedbar-directory-unshown-regexp "^$")
+
+;;------------------------------------------------------------------------------
 ;; Tags
-(defun my/find-tags-file-r (path)
-  "find the tags file from the parent directories"
-  (let* ((parent (file-name-directory path))
-         (possible-tags-file (concat parent ".git/TAGS")))
-    (cond
-     ((file-exists-p possible-tags-file) (throw 'found-it possible-tags-file))
-     ((string= "/.git/TAGS" possible-tags-file) (error "no tags file found"))
-     (t (my/find-tags-file-r (directory-file-name parent))))))
+;; (defun my/find-tags-file-r (path)
+;;   "find the tags file from the parent directories"
+;;   (let* ((parent (file-name-directory path))
+;;          (possible-tags-file (concat parent ".git/TAGS")))
+;;     (cond
+;;      ((file-exists-p possible-tags-file) (throw 'found-it possible-tags-file))
+;;      ((string= "/.git/TAGS" possible-tags-file) (error "no tags file found"))
+;;      (t (my/find-tags-file-r (directory-file-name parent))))))
 
-(defun my/find-tags-file ()
-  "recursively searches each parent directory for a file named
-'TAGS' in the bare .git repo and returns the path to that file or
-nil if a tags file is not found. Returns nil if the buffer is not
-visiting a file"
-  (if (buffer-file-name)
-      (catch 'found-it
-        (my/find-tags-file-r (buffer-file-name)))
-    (error "buffer is not visiting a file")))
+;; (defun my/find-tags-file ()
+;;   "recursively searches each parent directory for a file named
+;; 'TAGS' in the bare .git repo and returns the path to that file or
+;; nil if a tags file is not found. Returns nil if the buffer is not
+;; visiting a file"
+;;   (if (buffer-file-name)
+;;       (catch 'found-it
+;;         (my/find-tags-file-r (buffer-file-name)))
+;;     (error "buffer is not visiting a file")))
 
-(defun my/set-tags-file-path ()
-  "calls `my/find-tags-file' to recursively search up the
-directory tree to find a file named '.git/TAGS'. If found, set
-'tags-table-list' with that path as an argument otherwise raises
-an error."
-  (interactive)
-  (condition-case nil
-      (add-to-list 'tags-table-list (my/find-tags-file))
-    (error nil)))
+;; (defun my/set-tags-file-path ()
+;;   "calls `my/find-tags-file' to recursively search up the
+;; directory tree to find a file named '.git/TAGS'. If found, set
+;; 'tags-table-list' with that path as an argument otherwise raises
+;; an error."
+;;   (interactive)
+;;   (condition-case nil
+;;       (add-to-list 'tags-table-list (my/find-tags-file))
+;;     (error nil)))
 
-;; find the TAGS file after opening the source file
-(add-hook 'find-file-hook
-          '(lambda () (my/set-tags-file-path)))
+;; ;; find the TAGS file after opening the source file
+;; (add-hook 'find-file-hook
+;;           '(lambda () (my/set-tags-file-path)))
 
-(use-package etags-select
-  :ensure t)
+;; (use-package etags-select
+;;   :ensure t)
 
-(use-package etags-table
-  :ensure t)
+;; (use-package etags-table
+;;   :ensure t)
 
-(setq tags-revert-without-query 1
-      etags-table-search-up-depth 10)
-(bind-key "M-." 'etags-select-find-tag-at-point)
-(bind-key "M-*" 'pop-tag-mark)
-
-;; prevent prompt on opening large TAGS file
-(setq large-file-warning-threshold 100000000)
+;; (setq tags-revert-without-query 1
+;;       etags-table-search-up-depth 10)
+;; (bind-key "M-." 'etags-select-find-tag-at-point)
+;; (bind-key "M-*" 'pop-tag-mark)
 
 ;;------------------------------------------------------------------------------
 ;; C++ autocomplete on linux: irony
@@ -603,57 +612,57 @@ an error."
 ;; Use cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON to generate compile_commands.json
 ;; The compilation db list is in ~/.emacs.d/irony/cdb-json-projects
 
-(when (eq system-type 'gnu/linux)
-  (use-package irony
-    :ensure t
-    :config
-    (add-hook 'c++-mode-hook 'irony-mode)
-    (add-hook 'c-mode-hook 'irony-mode)
-    (add-hook 'objc-mode-hook 'irony-mode)
-    ;; replace the `completion-at-point' and `complete-symbol' bindings in
-    ;; irony-mode's buffers by irony-mode's function
-    (defun my-irony-mode-hook ()
-      (define-key irony-mode-map [remap completion-at-point]
-        'irony-completion-at-point-async)
-      (define-key irony-mode-map [remap complete-symbol]
-        'irony-completion-at-point-async))
-    (add-hook 'irony-mode-hook 'my-irony-mode-hook)
-    (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
+;; (when (eq system-type 'gnu/linux)
+;;   (use-package irony
+;;     :ensure t
+;;     :config
+;;     (add-hook 'c++-mode-hook 'irony-mode)
+;;     (add-hook 'c-mode-hook 'irony-mode)
+;;     (add-hook 'objc-mode-hook 'irony-mode)
+;;     ;; replace the `completion-at-point' and `complete-symbol' bindings in
+;;     ;; irony-mode's buffers by irony-mode's function
+;;     (defun my-irony-mode-hook ()
+;;       (define-key irony-mode-map [remap completion-at-point]
+;;         'irony-completion-at-point-async)
+;;       (define-key irony-mode-map [remap complete-symbol]
+;;         'irony-completion-at-point-async))
+;;     (add-hook 'irony-mode-hook 'my-irony-mode-hook)
+;;     (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
 
-  (use-package company-irony
-    :ensure t
-    :config
-    ;; (optional) adds CC special commands to `company-begin-commands' in order to
-    ;; trigger completion at interesting places, such as after scope operator
-    ;;     std::|
-    (add-hook 'irony-mode-hook 'company-irony-setup-begin-commands))
+;;   (use-package company-irony
+;;     :ensure t
+;;     :config
+;;     ;; (optional) adds CC special commands to `company-begin-commands' in order to
+;;     ;; trigger completion at interesting places, such as after scope operator
+;;     ;;     std::|
+;;     (add-hook 'irony-mode-hook 'company-irony-setup-begin-commands))
 
-  (use-package flycheck-irony
-    :ensure t
-    :config
-    (eval-after-load 'flycheck
-      '(add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
-    (add-hook 'irony-mode-hook 'flycheck-mode)))
+;;   (use-package flycheck-irony
+;;     :ensure t
+;;     :config
+;;     (eval-after-load 'flycheck
+;;       '(add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
+;;     (add-hook 'irony-mode-hook 'flycheck-mode)))
 
 ;;------------------------------------------------------------------------------
 ;; Autocomplete: company
-(use-package company
-  :ensure t
-  :config
-  (global-company-mode)
-  (delete 'company-semantic company-backends)
-  ;; Use irony for linux completion, plain dabbrev-code for windows
-  (cond ((eq system-type 'gnu/linux)
-         (add-to-list 'company-backends 'company-irony))
-        ((eq system-type 'cygwin)
-         (add-to-list 'company-backends 'company-dabbrev-code)))
-  (setq company-tooltip-align-annotations t
-        company-show-numbers t))
+;; (use-package company
+;;   :ensure t
+;;   :config
+;;   (global-company-mode)
+;;   (delete 'company-semantic company-backends)
+;;   ;; Use irony for linux completion, plain dabbrev-code for windows
+;;   (cond ((eq system-type 'gnu/linux)
+;;          (add-to-list 'company-backends 'company-irony))
+;;         ((eq system-type 'cygwin)
+;;          (add-to-list 'company-backends 'company-dabbrev-code)))
+;;   (setq company-tooltip-align-annotations t
+;;         company-show-numbers t))
 
-(use-package company-c-headers
-  :ensure t
-  :config
-  (add-to-list 'company-backends 'company-c-headers))
+;; (use-package company-c-headers
+;;   :ensure t
+;;   :config
+;;   (add-to-list 'company-backends 'company-c-headers))
 
 ;;------------------------------------------------------------------------------
 ;; Make sure tab works with indenting, completion, yasnippet
@@ -675,9 +684,10 @@ an error."
       (minibuffer-complete)
     (if (or (not yas-minor-mode)
             (null (do-yas-expand)))
-        (if (check-expansion)
-            (company-complete-common)
-          (indent-for-tab-command)))))
+        (indent-for-tab-command))))
+        ;; (if (check-expansion)
+        ;;     (company-complete-common)
+        ;;   (indent-for-tab-command)))))
 
 (bind-key "<tab>" 'tab-indent-or-complete)
 
@@ -760,21 +770,21 @@ an error."
 (use-package cmake-mode
   :ensure t)
 
-(defun my/gdb-exec ()
-  (interactive)
-  (gud-gdb (concat "gdb --fullname " (cppcm-get-exe-path-current-buffer))))
+;; (defun my/gdb-exec ()
+;;   (interactive)
+;;   (gud-gdb (concat "gdb --fullname " (cppcm-get-exe-path-current-buffer))))
 
-(eval-after-load 'cc-mode
-  '(bind-key "C-c C-g" 'my/gdb-exec c++-mode-map))
+;; (eval-after-load 'cc-mode
+;;   '(bind-key "C-c C-g" 'my/gdb-exec c++-mode-map))
 
-(use-package cpputils-cmake
-  :ensure t
-  :config
-  (setq cppcm-write-flymake-makefile nil)
-  (add-hook 'c-mode-common-hook
-            (lambda ()
-              (if (derived-mode-p 'c-mode 'c++-mode)
-                  (cppcm-reload-all)))))
+;; (use-package cpputils-cmake
+;;   :ensure t
+;;   :config
+;;   (setq cppcm-write-flymake-makefile nil)
+;;   (add-hook 'c-mode-common-hook
+;;             (lambda ()
+;;               (if (derived-mode-p 'c-mode 'c++-mode)
+;;                   (cppcm-reload-all)))))
 
 ;;------------------------------------------------------------------------------
 ;; Compilation
@@ -797,71 +807,91 @@ an error."
 
 (setq compilation-parse-errors-filename-function 'process-error-filename)
 
-(defun find-sconstruct ()
-  "recursively searches upwards from buffer's current dir for file named SConstruct and returns that dir. Or nil if not found or if buffer is not visiting a file"
-  (cl-labels
-      ((find-sconstruct-r (path)
-                          (let* ((parent (file-name-directory path))
-                                 (possible-file (concat parent "SConstruct")))
-                            (cond
-                             ((file-exists-p possible-file)
-                              (throw 'found-it possible-file))
-                             ((string= "/SConstruct" possible-file)
-                              (error "No SConstruct found"))
-                             (t (find-sconstruct-r (directory-file-name parent)))))))
-    (if (buffer-file-name)
-        (catch 'found-it
-          (find-sconstruct-r (buffer-file-name)))
-      (error "Buffer is not visiting a file"))))
-
-(defun project-root ()
-  (file-name-directory (find-sconstruct)))
-
-(if (eq system-type 'cygwin)
-    (setq compile-command '(concat "cd " (project-root) " && /usr/local/bin/scons"))
-  (setq compile-command '(concat "cd " (project-root) " && scons")))
-
-(setq compilation-read-command nil)
-
 ;;------------------------------------------------------------------------------
 ;; CEDET
 
-(use-package semantic
-  :config
-  (mapc (lambda (m) (add-to-list 'semantic-default-submodes m))
-      '(global-semantic-mru-bookmark-mode
-        global-semanticdb-minor-mode
-        global-semantic-idle-scheduler-mode
-        global-semantic-highlight-func-mode
-        global-semantic-idle-summary-mode
-        ))
-  (semantic-mode 1)
-  (semanticdb-enable-gnu-global-databases 'c-mode t)
-  (semanticdb-enable-gnu-global-databases 'c++-mode t))
+;; (use-package semantic
+;;   :config
+;;   (mapc (lambda (m) (add-to-list 'semantic-default-submodes m))
+;;       '(global-semantic-mru-bookmark-mode
+;;         global-semanticdb-minor-mode
+;;         global-semantic-idle-scheduler-mode
+;;         global-semantic-highlight-func-mode
+;;         global-semantic-idle-summary-mode
+;;         ))
+;;   (semantic-mode 1)
+;;   (semanticdb-enable-gnu-global-databases 'c-mode t)
+;;   (semanticdb-enable-gnu-global-databases 'c++-mode t))
 
-(autoload 'eassist-list-methods "eassist" "List methods in the current buffer." t)
-(eval-after-load 'cc-mode
-  '(bind-keys :map c++-mode-map
-              ("C-c m" . eassist-list-methods)
-              ("C-c C-r" . semantic-symref)))
-
-;; speedbar
-(setq speedbar-use-images nil)
-(bind-key "C-c s" 'speedbar)
-(setq speedbar-directory-unshown-regexp "^$")
+;; (autoload 'eassist-list-methods "eassist" "List methods in the current buffer." t)
+;; (eval-after-load 'cc-mode
+;;   '(bind-keys :map c++-mode-map
+;;               ("C-c m" . eassist-list-methods)
+;;               ("C-c C-r" . semantic-symref)))
 
 ;;------------------------------------------------------------------------------
 ;; Projectile
-(use-package projectile
+;; (use-package projectile
+;;   :ensure t
+;;   :config
+;;   (projectile-global-mode)
+;;   (setq projectile-enable-caching t)
+;;   :bind
+;;   (("C-x f" . projectile-find-file)
+;;    ("C-x g" . projectile-grep)
+;;    ("C-c #" . projectile-find-file-dwim)
+;;    ("C-x C-h" . projectile-find-other-file)))
+
+;;------------------------------------------------------------------------------
+;; Haskell mode
+(use-package ghc
+  :pin stable-melpa
   :ensure t
   :config
-  (projectile-global-mode)
-  (setq projectile-enable-caching t)
-  :bind
-  (("C-x f" . projectile-find-file)
-   ("C-x g" . projectile-grep)
-   ("C-c #" . projectile-find-file-dwim)
-   ("C-x C-h" . projectile-find-other-file)))
+  (setq ghc-interactive-command "ghc-modi"
+        ghc-debug t)
+  (add-hook 'haskell-mode-hook 'ghc-init))
+
+;; (use-package company-ghc
+;;   :ensure t
+;;   :config
+;;   (add-to-list 'company-backends '(company-ghc :with company-dabbrev-code))
+;;   (setq company-ghc-show-info 'oneline))
+
+(eval-after-load "haskell-cabal"
+  '(bind-key "M-k" 'haskell-compile haskell-cabal-mode-map))
+
+(defun find-haskell-definition-at-point ()
+  (interactive)
+  (inferior-haskell-find-definition (haskell-ident-at-point)))
+
+(use-package haskell-mode
+  :ensure t
+  :mode "\\.hs$"
+  :config
+  (setq font-lock-maximum-decoration '((haskell-mode . 2) (t . 0))
+        haskell-tags-on-save t))
+
+(eval-after-load "haskell-mode"
+  '(bind-keys :map haskell-mode-map
+              ("M-k" . haskell-compile)
+              ("M-." . find-haskell-definition-at-point)
+              ("C-c M-." . inferior-haskell-find-definition)
+              ("C-c v c" . haskell-cabal-visit-file)
+              ("C-c C-z" . inferior-haskell-load-file)))
+
+(use-package flycheck-haskell
+  :ensure t
+  :config
+  (add-hook 'haskell-mode-hook 'flycheck-mode)
+  (add-hook 'haskell-mode-hook 'flycheck-haskell-setup))
+
+(use-package hindent
+  :ensure t
+  :config
+  (setq hindent-style "chris-done")
+  (add-hook 'haskell-mode-hook 'haskell-indentation-mode)
+  (add-hook 'haskell-mode-hook 'hindent-mode))
 
 ;;------------------------------------------------------------------------------
 ;; Python mode
@@ -919,57 +949,6 @@ an error."
   :init
   (require 'cl)
   :mode ("\\.proto$" "\\.pb$"))
-
-;;------------------------------------------------------------------------------
-;; Haskell mode
-(use-package ghc
-  :pin stable-melpa
-  :ensure t
-  :config
-  (setq ghc-interactive-command "ghc-modi"
-        ghc-debug t)
-  (add-hook 'haskell-mode-hook 'ghc-init))
-
-(use-package company-ghc
-  :ensure t
-  :config
-  (add-to-list 'company-backends '(company-ghc :with company-dabbrev-code))
-  (setq company-ghc-show-info 'oneline))
-
-(eval-after-load "haskell-cabal"
-  '(bind-key "M-k" 'haskell-compile haskell-cabal-mode-map))
-
-(defun find-haskell-definition-at-point ()
-  (interactive)
-  (inferior-haskell-find-definition (haskell-ident-at-point)))
-
-(use-package haskell-mode
-  :ensure t
-  :mode "\\.hs$"
-  :config
-  (setq font-lock-maximum-decoration '((haskell-mode . 2) (t . 0))
-        haskell-tags-on-save t))
-
-(eval-after-load "haskell-mode"
-  '(bind-keys :map haskell-mode-map
-              ("M-k" . haskell-compile)
-              ("M-." . find-haskell-definition-at-point)
-              ("C-c M-." . inferior-haskell-find-definition)
-              ("C-c v c" . haskell-cabal-visit-file)
-              ("C-c C-z" . inferior-haskell-load-file)))
-
-(use-package flycheck-haskell
-  :ensure t
-  :config
-  (add-hook 'haskell-mode-hook 'flycheck-mode)
-  (add-hook 'haskell-mode-hook 'flycheck-haskell-setup))
-
-(use-package hindent
-  :ensure t
-  :config
-  (setq hindent-style "chris-done")
-  (add-hook 'haskell-mode-hook 'haskell-indentation-mode)
-  (add-hook 'haskell-mode-hook 'hindent-mode))
 
 ;;------------------------------------------------------------------------------
 ;; Git interactions
@@ -1107,6 +1086,19 @@ an error."
     (error (message "Invalid expression")
            (insert (current-kill 0)))))
 (bind-key "C-x C-S-e" 'eval-and-replace)
+
+;;------------------------------------------------------------------------------
+;; which minor modes are active?
+(defun which-active-modes ()
+  "Give a message of which minor modes are enabled in the current buffer."
+  (interactive)
+  (let ((active-modes))
+    (mapc (lambda (mode) (condition-case nil
+                             (if (and (symbolp mode) (symbol-value mode))
+                                 (add-to-list 'active-modes mode))
+                           (error nil) ))
+          minor-mode-list)
+    (message "Active modes are %s" active-modes)))
 
 ;;------------------------------------------------------------------------------
 ;; Insert current time/date
@@ -1258,11 +1250,6 @@ Example of an XCode UUID: a513b85041a3535fc3520c3d."
 (mapc 'load (files-in-below-directory (concat dotfile-dir ".emacs.d/custom/")))
 
 ;;------------------------------------------------------------------------------
-;; Start server
-(require 'server)
-(server-start)
-
-;;------------------------------------------------------------------------------
 ;; Size the frame
 (setq default-frame-height (frame-height))
 (setq default-frame-alist
@@ -1274,17 +1261,9 @@ Example of an XCode UUID: a513b85041a3535fc3520c3d."
 (size-frame-default)
 
 ;;------------------------------------------------------------------------------
-;; which minor modes are active?
-(defun which-active-modes ()
-  "Give a message of which minor modes are enabled in the current buffer."
-  (interactive)
-  (let ((active-modes))
-    (mapc (lambda (mode) (condition-case nil
-                             (if (and (symbolp mode) (symbol-value mode))
-                                 (add-to-list 'active-modes mode))
-                           (error nil) ))
-          minor-mode-list)
-    (message "Active modes are %s" active-modes)))
+;; Start server
+(require 'server)
+(server-start)
 
 ;; Local Variables:
 ;; byte-compile-warnings: (not free-vars)
