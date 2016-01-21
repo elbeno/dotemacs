@@ -290,11 +290,19 @@
 ;; use ibuffer instead of list-buffers
 (defalias 'list-buffers 'ibuffer)
 
+;; expand-region
 (use-package expand-region
   :ensure t
   :bind (("C-'" . er/expand-region)
          ("C-@" . er/contract-region)))
 (delete-selection-mode 1)
+
+;; region-state: show lines/characters selected
+(use-package region-state
+  :ensure t
+  :config
+  (region-state-mode)
+  :diminish region-state-mode)
 
 ;;------------------------------------------------------------------------------
 ;; Colors
