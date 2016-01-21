@@ -493,7 +493,7 @@
 (use-package google-this
   :ensure t
   :bind
-  (("C-c r" . google-this-cpp-reference)))
+  (("C-c <f1>" . google-this-cpp-reference)))
 
 ;;------------------------------------------------------------------------------
 ;; Diffing things
