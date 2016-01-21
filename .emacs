@@ -878,6 +878,13 @@ See URL `https://github.com/FND/jslint-reporter'."
   ;; Enable magit-commit-mode after typing 's', 'S', 'd'
   (add-hook 'git-messenger:popup-buffer-hook 'magit-commit-mode))
 
+;; on-the-fly diff highlighting
+(use-package diff-hl
+  :ensure t
+  :config
+  (setq diff-hl-side 'right)
+  (global-diff-hl-mode))
+
 ;;------------------------------------------------------------------------------
 ;; Org-mode
 (use-package org
