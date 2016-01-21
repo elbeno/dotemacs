@@ -674,6 +674,15 @@ See URL `https://github.com/FND/jslint-reporter'."
 (add-hook 'c-mode-common-hook 'complete-c-headers)
 
 ;; cmake-ide setup
+(defun rtags-enable-my-keybindings (&optional map prefix)
+  (interactive)
+  (unless map
+    (setq map c-mode-base-map))
+  (unless prefix
+    (setq prefix "\C-cr"))
+  (ignore-errors
+    (define-key map (concat prefix "t") (function rtags-symbol-type))))
+
 (defun use-cmake-ide ()
   (use-package cmake-ide
     :ensure t
@@ -681,6 +690,8 @@ See URL `https://github.com/FND/jslint-reporter'."
     (add-to-list 'load-path (concat dotfile-dir "../rtags/src/"))
     (add-to-list 'exec-path (concat dotfile-dir "../rtags/bin/"))
     (require 'rtags)
+    (rtags-enable-standard-keybindings c-mode-base-map)
+    (rtags-enable-my-keybindings c-mode-base-map)
     (cmake-ide-setup)
     (when (cmake-ide--locate-cmakelists)
       (setq cmake-ide-dir (concat (cmake-ide--locate-cmakelists) "build/")))))
@@ -701,9 +712,10 @@ See URL `https://github.com/FND/jslint-reporter'."
               ("C-c i" . cpp-auto-include/ensure-includes-for-file)
               ("C-c o" . cpp-auto-include/ensure-includes-for-current-line)
               ("M-."   . rtags-find-symbol-at-point)
-              ("C-M-." . rtags-find-symbol)
-              ("M-,"   . rtags-location-stack-back)
-              ("C-M-," . rtags-location-stack-forward)
+              ("C-M-." . rtags-location-stack-back)
+              ("M-,"   . rtags-find-references-at-point)
+              ("M-]"   . rtags-next-match)
+              ("M-["   . rtags-previous-match)
               ("M-k"   . cmake-ide-compile)))
 
 ;;------------------------------------------------------------------------------
