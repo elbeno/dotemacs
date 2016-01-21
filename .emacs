@@ -559,110 +559,14 @@ See URL `https://github.com/FND/jslint-reporter'."
 (setq speedbar-directory-unshown-regexp "^$")
 
 ;;------------------------------------------------------------------------------
-;; Tags
-;; (defun my/find-tags-file-r (path)
-;;   "find the tags file from the parent directories"
-;;   (let* ((parent (file-name-directory path))
-;;          (possible-tags-file (concat parent ".git/TAGS")))
-;;     (cond
-;;      ((file-exists-p possible-tags-file) (throw 'found-it possible-tags-file))
-;;      ((string= "/.git/TAGS" possible-tags-file) (error "no tags file found"))
-;;      (t (my/find-tags-file-r (directory-file-name parent))))))
-
-;; (defun my/find-tags-file ()
-;;   "recursively searches each parent directory for a file named
-;; 'TAGS' in the bare .git repo and returns the path to that file or
-;; nil if a tags file is not found. Returns nil if the buffer is not
-;; visiting a file"
-;;   (if (buffer-file-name)
-;;       (catch 'found-it
-;;         (my/find-tags-file-r (buffer-file-name)))
-;;     (error "buffer is not visiting a file")))
-
-;; (defun my/set-tags-file-path ()
-;;   "calls `my/find-tags-file' to recursively search up the
-;; directory tree to find a file named '.git/TAGS'. If found, set
-;; 'tags-table-list' with that path as an argument otherwise raises
-;; an error."
-;;   (interactive)
-;;   (condition-case nil
-;;       (add-to-list 'tags-table-list (my/find-tags-file))
-;;     (error nil)))
-
-;; ;; find the TAGS file after opening the source file
-;; (add-hook 'find-file-hook
-;;           '(lambda () (my/set-tags-file-path)))
-
-;; (use-package etags-select
-;;   :ensure t)
-
-;; (use-package etags-table
-;;   :ensure t)
-
-;; (setq tags-revert-without-query 1
-;;       etags-table-search-up-depth 10)
-;; (bind-key "M-." 'etags-select-find-tag-at-point)
-;; (bind-key "M-*" 'pop-tag-mark)
-
-;;------------------------------------------------------------------------------
-;; C++ autocomplete on linux: irony
-
-;; On first install, run M-x irony-install-server
-;; To set compilation database, use M-x irony-cdb-json-add-compile-commands-path
-;; Use cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON to generate compile_commands.json
-;; The compilation db list is in ~/.emacs.d/irony/cdb-json-projects
-
-;; (when (eq system-type 'gnu/linux)
-;;   (use-package irony
-;;     :ensure t
-;;     :config
-;;     (add-hook 'c++-mode-hook 'irony-mode)
-;;     (add-hook 'c-mode-hook 'irony-mode)
-;;     (add-hook 'objc-mode-hook 'irony-mode)
-;;     ;; replace the `completion-at-point' and `complete-symbol' bindings in
-;;     ;; irony-mode's buffers by irony-mode's function
-;;     (defun my-irony-mode-hook ()
-;;       (define-key irony-mode-map [remap completion-at-point]
-;;         'irony-completion-at-point-async)
-;;       (define-key irony-mode-map [remap complete-symbol]
-;;         'irony-completion-at-point-async))
-;;     (add-hook 'irony-mode-hook 'my-irony-mode-hook)
-;;     (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
-
-;;   (use-package company-irony
-;;     :ensure t
-;;     :config
-;;     ;; (optional) adds CC special commands to `company-begin-commands' in order to
-;;     ;; trigger completion at interesting places, such as after scope operator
-;;     ;;     std::|
-;;     (add-hook 'irony-mode-hook 'company-irony-setup-begin-commands))
-
-;;   (use-package flycheck-irony
-;;     :ensure t
-;;     :config
-;;     (eval-after-load 'flycheck
-;;       '(add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
-;;     (add-hook 'irony-mode-hook 'flycheck-mode)))
-
-;;------------------------------------------------------------------------------
 ;; Autocomplete: company
-;; (use-package company
-;;   :ensure t
-;;   :config
-;;   (global-company-mode)
-;;   (delete 'company-semantic company-backends)
-;;   ;; Use irony for linux completion, plain dabbrev-code for windows
-;;   (cond ((eq system-type 'gnu/linux)
-;;          (add-to-list 'company-backends 'company-irony))
-;;         ((eq system-type 'cygwin)
-;;          (add-to-list 'company-backends 'company-dabbrev-code)))
-;;   (setq company-tooltip-align-annotations t
-;;         company-show-numbers t))
-
-;; (use-package company-c-headers
-;;   :ensure t
-;;   :config
-;;   (add-to-list 'company-backends 'company-c-headers))
+(use-package company
+  :ensure t
+  :config
+  (global-company-mode)
+  (delete 'company-semantic company-backends)
+  (setq company-tooltip-align-annotations t
+        company-show-numbers t))
 
 ;;------------------------------------------------------------------------------
 ;; Make sure tab works with indenting, completion, yasnippet
@@ -684,10 +588,10 @@ See URL `https://github.com/FND/jslint-reporter'."
       (minibuffer-complete)
     (if (or (not yas-minor-mode)
             (null (do-yas-expand)))
-        (indent-for-tab-command))))
-        ;; (if (check-expansion)
-        ;;     (company-complete-common)
-        ;;   (indent-for-tab-command)))))
+        (indent-for-tab-command)
+        (if (check-expansion)
+            (company-complete-common)
+          (indent-for-tab-command)))))
 
 (bind-key "<tab>" 'tab-indent-or-complete)
 
@@ -751,6 +655,30 @@ See URL `https://github.com/FND/jslint-reporter'."
 
 (add-hook 'c-mode-common-hook 'infer-indentation-style)
 
+;; Header completion
+(defun complete-c-headers ()
+  (use-package company-c-headers
+    :ensure t
+    :config
+    (add-to-list 'company-backends 'company-c-headers)))
+
+(add-hook 'c-mode-common-hook 'complete-c-headers)
+
+;; cmake-ide setup
+(defun use-cmake-ide ()
+  (use-package cmake-ide
+    :ensure t
+    :config
+    (add-to-list 'load-path (concat dotfile-dir "../rtags/src/"))
+    (add-to-list 'exec-path (concat dotfile-dir "../rtags/bin/"))
+    (require 'rtags)
+    (cmake-ide-setup)
+    (when (cmake-ide--locate-cmakelists)
+      (setq cmake-ide-dir (concat (cmake-ide--locate-cmakelists) "build/")))))
+
+(add-hook 'c++-mode-hook 'use-cmake-ide)
+(add-hook 'c++-mode-hook 'flycheck-mode)
+
 ;; Auto insertion of headers
 (autoload 'cpp-auto-include/namespace-qualify-file "cpp-auto-include"
   "Explicitly qualify uses of the standard library with their namespace(s)." t)
@@ -762,29 +690,18 @@ See URL `https://github.com/FND/jslint-reporter'."
   '(bind-keys :map c++-mode-map
               ("C-c q" . cpp-auto-include/namespace-qualify-file)
               ("C-c i" . cpp-auto-include/ensure-includes-for-file)
-              ("C-c o" . cpp-auto-include/ensure-includes-for-current-line)))
+              ("C-c o" . cpp-auto-include/ensure-includes-for-current-line)
+              ("M-."   . rtags-find-symbol-at-point)
+              ("C-M-." . rtags-find-symbol)
+              ("M-,"   . rtags-location-stack-back)
+              ("C-M-," . rtags-location-stack-forward)
+              ("M-k"   . cmake-ide-compile)))
 
 ;;------------------------------------------------------------------------------
 ;; CMake
 
 (use-package cmake-mode
   :ensure t)
-
-;; (defun my/gdb-exec ()
-;;   (interactive)
-;;   (gud-gdb (concat "gdb --fullname " (cppcm-get-exe-path-current-buffer))))
-
-;; (eval-after-load 'cc-mode
-;;   '(bind-key "C-c C-g" 'my/gdb-exec c++-mode-map))
-
-;; (use-package cpputils-cmake
-;;   :ensure t
-;;   :config
-;;   (setq cppcm-write-flymake-makefile nil)
-;;   (add-hook 'c-mode-common-hook
-;;             (lambda ()
-;;               (if (derived-mode-p 'c-mode 'c++-mode)
-;;                   (cppcm-reload-all)))))
 
 ;;------------------------------------------------------------------------------
 ;; Compilation
@@ -808,39 +725,17 @@ See URL `https://github.com/FND/jslint-reporter'."
 (setq compilation-parse-errors-filename-function 'process-error-filename)
 
 ;;------------------------------------------------------------------------------
-;; CEDET
-
-;; (use-package semantic
-;;   :config
-;;   (mapc (lambda (m) (add-to-list 'semantic-default-submodes m))
-;;       '(global-semantic-mru-bookmark-mode
-;;         global-semanticdb-minor-mode
-;;         global-semantic-idle-scheduler-mode
-;;         global-semantic-highlight-func-mode
-;;         global-semantic-idle-summary-mode
-;;         ))
-;;   (semantic-mode 1)
-;;   (semanticdb-enable-gnu-global-databases 'c-mode t)
-;;   (semanticdb-enable-gnu-global-databases 'c++-mode t))
-
-;; (autoload 'eassist-list-methods "eassist" "List methods in the current buffer." t)
-;; (eval-after-load 'cc-mode
-;;   '(bind-keys :map c++-mode-map
-;;               ("C-c m" . eassist-list-methods)
-;;               ("C-c C-r" . semantic-symref)))
-
-;;------------------------------------------------------------------------------
 ;; Projectile
-;; (use-package projectile
-;;   :ensure t
-;;   :config
-;;   (projectile-global-mode)
-;;   (setq projectile-enable-caching t)
-;;   :bind
-;;   (("C-x f" . projectile-find-file)
-;;    ("C-x g" . projectile-grep)
-;;    ("C-c #" . projectile-find-file-dwim)
-;;    ("C-x C-h" . projectile-find-other-file)))
+(use-package projectile
+  :ensure t
+  :config
+  (projectile-global-mode)
+  (setq projectile-enable-caching t)
+  :bind
+  (("C-x f" . projectile-find-file)
+   ("C-x g" . projectile-grep)
+   ("C-c #" . projectile-find-file-dwim)
+   ("C-x C-h" . projectile-find-other-file)))
 
 ;;------------------------------------------------------------------------------
 ;; Haskell mode
@@ -852,11 +747,11 @@ See URL `https://github.com/FND/jslint-reporter'."
         ghc-debug t)
   (add-hook 'haskell-mode-hook 'ghc-init))
 
-;; (use-package company-ghc
-;;   :ensure t
-;;   :config
-;;   (add-to-list 'company-backends '(company-ghc :with company-dabbrev-code))
-;;   (setq company-ghc-show-info 'oneline))
+(use-package company-ghc
+  :ensure t
+  :config
+  (add-to-list 'company-backends '(company-ghc :with company-dabbrev-code))
+  (setq company-ghc-show-info 'oneline))
 
 (eval-after-load "haskell-cabal"
   '(bind-key "M-k" 'haskell-compile haskell-cabal-mode-map))
