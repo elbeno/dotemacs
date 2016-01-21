@@ -231,6 +231,7 @@
 
 ;; Auto-revert buffers
 (global-auto-revert-mode)
+(diminish 'auto-revert-mode)
 
 ;; Rainbow delimiters
 (use-package rainbow-delimiters
