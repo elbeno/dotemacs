@@ -892,7 +892,8 @@ See URL `https://github.com/FND/jslint-reporter'."
   :ensure t
   :config
   (setq diff-hl-side 'right)
-  (global-diff-hl-mode))
+  (global-diff-hl-mode)
+  (diff-hl-flydiff-mode))
 
 ;;------------------------------------------------------------------------------
 ;; Org-mode
