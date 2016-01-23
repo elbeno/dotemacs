@@ -4,6 +4,8 @@
 ;; plenty of memory, GC threshold is 100MB
 (setq gc-cons-threshold 100000000)
 
+(setq user-full-name "Ben Deane")
+
 ;; this file's true directory
 (setq dotfile-dir (file-name-directory
                    (file-chase-links
@@ -574,6 +576,9 @@ See URL `https://github.com/FND/jslint-reporter'."
   :config
   (global-company-mode)
   (delete 'company-semantic company-backends)
+  ;; Use dabbrev-code completion for windows
+  (cond ((eq system-type 'cygwin)
+         (add-to-list 'company-backends 'company-dabbrev-code)))
   (setq company-tooltip-align-annotations t
         company-show-numbers t))
 
@@ -609,6 +614,7 @@ See URL `https://github.com/FND/jslint-reporter'."
 (setq-default c-basic-offset 2)
 (setq lua-indent-level 2)
 (setq js-indent-level 2)
+(setq js2-basic-offset 2)
 (setq python-indent-offset 2)
 
 ;;------------------------------------------------------------------------------
@@ -637,6 +643,10 @@ See URL `https://github.com/FND/jslint-reporter'."
   (setq c-basic-offset 4)
   (setq c-basic-indent 4)
   (c-set-offset 'arglist-intro '+))
+(defun qml-indent-rules ()
+  (interactive)
+  (setq indent-tabs-mode t)
+  (setq tab-width 2))
 
 (defun how-many-region (begin end regexp &optional interactive)
   "Print number of non-trivial matches for REGEXP in region.
