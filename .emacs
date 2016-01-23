@@ -113,6 +113,8 @@
 (set-selection-coding-system 'utf-8)
 (setq buffer-file-coding-system 'utf-8)
 (setq locale-coding-system 'utf-8)
+(when (display-graphic-p)
+  (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
 
 ;;------------------------------------------------------------------------------
 ;; Clean up display
@@ -306,6 +308,11 @@
   :config
   (region-state-mode)
   :diminish region-state-mode)
+
+;; prettify symbols in modes that support it
+;; unprettify the symbol at point
+(global-prettify-symbols-mode)
+(setq prettify-symbols-unprettify-at-point 'right-edge)
 
 ;;------------------------------------------------------------------------------
 ;; Colors
@@ -941,7 +948,18 @@ See URL `https://github.com/FND/jslint-reporter'."
           ("fontsize" "\\scriptsize")
           ("linenos" "")
           ))
-  (setq org-beamer-outline-frame-title "Contents"))
+  (setq org-beamer-outline-frame-title "Contents")
+  (setq org-todo-keywords '((sequence "☛ TODO(t)" "|" "✔ DONE(d)")
+                            (sequence "⚑ WAITING(w)" "|")
+                            (sequence "|" "✘ CANCELLED(c)"))))
+
+(use-package org-bullets
+  :ensure t
+  :init
+  (setq org-bullets-bullet-list
+        '("◉" "✸" "✿" "◎" "►" "◇"))
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
 (bind-key "C-c l" 'org-store-link)
 (bind-key "C-c c" 'org-capture)
