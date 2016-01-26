@@ -279,6 +279,13 @@
   (add-hook 'prog-mode-hook 'hes-mode)
   :diminish hes-mode)
 
+;; Highlight numbers in groups of 3
+(use-package num3-mode
+  :ensure t
+  :config
+  (global-num3-mode)
+  :diminish num3-mode)
+
 ;; elisp hints
 (use-package eldoc
   :diminish eldoc-mode
@@ -729,8 +736,9 @@ See URL `https://github.com/FND/jslint-reporter'."
     (when (cmake-ide--locate-cmakelists)
       (setq cmake-ide-dir (concat (cmake-ide--locate-cmakelists) "build/")))))
 
-(add-hook 'c++-mode-hook 'use-cmake-ide)
-(add-hook 'c++-mode-hook 'flycheck-mode)
+(when (eq system-type 'gnu/linux)
+  (add-hook 'c++-mode-hook 'use-cmake-ide)
+  (add-hook 'c++-mode-hook 'flycheck-mode))
 
 ;; Auto insertion of headers
 (autoload 'cpp-auto-include/namespace-qualify-file "cpp-auto-include"
@@ -743,13 +751,17 @@ See URL `https://github.com/FND/jslint-reporter'."
   '(bind-keys :map c++-mode-map
               ("C-c q" . cpp-auto-include/namespace-qualify-file)
               ("C-c i" . cpp-auto-include/ensure-includes-for-file)
-              ("C-c o" . cpp-auto-include/ensure-includes-for-current-line)
-              ("M-."   . rtags-find-symbol-at-point)
-              ("C-M-." . rtags-location-stack-back)
-              ("M-,"   . rtags-find-references-at-point)
-              ("M-]"   . rtags-next-match)
-              ("M-["   . rtags-previous-match)
-              ("M-k"   . cmake-ide-compile)))
+              ("C-c o" . cpp-auto-include/ensure-includes-for-current-line)))
+
+(when (eq system-type 'gnu/linux)
+  (eval-after-load 'cc-mode
+    '(bind-keys :map c++-mode-map
+                ("M-."   . rtags-find-symbol-at-point)
+                ("C-M-." . rtags-location-stack-back)
+                ("M-,"   . rtags-find-references-at-point)
+                ("M-]"   . rtags-next-match)
+                ("M-["   . rtags-previous-match)
+                ("M-k"   . cmake-ide-compile))))
 
 ;;------------------------------------------------------------------------------
 ;; CMake
