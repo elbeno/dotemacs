@@ -30,7 +30,7 @@
 ;; package setup
 (setq package-archives '(("org" . "http://orgmode.org/elpa/")
                          ("gnu" . "http://elpa.gnu.org/packages/")
-                         ("elpa" . "http://tromey.com/elpa/")
+                         ;; ("elpa" . "http://tromey.com/elpa/")
                          ;;("marmalade" . "http://marmalade-repo.org/packages/")
                          ("stable-melpa" . "http://stable.melpa.org/packages/")
                          ("melpa" . "http://melpa.org/packages/")))
@@ -122,13 +122,13 @@
 (menu-bar-mode -1)
 (display-battery-mode -1)
 (scroll-bar-mode -1)
-(setq inhibit-startup-screen t)
-(setq initial-scratch-message "")
-(setq visible-bell 1)
+(setq inhibit-startup-screen t
+      initial-scratch-message ""
+      visible-bell 1)
 
 ;; Display defaults
-(setq column-wrap-soft 80)
-(setq column-wrap-hard 100)
+(setq column-wrap-soft 80
+      column-wrap-hard 100)
 (setq sentence-end-double-space nil)
 (setq-default indent-tabs-mode nil)
 (setq tab-width 2)
@@ -141,6 +141,16 @@
   (ws-butler-global-mode)
   :diminish
   ws-butler-mode)
+
+;;------------------------------------------------------------------------------
+;; Copy/paste stuff
+
+(setq select-enable-clipboard t
+      select-enable-primary t
+      save-interprogram-paste-before-kill t
+      mouse-yank-at-point t)
+
+(setq load-prefer-newer t)
 
 ;;------------------------------------------------------------------------------
 ;; Set up the frame
@@ -340,6 +350,12 @@
 (bind-key "M-r" 'replace-string)
 (bind-key "M-k" 'compile)
 (bind-key "M-SPC" 'cycle-spacing)
+
+;; better searching
+(bind-key "C-s" 'isearch-forward-regexp)
+(bind-key "C-r" 'isearch-backward-regexp)
+(bind-key "C-M-s" 'isearch-forward)
+(bind-key "C-M-r" 'isearch-backward)
 
 ;; Action of home key
 (defun beginning-of-line-or-indentation ()
