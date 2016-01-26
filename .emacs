@@ -594,10 +594,37 @@ See URL `https://github.com/FND/jslint-reporter'."
   :diminish yas-minor-mode)
 
 ;;------------------------------------------------------------------------------
-;; Speedbar
-(setq speedbar-use-images nil)
-(bind-key "C-c s" 'speedbar)
-(setq speedbar-directory-unshown-regexp "^$")
+;; Neotree - an in-buffer speedbar replacement
+
+;; When opening a file, or a directory with dired, hide the neotree window. Just
+;; using neo-enter-hook doesn't quite do it, because neotree routes all
+;; functionality (eg refresh, toggle hidden, etc) through neo-buffer--execute.
+
+(use-package neotree
+  :ensure t
+  :config
+  (setq neo-smart-open t
+        neo-hidden-regexp-list '("\\.pyc$" "~$" "^#.*#$" "^\\.#\\..*$" "\\.elc$")
+        my/neotree-opening-file nil
+        my/neotree-entering-dired nil)
+  (defun neo-hide-on-enter (type path arg)
+    (if (or (and (eq my/neotree-opening-file t)
+                 (equal type 'file))
+            (and (eq my/neotree-entering-dired t)
+                 (equal type 'directory)))
+        (neotree-hide))
+    (setq my/neotree-opening-file nil
+          my/neotree-entering-dired nil))
+  (defun my/before-neobuffer-execute (arg0 &optional file-fn dir-fn &rest args)
+    (when (eq dir-fn 'neo-open-dired)
+      (setq my/neotree-entering-dired t))
+    (when (or (eq file-fn 'neo-open-file)
+              (eq file-fn 'neo-open-file-vertical-split)
+              (eq file-fn 'neo-open-file-horizontal-split))
+      (setq my/neotree-opening-file t)))
+  (advice-add 'neo-buffer--execute :before #'my/before-neobuffer-execute)
+  (add-hook 'neo-enter-hook #'neo-hide-on-enter)
+  :bind (("<f12>" . neotree-toggle)))
 
 ;;------------------------------------------------------------------------------
 ;; Autocomplete: company
@@ -796,7 +823,8 @@ See URL `https://github.com/FND/jslint-reporter'."
   :ensure t
   :config
   (projectile-global-mode)
-  (setq projectile-enable-caching t)
+  (setq projectile-enable-caching t
+        projectile-switch-project-action 'neotree-projectile-action)
   :bind
   (("C-x f" . projectile-find-file)
    ("C-x g" . projectile-grep)
@@ -857,9 +885,9 @@ See URL `https://github.com/FND/jslint-reporter'."
 ;;------------------------------------------------------------------------------
 ;; Python mode
 (add-hook 'python-mode-hook (lambda ()
-                          (flycheck-select-checker 'python-flake8)
-                          (flycheck-mode)
-                          (elpy-mode)))
+                              (flycheck-select-checker 'python-flake8)
+                              (flycheck-mode)
+                              (elpy-mode)))
 
 (use-package jinja2-mode
   :ensure t
@@ -1013,6 +1041,7 @@ See URL `https://github.com/FND/jslint-reporter'."
   :ensure t
   :defer 5)
 
+;; highlight line in dired
 (add-hook 'dired-mode-hook 'hl-line-mode)
 
 ;; Shells
@@ -1034,7 +1063,6 @@ See URL `https://github.com/FND/jslint-reporter'."
   (eval-after-load "lyqi"
     '(bind-keys :map lyqi:normal-mode-map
                 ("M-k" . lyqi:compile-ly))))
-
 
 ;;------------------------------------------------------------------------------
 ;; Byte-compile elisp on save
