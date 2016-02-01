@@ -445,7 +445,8 @@
                                 ("\\.ml[iyl]?$" . caml-mode)
                                 ("\\.pb$" . protobuf-mode)
                                 ("\\.proto$" . protobuf-mode)
-                                ("\\.presql$" . sql-mode))
+                                ("\\.presql$" . sql-mode)
+                                ("\\.yml$" . yaml-mode))
                               auto-mode-alist))
 
 ;;------------------------------------------------------------------------------
@@ -908,6 +909,12 @@ See URL `https://github.com/FND/jslint-reporter'."
 (use-package lua-mode
   :ensure t
   :mode "\\.lua$")
+
+;;------------------------------------------------------------------------------
+;; Yaml mode
+(use-package yaml-mode
+  :ensure t
+  :mode "\\.yml$")
 
 ;;------------------------------------------------------------------------------
 ;; Javascript
