@@ -640,6 +640,19 @@ See URL `https://github.com/FND/jslint-reporter'."
   (setq company-tooltip-align-annotations t
         company-show-numbers t))
 
+;; Use help with company
+(use-package pos-tip
+  :ensure t
+  :pin melpa)
+
+(use-package company-quickhelp
+  :ensure t
+  :config
+  (company-quickhelp-mode 1))
+
+(eval-after-load 'company
+  '(define-key company-active-map (kbd "M-h") #'company-quickhelp-manual-begin))
+
 ;;------------------------------------------------------------------------------
 ;; Make sure tab works with indenting, completion, yasnippet
 (defun check-expansion ()
@@ -1065,6 +1078,12 @@ See URL `https://github.com/FND/jslint-reporter'."
 ;; Shells
 (setq ls-lisp-use-insert-directory-program t)
 (setq insert-directory-program "/bin/ls")
+
+;; company for shell mode
+(use-package company-shell
+  :ensure t
+  :config
+  (add-to-list 'company-backends 'company-shell))
 
 ;; lilypond
 (when (eq system-type 'gnu/linux)
