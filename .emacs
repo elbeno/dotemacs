@@ -805,6 +805,17 @@ See URL `https://github.com/FND/jslint-reporter'."
 (bind-key "M-<down>" 'next-error)
 (setq compilation-scroll-output t)
 
+;; Remove compilation window on success
+(setq compilation-finish-functions
+      (lambda (buf str)
+        (if (null (string-match ".*exited abnormally.*" str))
+            ;;no errors, make the compilation window go away in a few seconds
+            (progn
+              (run-at-time
+               "1 sec" nil 'delete-windows-on
+               (get-buffer-create "*compilation*"))
+              (message "No compilation errors!")))))
+
 ;; SCons builds into a 'build' subdir, but we want to find the errors
 ;; in the regular source dir.  So we remove build/XXX/YYY/{debug,release}/ from the
 ;; filenames.
