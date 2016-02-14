@@ -971,6 +971,13 @@ See URL `https://github.com/FND/jslint-reporter'."
   :mode ("\\.proto$" "\\.pb$"))
 
 ;;------------------------------------------------------------------------------
+;; PDFs
+(use-package pdf-tools
+  :ensure t
+  :init
+  (pdf-tools-install))
+
+;;------------------------------------------------------------------------------
 ;; Git interactions
 
 ;; modes
