@@ -1050,6 +1050,10 @@ See URL `https://github.com/FND/jslint-reporter'."
   :config
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
+(use-package ox-reveal
+  :ensure t
+  :defer)
+
 (bind-key "C-c l" 'org-store-link)
 (bind-key "C-c c" 'org-capture)
 (bind-key "C-c a" 'org-agenda)
@@ -1061,6 +1065,7 @@ See URL `https://github.com/FND/jslint-reporter'."
             (bind-key "M-Q" 'toggle-truncate-lines org-mode-map)
             (require 'ox-latex)
             (require 'ox-beamer)
+            (require 'ox-reveal)
             (add-to-list 'org-beamer-environments-extra
              '("onlyenv" "O" "\\begin{onlyenv}%a" "\\end{onlyenv}"))))
 
