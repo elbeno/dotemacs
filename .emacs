@@ -237,8 +237,9 @@
 (setq show-paren-delay 0)
 
 ;; General close
-(autoload 'general-close "general-close" "Insert closing delimiter." t)
-(bind-key "C-c ]" 'general-close)
+(use-package general-close
+  :ensure t
+  :bind ("M-]" . general-close))
 
 ;; Show column numbers
 (column-number-mode)
