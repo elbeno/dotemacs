@@ -956,12 +956,6 @@ See URL `https://github.com/FND/jslint-reporter'."
                             (flycheck-mode))))
 
 ;;------------------------------------------------------------------------------
-;; For Qt ui files
-(use-package nxml-mode
-  :ensure t
-  :mode "\\.ui$")
-
-;;------------------------------------------------------------------------------
 ;; Protobufs
 ;; protobuf mode requires cl
 (use-package protobuf-mode
