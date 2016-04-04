@@ -1040,7 +1040,13 @@ See URL `https://github.com/FND/jslint-reporter'."
   (setq org-beamer-outline-frame-title "Contents")
   (setq org-todo-keywords '((sequence "☛ TODO(t)" "|" "✔ DONE(d)")
                             (sequence "⚑ WAITING(w)" "|")
-                            (sequence "|" "✘ CANCELLED(c)"))))
+                            (sequence "|" "✘ CANCELLED(c)")))
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((C . t)
+     (js . t)
+     (haskell . t)
+     (emacs-lisp . t))))
 
 ;; better header bullets
 (use-package org-bullets
