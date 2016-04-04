@@ -1060,6 +1060,10 @@ See URL `https://github.com/FND/jslint-reporter'."
   :ensure t
   :defer)
 
+(use-package htmlize
+  :ensure t
+  :defer)
+
 (bind-key "C-c l" 'org-store-link)
 (bind-key "C-c c" 'org-capture)
 (bind-key "C-c a" 'org-agenda)
@@ -1072,6 +1076,7 @@ See URL `https://github.com/FND/jslint-reporter'."
             (require 'ox-latex)
             (require 'ox-beamer)
             (require 'ox-reveal)
+            (require 'htmlize)
             (add-to-list 'org-beamer-environments-extra
              '("onlyenv" "O" "\\begin{onlyenv}%a" "\\end{onlyenv}"))))
 
