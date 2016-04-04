@@ -755,7 +755,7 @@ See URL `https://github.com/FND/jslint-reporter'."
 
 (add-hook 'c-mode-common-hook 'complete-c-headers)
 
-;; cmake-ide setup
+;; rtags
 (defun rtags-enable-my-keybindings (&optional map prefix)
   (interactive)
   (unless map
@@ -765,22 +765,36 @@ See URL `https://github.com/FND/jslint-reporter'."
   (ignore-errors
     (define-key map (concat prefix "t") (function rtags-symbol-type))))
 
-(defun use-cmake-ide ()
-  (use-package cmake-ide
-    :ensure t
-    :config
-    (add-to-list 'load-path (concat dotfile-dir "../rtags/src/"))
-    (add-to-list 'exec-path (concat dotfile-dir "../rtags/bin/"))
-    (require 'rtags)
-    (rtags-enable-standard-keybindings c-mode-base-map)
-    (rtags-enable-my-keybindings c-mode-base-map)
-    (cmake-ide-setup)
-    (when (cmake-ide--locate-cmakelists)
-      (setq cmake-ide-dir (concat (cmake-ide--locate-cmakelists) "build/")))))
+(defun use-rtags ()
+  (add-to-list 'load-path (concat dotfile-dir "../rtags/build/src/"))
+  (add-to-list 'exec-path (concat dotfile-dir "../rtags/build/bin/"))
+  (require 'rtags)
+  (setq rtags-autostart-diagnostics t)
+  (rtags-enable-standard-keybindings c-mode-base-map)
+  (rtags-enable-my-keybindings c-mode-base-map))
 
-(when (eq system-type 'gnu/linux)
-  (add-hook 'c++-mode-hook 'use-cmake-ide)
-  (add-hook 'c++-mode-hook 'flycheck-mode))
+;; cmake ide
+(use-package cmake-ide
+  :ensure t
+  :defer)
+
+(defun use-cmake-ide ()
+  (cmake-ide-setup)
+  (when (cmake-ide--locate-cmakelists)
+    (setq cmake-ide-dir (concat (cmake-ide--locate-cmakelists) "build/"))))
+
+(eval-after-load 'cc-mode
+  '(bind-keys :map c++-mode-map
+              ("M-."   . rtags-find-symbol-at-point)
+              ("C-M-." . rtags-location-stack-back)
+              ("M-,"   . rtags-find-references-at-point)
+              ("M-]"   . rtags-next-match)
+              ("M-["   . rtags-previous-match)
+              ("M-k"   . cmake-ide-compile)))
+
+(add-hook 'c-mode-common-hook #'use-rtags)
+(add-hook 'c-mode-common-hook #'flycheck-mode)
+(add-hook 'c-mode-common-hook #'use-cmake-ide)
 
 ;; Auto insertion of headers
 (autoload 'cpp-auto-include/namespace-qualify-file "cpp-auto-include"
@@ -794,16 +808,6 @@ See URL `https://github.com/FND/jslint-reporter'."
               ("C-c q" . cpp-auto-include/namespace-qualify-file)
               ("C-c i" . cpp-auto-include/ensure-includes-for-file)
               ("C-c o" . cpp-auto-include/ensure-includes-for-current-line)))
-
-(when (eq system-type 'gnu/linux)
-  (eval-after-load 'cc-mode
-    '(bind-keys :map c++-mode-map
-                ("M-."   . rtags-find-symbol-at-point)
-                ("C-M-." . rtags-location-stack-back)
-                ("M-,"   . rtags-find-references-at-point)
-                ("M-]"   . rtags-next-match)
-                ("M-["   . rtags-previous-match)
-                ("M-k"   . cmake-ide-compile))))
 
 ;;------------------------------------------------------------------------------
 ;; CMake
