@@ -1042,6 +1042,7 @@ See URL `https://github.com/FND/jslint-reporter'."
                             (sequence "⚑ WAITING(w)" "|")
                             (sequence "|" "✘ CANCELLED(c)"))))
 
+;; better header bullets
 (use-package org-bullets
   :ensure t
   :init
@@ -1049,6 +1050,11 @@ See URL `https://github.com/FND/jslint-reporter'."
         '("◉" "✸" "✿" "◎" "►" "◇"))
   :config
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+
+;; better inline list bullets
+(font-lock-add-keywords 'org-mode
+                        '(("^ +\\([-*]\\) "
+                           (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
 
 (use-package ox-reveal
   :ensure t
