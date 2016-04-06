@@ -418,18 +418,50 @@
 
 ;;------------------------------------------------------------------------------
 ;; Mark the fill column
-(use-package column-marker
-  :ensure t)
-(autoload 'column-marker-1 "column-marker" "Highlight a column." t)
-(autoload 'column-marker-2 "column-marker" "Highlight a column." t)
-(add-hook 'c-mode-common-hook (lambda () (interactive) (column-marker-1 column-wrap-soft)))
-(add-hook 'c-mode-common-hook (lambda () (interactive) (column-marker-2 column-wrap-hard)))
 (setq-default fill-column column-wrap-soft)
 
-;; fci-mode doesn't play well with company
-;; (use-package fill-column-indicator
-;;   :ensure t)
-;; (add-hook 'c-mode-common-hook 'fci-mode)
+;; fci-mode doesn't play well with popups
+(defun sanityinc/prog-mode-fci-settings ()
+  (turn-on-fci-mode)
+  (when show-trailing-whitespace
+    (set (make-local-variable 'whitespace-style) '(face trailing))
+    (whitespace-mode 1)))
+
+(defun sanityinc/fci-enabled-p ()
+  (and (boundp 'fci-mode) fci-mode))
+
+(defvar sanityinc/fci-mode-suppressed nil)
+
+(defun suspend-fci-mode ()
+  "Suspend fci-mode"
+  (let ((fci-enabled (sanityinc/fci-enabled-p)))
+    (when fci-enabled
+      (set (make-local-variable 'sanityinc/fci-mode-suppressed) fci-enabled)
+      (turn-off-fci-mode))))
+
+(defun unsuspend-fci-mode ()
+  "Restore fci-mode"
+  (when (and sanityinc/fci-mode-suppressed
+             (null popup-instances))
+    (setq sanityinc/fci-mode-suppressed nil)
+    (turn-on-fci-mode)))
+
+(defadvice popup-create (before suppress-fci-mode activate)
+  (suspend-fci-mode))
+
+(defadvice popup-delete (after restore-fci-mode activate)
+  (unsuspend-fci-mode))
+
+;; Regenerate fci-mode line images after switching themes
+(defadvice enable-theme (after recompute-fci-face activate)
+  (dolist (buffer (buffer-list))
+    (with-current-buffer buffer
+      (when (sanityinc/fci-enabled-p)
+        (turn-on-fci-mode)))))
+
+(use-package fill-column-indicator
+  :ensure t)
+(add-hook 'prog-mode-hook #'sanityinc/prog-mode-fci-settings)
 
 ;;------------------------------------------------------------------------------
 ;; Auto modes
@@ -442,7 +474,7 @@
                                 ("\\.ui$" . nxml-mode)
                                 ("SConstruct" . python-mode)
                                 ("SConscript" . python-mode)
-                                ("\\.tmpl$" . jinja2-mode)                                
+                                ("\\.tmpl$" . jinja2-mode)
                                 ("\\.ml[iyl]?$" . caml-mode)
                                 ("\\.pb$" . protobuf-mode)
                                 ("\\.proto$" . protobuf-mode)
@@ -1073,6 +1105,32 @@ See URL `https://github.com/FND/jslint-reporter'."
 (use-package htmlize
   :ensure t
   :defer)
+
+;; suspend fci mode and flyspell-mode when exporting html
+(defvar modi/htmlize-initial-fci-state nil
+  "Variable to store the state of `fci-mode' when `htmlize-buffer' is called.")
+(defvar modi/htmlize-initial-flyspell-state nil
+  "Variable to store the state of `flyspell-mode' when `htmlize-buffer' is called.")
+
+(defun modi/htmlize-before-hook-fn ()
+  (when (fboundp 'fci-mode)
+    (setq modi/htmlize-initial-fci-state fci-mode)
+    (when fci-mode
+      (fci-mode -1)))
+  (when (fboundp 'flyspell-mode)
+    (setq modi/htmlize-initial-flyspell-state flyspell-mode)
+    (when flyspell-mode
+      (flyspell-mode -1))))
+(add-hook 'htmlize-before-hook #'modi/htmlize-before-hook-fn)
+
+(defun modi/htmlize-after-hook-fn ()
+  (when (fboundp 'fci-mode)
+    (when modi/htmlize-initial-fci-state
+      (fci-mode 1)))
+  (when (fboundp 'flyspell-mode)
+    (when modi/htmlize-initial-flyspell-state
+      (flyspell-mode 1))))
+(add-hook 'htmlize-after-hook #'modi/htmlize-after-hook-fn)
 
 (bind-key "C-c l" 'org-store-link)
 (bind-key "C-c c" 'org-capture)
