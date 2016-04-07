@@ -259,6 +259,7 @@
   :ensure t
   :config
   (add-hook 'prog-mode-hook #'rainbow-mode)
+  (add-hook 'css-mode-hook #'rainbow-mode)
   :diminish rainbow-mode)
 
 ;; Highlight numbers, quoted things, escape sequences
