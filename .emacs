@@ -1105,7 +1105,8 @@ See URL `https://github.com/FND/jslint-reporter'."
 ;; better inline list bullets
 (font-lock-add-keywords 'org-mode
                         '(("^ +\\([-*]\\) "
-                           (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+                           (0 (prog1 () (compose-region (match-beginning 1)
+                                                        (match-end 1) "•"))))))
 
 (use-package ox-reveal
   :ensure t
