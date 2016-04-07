@@ -990,7 +990,9 @@ See URL `https://github.com/FND/jslint-reporter'."
 ;; Javascript
 (use-package js2-mode
   :ensure t
-  :mode ("\\.js$" "\\.qml$"))
+  :mode ("\\.js$" "\\.qml$")
+  :config
+  (bind-key "M-<down>" 'js2-next-error js2-mode-map))
 
 (use-package json-mode
   :ensure t
