@@ -728,61 +728,6 @@ See URL `https://github.com/FND/jslint-reporter'."
 
 ;;------------------------------------------------------------------------------
 ;; C++ mode
-(defun indentation-c-mode-hook ()
-  (c-set-offset 'substatement-open 0)
-  (c-set-offset 'brace-list-open 0)
-  (c-set-offset 'member-init-cont '-)
-  (c-set-offset 'arglist-intro '++)
-  (c-set-offset 'case-label '+)
-  (c-set-offset 'statement-case-open 0))
-(add-hook 'c-mode-common-hook 'indentation-c-mode-hook)
-
-;; Indent rules
-(defun normal-indent-rules ()
-  (interactive)
-  (setq indent-tabs-mode nil)
-  (setq tab-width 2)
-  (setq c-basic-offset 2)
-  (setq c-basic-indent 2)
-  (c-set-offset 'arglist-intro '++))
-(defun tabbed-indent-rules ()
-  (interactive)
-  (setq indent-tabs-mode t)
-  (setq tab-width 4)
-  (setq c-basic-offset 4)
-  (setq c-basic-indent 4)
-  (c-set-offset 'arglist-intro '+))
-(defun qml-indent-rules ()
-  (interactive)
-  (setq indent-tabs-mode t)
-  (setq tab-width 2))
-
-(defun how-many-region (begin end regexp &optional interactive)
-  "Print number of non-trivial matches for REGEXP in region.
-  Non-interactive arguments are Begin End Regexp"
-  (interactive "r\nsHow many matches for (regexp): \np")
-  (let ((count 0) opoint)
-    (save-excursion
-      (setq end (or end (point-max)))
-      (goto-char (or begin (point)))
-      (while (and (< (setq opoint (point)) end)
-                  (re-search-forward regexp end t))
-        (if (= opoint (point))
-            (forward-char 1)
-          (setq count (1+ count))))
-      (if interactive (message "%d occurrences" count))
-      count)))
-
-(defun infer-indentation-style ()
-  ;; if our source file uses tabs, we use tabs, if spaces spaces, and if
-  ;; neither, we use the current indent-tabs-mode
-  (let ((space-count (how-many-region (point-min) (point-max) "^  "))
-        (tab-count (how-many-region (point-min) (point-max) "^\t")))
-    (if (> space-count tab-count) (normal-indent-rules))
-    (if (> tab-count space-count) (tabbed-indent-rules))))
-
-(add-hook 'c-mode-common-hook 'infer-indentation-style)
-
 ;; Header completion
 (defun complete-c-headers ()
   (use-package company-c-headers
@@ -846,6 +791,64 @@ See URL `https://github.com/FND/jslint-reporter'."
               ("C-c q" . cpp-auto-include/namespace-qualify-file)
               ("C-c i" . cpp-auto-include/ensure-includes-for-file)
               ("C-c o" . cpp-auto-include/ensure-includes-for-current-line)))
+
+;; indentation rules
+(defun indentation-c-mode-hook ()
+  (c-set-offset 'substatement-open 0)
+  (c-set-offset 'brace-list-open 0)
+  (c-set-offset 'member-init-cont '-)
+  (c-set-offset 'arglist-intro '++)
+  (c-set-offset 'case-label '+)
+  (c-set-offset 'statement-case-open 0))
+(add-hook 'c-mode-common-hook 'indentation-c-mode-hook)
+
+;; Indent rules
+(defun normal-indent-rules ()
+  (interactive)
+  (setq indent-tabs-mode nil)
+  (setq tab-width 2)
+  (setq c-basic-offset 2)
+  (setq c-basic-indent 2)
+  (c-set-offset 'arglist-intro '++))
+(defun tabbed-indent-rules ()
+  (interactive)
+  (setq indent-tabs-mode t)
+  (setq tab-width 4)
+  (setq c-basic-offset 4)
+  (setq c-basic-indent 4)
+  (c-set-offset 'arglist-intro '+))
+(defun qml-indent-rules ()
+  (interactive)
+  (setq indent-tabs-mode t)
+  (setq tab-width 2))
+
+;; infer indentation style
+(defun how-many-region (begin end regexp &optional interactive)
+  "Print number of non-trivial matches for REGEXP in region.
+  Non-interactive arguments are Begin End Regexp"
+  (interactive "r\nsHow many matches for (regexp): \np")
+  (let ((count 0) opoint)
+    (save-excursion
+      (setq end (or end (point-max)))
+      (goto-char (or begin (point)))
+      (while (and (< (setq opoint (point)) end)
+                  (re-search-forward regexp end t))
+        (if (= opoint (point))
+            (forward-char 1)
+          (setq count (1+ count))))
+      (if interactive (message "%d occurrences" count))
+      count)))
+
+(defun infer-indentation-style ()
+  (interactive)
+  ;; if our source file uses tabs, we use tabs, if spaces spaces, and if
+  ;; neither, we use the current indent-tabs-mode
+  (let ((space-count (how-many-region (point-min) (point-max) "^  "))
+        (tab-count (how-many-region (point-min) (point-max) "^\t")))
+    (if (> space-count tab-count) (normal-indent-rules))
+    (if (> tab-count space-count) (tabbed-indent-rules))))
+
+(add-hook 'c-mode-common-hook 'infer-indentation-style)
 
 ;;------------------------------------------------------------------------------
 ;; CMake
