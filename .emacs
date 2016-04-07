@@ -829,9 +829,10 @@ See URL `https://github.com/FND/jslint-reporter'."
               ("M-["   . rtags-previous-match)
               ("M-k"   . cmake-ide-compile)))
 
-(add-hook 'c-mode-common-hook #'use-rtags)
-(add-hook 'c-mode-common-hook #'flycheck-mode)
-(add-hook 'c-mode-common-hook #'use-cmake-ide)
+(when (eq system-type 'gnu/linux)
+  (add-hook 'c-mode-common-hook #'use-rtags)
+  (add-hook 'c-mode-common-hook #'flycheck-mode)
+  (add-hook 'c-mode-common-hook #'use-cmake-ide))
 
 ;; Auto insertion of headers
 (autoload 'cpp-auto-include/namespace-qualify-file "cpp-auto-include"
