@@ -461,7 +461,11 @@
         (turn-on-fci-mode)))))
 
 (use-package fill-column-indicator
-  :ensure t)
+  :ensure t
+  :config
+  (setq fci-rule-color "#ff8888")
+  (setq fci-always-use-textual-rule t))
+
 (add-hook 'prog-mode-hook #'sanityinc/prog-mode-fci-settings)
 
 ;;------------------------------------------------------------------------------
