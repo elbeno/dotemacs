@@ -722,9 +722,12 @@ See URL `https://github.com/FND/jslint-reporter'."
 ;; Basic offset = 2
 (setq-default c-basic-offset 2)
 (setq lua-indent-level 2)
-(setq js-indent-level 2)
-(setq js2-basic-offset 2)
 (setq python-indent-offset 2)
+
+;;------------------------------------------------------------------------------
+;; JS2 mode
+(setq js-indent-level 4)
+(setq js2-basic-offset 4)
 
 ;;------------------------------------------------------------------------------
 ;; C++ mode
