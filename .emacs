@@ -751,8 +751,8 @@ See URL `https://github.com/FND/jslint-reporter'."
     (define-key map (concat prefix "t") (function rtags-symbol-type))))
 
 (defun use-rtags ()
-  (add-to-list 'load-path (concat dotfile-dir "../rtags/build/src/"))
-  (add-to-list 'exec-path (concat dotfile-dir "../rtags/build/bin/"))
+  (add-to-list 'load-path (concat dotfile-dir "../rtags/src/"))
+  (add-to-list 'exec-path (concat dotfile-dir "../rtags/bin/"))
   (require 'rtags)
   (setq rtags-autostart-diagnostics t)
   (rtags-enable-standard-keybindings c-mode-base-map)
@@ -863,8 +863,20 @@ See URL `https://github.com/FND/jslint-reporter'."
 ;; Compilation
 
 ;; Compilation
-(bind-key "M-<up>" 'previous-error)
-(bind-key "M-<down>" 'next-error)
+(defun my-next-error ()
+  (interactive)
+  (condition-case nil
+      (next-error)
+    (error (flycheck-next-error))))
+
+(defun my-previous-error ()
+  (interactive)
+  (condition-case nil
+      (previous-error)
+    (error (flycheck-previous-error))))
+
+(bind-key "M-<up>" 'my-previous-error)
+(bind-key "M-<down>" 'my-next-error)
 (setq compilation-scroll-output t)
 
 ;; Remove compilation window on success
@@ -907,41 +919,38 @@ See URL `https://github.com/FND/jslint-reporter'."
 
 ;;------------------------------------------------------------------------------
 ;; Haskell mode
-(use-package ghc
-  :pin stable-melpa
-  :ensure t
-  :config
-  (setq ghc-interactive-command "ghc-modi"
-        ghc-debug t)
-  (add-hook 'haskell-mode-hook 'ghc-init))
 
-(use-package company-ghc
-  :ensure t
-  :config
-  (add-to-list 'company-backends '(company-ghc :with company-dabbrev-code))
-  (setq company-ghc-show-info 'oneline))
-
-(eval-after-load "haskell-cabal"
-  '(bind-key "M-k" 'haskell-compile haskell-cabal-mode-map))
-
-(defun find-haskell-definition-at-point ()
+(defun haskell-definition-at-point ()
   (interactive)
   (inferior-haskell-find-definition (haskell-ident-at-point)))
+(defun haskell-hoogle-at-point ()
+  (interactive)
+  (hoogle (haskell-ident-at-point)))
 
 (use-package haskell-mode
   :ensure t
-  :mode "\\.hs$"
   :config
   (setq font-lock-maximum-decoration '((haskell-mode . 2) (t . 0))
-        haskell-tags-on-save t))
+        haskell-tags-on-save t
+        haskell-compile-cabal-build-command "cd %s && stack build --ghc-options=-ferror-spans"
+        haskell-compile-cabal-build-alt-command "cd %s && stack clean && stack build --ghc-options=-ferror-spans"
+        haskell-process-use-presentation-mode t)
+  (add-hook 'haskell-mode-hook 'haskell-doc-mode)
+  (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
+  (add-hook 'haskell-mode-hook 'haskell-decl-scan-mode))
 
 (eval-after-load "haskell-mode"
   '(bind-keys :map haskell-mode-map
               ("M-k" . haskell-compile)
-              ("M-." . find-haskell-definition-at-point)
-              ("C-c M-." . inferior-haskell-find-definition)
+              ("M-." . haskell-definition-at-point)
+              ("C-M-." . pop-tag-mark)
+              ("M-?" . haskell-hoogle-at-point)
+              ("M-/" . haskell-process-do-info)
               ("C-c v c" . haskell-cabal-visit-file)
-              ("C-c C-z" . inferior-haskell-load-file)))
+              ("C-c r" . hlint-refactor-refactor-at-point)))
+
+(eval-after-load "haskell-cabal"
+  '(bind-key "M-k" 'haskell-compile haskell-cabal-mode-map))
 
 (use-package flycheck-haskell
   :ensure t
@@ -955,6 +964,19 @@ See URL `https://github.com/FND/jslint-reporter'."
   (setq hindent-style "chris-done")
   (add-hook 'haskell-mode-hook 'haskell-indentation-mode)
   (add-hook 'haskell-mode-hook 'hindent-mode))
+
+(use-package hlint-refactor
+  :ensure t
+  :config
+  (add-hook 'haskell-mode-hook 'hlint-refactor-mode))
+
+(use-package company-ghc
+  :ensure t
+  :config
+  (add-to-list 'company-backends '(company-ghc :with company-dabbrev-code))
+  (setq company-ghc-show-info 'oneline)
+  (setq ghc-debug t)
+  (ghc-comp-init))
 
 ;;------------------------------------------------------------------------------
 ;; Python mode
