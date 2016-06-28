@@ -150,8 +150,6 @@
       save-interprogram-paste-before-kill t
       mouse-yank-at-point t)
 
-(setq load-prefer-newer t)
-
 ;;------------------------------------------------------------------------------
 ;; Set up the frame
 (use-package dash
@@ -351,6 +349,29 @@
 ;; SQL comments
 (font-lock-add-keywords 'sql-mode
                         '(("\\s-*//.*$" 0 font-lock-comment-face prepend)))
+
+;; Special types of comments
+(defface font-lock-comment-strike
+  '((t (:strike-through t)))
+  "For strike-through comments")
+
+(defface font-lock-comment-important
+  '((t (:foreground "#00ff00")))
+  "For important")
+
+(defface font-lock-comment-todo
+  '((t (:foreground "#ff0000")))
+    "For todo comments")
+
+(defun add-custom-keyw()
+  "adds a few special keywords"
+  (font-lock-add-keywords
+   nil
+   '(("\\s<+x[[:space:]]*\\(.*?\\)[[:space:]]*\\s>" 1 'font-lock-comment-strike prepend)
+     ("\\s<+t[[:space:]]*\\(.*?\\)[[:space:]]*\\s>" 1 'font-lock-comment-todo prepend)
+     ("\\s<+i[[:space:]]*\\(.*?\\)[[:space:]]*\\s>" 1 'font-lock-comment-important prepend))))
+
+(add-hook 'prog-mode-hook #'add-custom-keyw)
 
 ;;------------------------------------------------------------------------------
 ;; Global key bindings
