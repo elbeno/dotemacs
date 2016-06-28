@@ -740,10 +740,13 @@ See URL `https://github.com/FND/jslint-reporter'."
 (bind-key "<tab>" 'tab-indent-or-complete)
 
 ;;------------------------------------------------------------------------------
-;; Basic offset = 2
+;; Basic offset for most languages
 (setq-default c-basic-offset 2)
 (setq lua-indent-level 2)
-(setq python-indent-offset 2)
+
+;;------------------------------------------------------------------------------
+;; Python mode
+(setq python-indent-offset 4)
 
 ;;------------------------------------------------------------------------------
 ;; JS2 mode
