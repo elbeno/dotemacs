@@ -338,7 +338,8 @@
      ,(rx (and symbol-start
                (or (and (or "align" "declare_reachable"
                             "declare_no_pointers" "undeclare_no_pointers"
-                            "get_pointer_safety" "addressof")
+                            "get_pointer_safety" "addressof"
+                            "shared_from_this")
                         (* space) "(")
                    (and (or "undeclare_unreachable"
                             "return_temporary_buffer"
@@ -359,7 +360,8 @@
                                  (or "relaxed" "preferred" "strict"))
                             "allocator_arg"
                             "allocator_arg_t"
-                            "bad_weak_ptr")
+                            "bad_weak_ptr"
+                            "enable_shared_from_this")
                         symbol-end)))))
     ;; [c.malloc]
     ("cstdlib" ("*")
