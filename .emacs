@@ -764,6 +764,12 @@ See URL `https://github.com/FND/jslint-reporter'."
 
 (add-hook 'c-mode-common-hook 'complete-c-headers)
 
+;; clang-format
+(use-package clang-format
+  :ensure t
+  :bind
+  (("C-c f" . clang-format)))
+
 ;; rtags
 (defun rtags-enable-my-keybindings (&optional map prefix)
   (interactive)
