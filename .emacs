@@ -629,12 +629,12 @@ See URL `https://github.com/FND/jslint-reporter'."
            ((error line-start (1+ nonl) ":" line ":" column ":" (message) line-end))
            :modes (js-mode js2-mode js3-mode))))
 
-  (use-package flycheck-tip
+  (use-package flycheck-pos-tip
     :ensure t
-    :config
-    (flycheck-tip-use-timer 'verbose)
-    :bind ("C-c n" . flycheck-tip-cycle)
     :demand))
+
+(eval-after-load 'flycheck-mode
+  (flycheck-pos-tip-mode))
 
 ;;------------------------------------------------------------------------------
 ;; Multiple cursors
