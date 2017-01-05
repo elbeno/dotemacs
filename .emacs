@@ -253,9 +253,21 @@
   (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
 
 ;; Rainbow hex colors & color names
+;; use custom regexp for #colors to avoid clash with e.g. #define
 (use-package rainbow-mode
   :ensure t
   :config
+  (setq rainbow-hexadecimal-colors-font-lock-keywords
+  '(("[^&]\\(#\\(?:[0-9a-fA-F]\\{3\\}\\)+\\{1,4\\}\\)\\b"
+     (1 (rainbow-colorize-itself 1)))
+    ("^\\(#\\(?:[0-9a-fA-F]\\{3\\}\\)+\\{1,4\\}\\)\\b"
+     (0 (rainbow-colorize-itself)))
+    ("[Rr][Gg][Bb]:[0-9a-fA-F]\\{1,4\\}/[0-9a-fA-F]\\{1,4\\}/[0-9a-fA-F]\\{1,4\\}"
+     (0 (rainbow-colorize-itself)))
+    ("[Rr][Gg][Bb][Ii]:[0-9.]+/[0-9.]+/[0-9.]+"
+     (0 (rainbow-colorize-itself)))
+    ("\\(?:[Cc][Ii][Ee]\\(?:[Xx][Yy][Zz]\\|[Uu][Vv][Yy]\\|[Xx][Yy][Yy]\\|[Ll][Aa][Bb]\\|[Ll][Uu][Vv]\\)\\|[Tt][Ee][Kk][Hh][Vv][Cc]\\):[+-]?[0-9.]+\\(?:[Ee][+-]?[0-9]+\\)?/[+-]?[0-9.]+\\(?:[Ee][+-]?[0-9]+\\)?/[+-]?[0-9.]+\\(?:[Ee][+-]?[0-9]+\\)?"
+     (0 (rainbow-colorize-itself)))))
   (add-hook 'prog-mode-hook #'rainbow-mode)
   (add-hook 'css-mode-hook #'rainbow-mode)
   :diminish rainbow-mode)
