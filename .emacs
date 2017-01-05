@@ -805,7 +805,8 @@ See URL `https://github.com/FND/jslint-reporter'."
               ("M-,"   . rtags-find-references-at-point)
               ("M-]"   . rtags-next-match)
               ("M-["   . rtags-previous-match)
-              ("M-k"   . cmake-ide-compile)))
+              ("M-k"   . cmake-ide-compile)
+              ("C-<tab>" . align)))
 
 (when (eq system-type 'gnu/linux)
   (add-hook 'c-mode-common-hook #'use-rtags)
