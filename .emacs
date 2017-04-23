@@ -234,10 +234,10 @@
 (show-paren-mode 1)
 (setq show-paren-delay 0)
 
-;; General close
-(use-package general-close
+;; Syntactic close
+(use-package syntactic-close
   :ensure t
-  :bind ("M-]" . general-close))
+  :bind ("M-]" . syntactic-close))
 
 ;; Show column numbers
 (column-number-mode)
@@ -793,8 +793,8 @@ See URL `https://github.com/FND/jslint-reporter'."
     (define-key map (concat prefix "t") (function rtags-symbol-type))))
 
 (defun use-rtags ()
-  (add-to-list 'load-path (concat dotfile-dir "../rtags/src/"))
-  (add-to-list 'exec-path (concat dotfile-dir "../rtags/bin/"))
+  (add-to-list 'load-path (concat dotfile-dir "../rtags/build/src/"))
+  (add-to-list 'exec-path (concat dotfile-dir "../rtags/build/bin/"))
   (require 'rtags)
   (setq rtags-autostart-diagnostics t)
   (rtags-enable-standard-keybindings c-mode-base-map)
