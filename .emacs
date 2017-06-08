@@ -385,6 +385,16 @@
 
 (add-hook 'prog-mode-hook #'add-custom-keyw)
 
+(defun add-custom-keyw-cpp()
+  "adds a few special keywords"
+  (font-lock-add-keywords
+   nil
+   '(("//+x[[:space:]]*\\(.*?\\)[[:space:]]*\\s>" 1 'font-lock-comment-strike prepend)
+     ("//+t[[:space:]]*\\(.*?\\)[[:space:]]*\\s>" 1 'font-lock-comment-todo prepend)
+     ("//+i[[:space:]]*\\(.*?\\)[[:space:]]*\\s>" 1 'font-lock-comment-important prepend))))
+
+(add-hook 'c++-mode-hook #'add-custom-keyw-cpp)
+
 ;;------------------------------------------------------------------------------
 ;; Global key bindings
 (bind-key "C-z" 'undo)
@@ -600,6 +610,11 @@
   (("C-c <f1>" . google-this-cpp-reference)))
 
 ;;------------------------------------------------------------------------------
+;; markdown mode
+(use-package markdown-mode
+  :ensure t)
+
+;;------------------------------------------------------------------------------
 ;; Diffing things
 (use-package ztree-diff
   :ensure ztree
@@ -775,6 +790,11 @@ See URL `https://github.com/FND/jslint-reporter'."
     (add-to-list 'company-backends 'company-c-headers)))
 
 (add-hook 'c-mode-common-hook 'complete-c-headers)
+
+(use-package modern-cpp-font-lock
+  :ensure t
+  :config  
+  (add-hook 'c++-mode-hook #'modern-c++-font-lock-mode))
 
 ;; clang-format
 (use-package clang-format
