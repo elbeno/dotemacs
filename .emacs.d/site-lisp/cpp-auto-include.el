@@ -476,6 +476,13 @@
      ,(rx (and symbol-start
                "type_index"
                symbol-end)))
+    ;; [string.view.synop]
+    ("string_view" ("*")
+     ,(rx (and symbol-start
+               (or (and "basic_string_view"
+                        (* space) "<")
+                   (and (or "string_view" "wstring_view" "u16string_view" "u32string_view")
+                        symbol-end)))))
     ;; [string.classes]
     ("string" ("*") ;; ("initializer_list")
      ,(rx (and symbol-start
