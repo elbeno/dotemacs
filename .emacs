@@ -52,6 +52,9 @@
 
 (setq personal-keybindings nil)
 
+(use-package diminish
+  :ensure t)
+
 ;;------------------------------------------------------------------------------
 ;; Startup profiling
 (use-package esup
@@ -522,7 +525,6 @@
                                 ("\\.ui$" . nxml-mode)
                                 ("SConstruct" . python-mode)
                                 ("SConscript" . python-mode)
-                                ("\\.tmpl$" . jinja2-mode)
                                 ("\\.ml[iyl]?$" . caml-mode)
                                 ("\\.pb$" . protobuf-mode)
                                 ("\\.proto$" . protobuf-mode)
@@ -563,7 +565,7 @@
   (flx-ido-mode 1)
   (setq ido-use-faces t))
 
-(use-package ido-ubiquitous
+(use-package ido-completing-read+
   :ensure t
   :preface
   (defvar ido-ubiquitous-debug-mode nil)
@@ -1033,13 +1035,13 @@ See URL `https://github.com/FND/jslint-reporter'."
   :config
   (add-hook 'haskell-mode-hook 'hlint-refactor-mode))
 
-(use-package company-ghc
-  :ensure t
-  :config
-  (add-to-list 'company-backends '(company-ghc :with company-dabbrev-code))
-  (setq company-ghc-show-info 'oneline)
-  (setq ghc-debug t)
-  (ghc-comp-init))
+;; (use-package company-ghc
+;;   :ensure t
+;;   :config
+;;   (add-to-list 'company-backends '(company-ghc :with company-dabbrev-code))
+;;   (setq company-ghc-show-info 'oneline)
+;;   (setq ghc-debug t)
+;;   (ghc-comp-init))
 
 ;;------------------------------------------------------------------------------
 ;; Python mode
@@ -1047,10 +1049,6 @@ See URL `https://github.com/FND/jslint-reporter'."
                               (flycheck-select-checker 'python-flake8)
                               (flycheck-mode)
                               (elpy-mode)))
-
-(use-package jinja2-mode
-  :ensure t
-  :mode "\\.tmpl$")
 
 (use-package elpy
   :ensure t
@@ -1520,7 +1518,8 @@ Example of an XCode UUID: a513b85041a3535fc3520c3d."
     el-files-list))
 
 ;; custom stuff is per-installation/work private
-(mapc 'load (files-in-below-directory (concat dotfile-dir ".emacs.d/custom/")))
+(if (file-directory-p ".emacs.d/custom/")
+    (mapc 'load (files-in-below-directory (concat dotfile-dir ".emacs.d/custom/"))))
 
 ;;------------------------------------------------------------------------------
 ;; Size the frame
