@@ -29,7 +29,7 @@
 
 ;; When the buffer's file extension is in this list, put "using namespace std;"
 ;; after the header block
-(defvar cpp-auto-include/ensure-using-namespace-std '("cpp"))
+(defvar cpp-auto-include/ensure-using-namespace-std nil)
 
 ;; The namespace to use in a "using namespace" directive
 (defvar cpp-auto-include/using-namespace "std")
@@ -38,7 +38,7 @@
 (defvar cpp-auto-include/ensure-brackets t)
 
 ;; When true, omit headers that are known to be included by others
-(defvar cpp-auto-include/minimal-headers t)
+(defvar cpp-auto-include/minimal-headers nil)
 
 (require 'cl-lib)
 (require 'rx)
@@ -49,7 +49,7 @@
   `(;; [support.types]
     ("cstddef" ("*")
      ,(rx (and symbol-start
-               (or "size_t" "ptrdiff_t" "nullptr_t" "max_align_t")
+               (or "size_t" "ptrdiff_t" "nullptr_t" "max_align_t" "byte")
                symbol-end)))
     ("cstddef" nil
      ,(rx (and symbol-start
@@ -68,7 +68,7 @@
                              "denorm_absent"
                              "denorm_present")
                          symbol-end)))))
-    ;; [c.limits]
+    ;; [climits.syn]
     ("climits" nil
      ,(rx (and symbol-start
                (or "CHAR_BIT" "CHAR_MAX" "CHAR_MIN"
@@ -77,10 +77,13 @@
                    "SCHAR_MIN" "SCHAR_MAX" "SHRT_MAX" "SHRT_MIN"
                    "UCHAR_MAX" "UINT_MAX" "ULLONG_MAX" "ULONG_MAX" "USHRT_MAX")
                symbol-end)))
+    ;; [cfloat.syn]
     ("cfloat" nil
      ,(rx (and symbol-start
                (or "FLT_RADIX" "DECIMAL_DIG"
+                   "FLT_DECIMAL_DIG" "DBL_DECIMAL_DIG" "LDBL_DECIMAL_DIG"
                    "FLT_MIN" "DBL_MIN" "LDBL_MIN"
+                   "FLT_TRUE_MIN" "DBL_TRUE_MIN" "LDBL_TRUE_MIN"
                    "FLT_MAX" "DBL_MAX" "LDBL_MAX"
                    "FLT_EPSILON" "DBL_EPSILON" "LDBL_EPSILON"
                    "FLT_DIG" "DBL_DIG" "LDBL_DIG"
@@ -89,7 +92,8 @@
                    "FLT_MIN_10_EXP" "DBL_MIN_10_EXP" "LDBL_MIN_10_EXP"
                    "FLT_MAX_EXP" "DBL_MAX_EXP" "LDBL_MAX_EXP"
                    "FLT_MAX_10_EXP" "DBL_MAX_10_EXP" "LDBL_MAX_10_EXP"
-                   "FLT_ROUNDS" "FLT_EVAL_METHOD")
+                   "FLT_ROUNDS" "FLT_EVAL_METHOD"
+                   "FLT_HAS_SUBNORM" "DBL_HAS_SUBNORM" "LDBL_HAS_SUBNORM")
                symbol-end)))
     ;; [cstdint.syn]
     ("cstdint" ("*")
@@ -126,14 +130,16 @@
                                  (or "MAX" "PTR")
                                  "_MAX")
                             (and (or "PTRDIFF" "SIG_ATOMIC" "WCHAR" "WINT")
-                                 (or "_MAX" "_MIN")))
+                                 (or "_MAX" "_MIN"))
+                            "SIZE_MAX")
                         symbol-end)))))
     ;; [support.start.term]
     ("cstdlib" ("*")
      ,(rx (and symbol-start
                (or "_Exit" "at_quick_exit" "quick_exit"
-                   "abort" "exit" "at_exit")
+                   "abort" "exit" "atexit")
                (* space) "(")))
+    ;; [cstdlib.syn]
     ("cstdlib" nil
      ,(rx (and symbol-start
                (or "EXIT_FAILURE" "EXIT_SUCCESS")
@@ -143,9 +149,13 @@
      ,(rx (and symbol-start
                (or (and (or "get_new_handler" "set_new_handler")
                         (* space) "(")
+                   (and "launder" (* space) (or "(" "<"))
                    (and (or "new_handler"
                             "nothrow" "nothrow_t"
-                            "bad_alloc" "bad_array_new_length")
+                            "bad_alloc" "bad_array_new_length"
+                            "align_val_t" "destroying_delete_t"
+                            "hardware_destruct_interference_size"
+                            "hardware_constructive_interference_size")
                         symbol-end)))))
     ;; [support.rtti]
     ("typeinfo" ("*")
@@ -157,7 +167,7 @@
      ,(rx (and symbol-start
                (or (and (or "get_unexpected" "set_unexpected" "unexpected"
                             "get_terminate" "set_terminate" "terminate"
-                            "uncaught_exception"
+                            "uncaught_exception" "uncaught_exceptions"
                             "current_exception"
                             "rethrow_exception")
                         (* space) "(")
@@ -220,11 +230,11 @@
                (* space) "(")))
     ("ctime" ("*")
      ,(rx (and symbol-start
-               (or (and (or "clock" "time" "difftime"
+               (or (and (or "clock" "time" "difftime" "timespec_get"
                             "ctime" "asctime" "strftime"
                             "wcsftime" "gmtime" "localtime" "mktime")
                         (* space) "(")
-                   (and  (or "clock_t" "time_t" "tm")
+                   (and  (or "clock_t" "time_t" "tm" "timespec")
                          symbol-end)))))
     ("ctime" nil
      ,(rx (and symbol-start
@@ -314,19 +324,27 @@
                    (and (or "forward" "pair" "declval"
                             "integer_sequence" "index_sequence"
                             "make_integer_sequence" "make_index_sequence"
-                            "index_sequence_for")
+                            "index_sequence_for"
+                            "in_place_type_t" "in_place_type"
+                            "in_place_index_t" "in_place_index")
                         (* space) "<")
-                   (and  (or "piecewise_construct" "piecewise_construct_t")
+                   (and (or "make_pair" "to_chars" "from_chars")
+                        (* space) "(")
+                   (and "chars_format::"
+                        (or "scientific" "fixed" "hex" "general")
+                        symbol-end)
+                   (and  (or "piecewise_construct" "piecewise_construct_t"
+                             "in_place" "in_place_t")
                          symbol-end)))))
     ;; [tuple]
     ("tuple" ("*")
      ,(rx (and symbol-start
-               (or (and (or "ignore")
+               (or (and (or "ignore" "apply" "make_from_tuple")
                         (* space) "(")
                    (and (or "make_tuple" "forward_as_tuple"
                             "tie" "tuple_cat")
                         (* space) (or "(" "<"))
-                   (and (or "tuple" "tuple_size" "tuple_element")
+                   (and (or "tuple" "tuple_size" "tuple_element" "tuple_element_t")
                         (* space) "<")))))
     ;; [template.bitset]
     ("bitset" ("*") ;; ("string" "iosfwd")
@@ -344,7 +362,14 @@
                    (and (or "undeclare_unreachable"
                             "return_temporary_buffer"
                             "uninitialized_copy" "uninitialized_copy_n"
-                            "uninitialized_fill" "uninitialized_fill_n")
+                            "uninitialized_fill" "uninitialized_fill_n"
+                            "uninitialized_move" "uninitialized_move_n"
+                            "uninitialized_default_construct"
+                            "uninitialized_default_construct_n"
+                            "uninitialized_value_construct"
+                            "uninitialized_value_construct_n"
+                            "destroy_at" "destroy" "destroy_n"
+                            "to_address")
                         (* space) (or "(" "<"))
                    (and (or "unique_ptr" "shared_ptr" "weak_ptr"
                             "pointer_traits" "uses_allocator"
@@ -352,7 +377,7 @@
                             "get_temporary_buffer"
                             "default_delete"
                             "make_unique" "make_shared" "allocate_shared"
-                            (and (or "static" "dynamic" "const")
+                            (and (or "static" "dynamic" "const" "reinterpret")
                                  "_pointer_cast")
                             "get_deleter" "owner_less")
                         (* space) "<")
@@ -366,18 +391,21 @@
     ;; [c.malloc]
     ("cstdlib" ("*")
      ,(rx (and symbol-start
-               (or "calloc" "free" "malloc" "realloc")
+               (or "calloc" "free" "malloc" "realloc" "aligned_alloc")
                (* space) "(")))
     ("cstring" ("*")
      ,(rx (and symbol-start
-               (or "memchr" "memcmp" "memmove" "memset")
+               (or "memchr" "memcmp" "memmove" "memset" "memcpy"
+                   "strcpy" "strncpy" "strcat" "strncat" "strxfrm"
+                   "strlen" "strcmp" "strncmp" "strcoll" "strchr"
+                   "strrchr" "strspn" "strcspn" "strpbrk" "strstr"
+                   "strtok" "strerror")
                (* space) "(")))
     ;; [functional]
     ("functional" ("*")
      ,(rx (and symbol-start
-               (or (and (or "ref" "cref"
-                            "not1" "not2"
-                            "bind" "mem_fn")
+               (or (and (or "ref" "cref" "not_fn"
+                            "bind" "mem_fn" "invoke")
                         (* space) (or "(" "<"))
                    (and (or "reference_wrapper"
                             "plus" "minus" "multiplies" "divides"
@@ -386,9 +414,10 @@
                             "greater" "less" "greater_equal" "less_equal"
                             "logical_and" "logical_or" "logical_not"
                             "bit_and" "bit_or" "bit_xor" "bit_not"
-                            "unary_negate"
                             "is_bind_expression" "is_placeholder"
-                            "function" "hash")
+                            "function" "hash"
+                            "default_searcher" "boyer_moore_searcher"
+                            "boyer_moore_horspool_searcher")
                         (* space) "<")
                    (and "bad_function_call"
                         symbol-end)))))
@@ -400,33 +429,41 @@
     ;; [meta.type.synop]
     ("type_traits" ("*")
      ,(rx (and symbol-start
-               (or (and (or "integral_constant"
-                            "is_void" "is_null_pointer"
-                            "is_integral" "is_floating_point"
-                            "is_array" "is_pointer"
-                            "is_lvalue_reference" "is_rvalue_reference"
-                            "is_member_object_pointer" "is_member_function_pointer"
-                            "is_enum" "is_union" "is_class" "is_function" "is_reference"
-                            "is_arithmetic" "is_fundamental" "is_object" "is_scalar"
-                            "is_compound" "is_member_pointer" "is_const" "is_volatile"
-                            "is_trivial" "is_trivially_copyable" "is_standard_layout"
-                            "is_pod" "is_literal_type" "is_empty" "is_polymorphic"
-                            "is_abstract" "is_final" "is_signed" "is_unsigned"
-                            "is_constructible" "is_default_constructible"
-                            "is_copy_constructible" "is_move_constructible"
-                            "is_assignable" "is_copy_assignable" "is_move_assignable"
-                            "is_destructible" "is_trivially_constructible"
-                            "is_trivially_default_constructible"
-                            "is_trivially_copy_constructible"
-                            "is_trivially_move_constructible" "is_trivially_assignable"
-                            "is_trivially_copy_assignable" "is_trivially_move_assignable"
-                            "is_trivially_destructible" "is_nothrow_constructible"
-                            "is_nothrow_default_constructible" "is_nothrow_copy_constructible"
-                            "is_nothrow_move_constructible" "is_nothrow_assignable"
-                            "is_nothrow_copy_assignable" "is_nothrow_move_assignable"
-                            "is_nothrow_destructible" "has_virtual_destructor"
-                            "alignment_of" "rank" "extent" "is_same" "is_base_of"
-                            "is_convertible"
+               (or (and (or "integral_constant" "bool_constant"
+                            "alignment_of" "rank" "extent" "void_t"
+                            (and (or
+                                  "is_void" "is_null_pointer"
+                                  "is_integral" "is_floating_point"
+                                  "is_array" "is_pointer"
+                                  "is_lvalue_reference" "is_rvalue_reference"
+                                  "is_member_object_pointer" "is_member_function_pointer"
+                                  "is_enum" "is_union" "is_class" "is_function" "is_reference"
+                                  "is_arithmetic" "is_fundamental" "is_object" "is_scalar"
+                                  "is_compound" "is_member_pointer" "is_const" "is_volatile"
+                                  "is_trivial" "is_trivially_copyable" "is_standard_layout"
+                                  "is_pod" "is_literal_type" "is_empty" "is_polymorphic"
+                                  "is_abstract" "is_final" "is_signed" "is_unsigned"
+                                  "is_constructible" "is_default_constructible"
+                                  "is_copy_constructible" "is_move_constructible"
+                                  "is_assignable" "is_copy_assignable" "is_move_assignable"
+                                  "is_destructible" "is_trivially_constructible"
+                                  "is_trivially_default_constructible"
+                                  "is_trivially_copy_constructible"
+                                  "is_trivially_move_constructible" "is_trivially_assignable"
+                                  "is_trivially_copy_assignable" "is_trivially_move_assignable"
+                                  "is_trivially_destructible" "is_nothrow_constructible"
+                                  "is_nothrow_default_constructible" "is_nothrow_copy_constructible"
+                                  "is_nothrow_move_constructible" "is_nothrow_assignable"
+                                  "is_nothrow_copy_assignable" "is_nothrow_move_assignable"
+                                  "is_nothrow_destructible" "has_virtual_destructor"
+                                  "is_same" "is_base_of"
+                                  "is_convertible" "has_unique_object_representations"
+                                  "is_aggregate" "is_swappable_with" "is_swappable"
+                                  "is_nothrow_swappable_with" "is_nothrow_swappable"
+                                  "is_invocable" "is_invocable_r"
+                                  "is_nothrow_invocable" "is_nothrow_invocable_r"
+                                  "conjunction" "disjunction" "negation")
+                                 (zero-or-one "_v"))
                             (and (or "remove_const" "remove_volatile" "remove_cv"
                                      "add_const" "add_volatile" "add_cv"
                                      "remove_reference" "add_lvalue_reference"
@@ -434,9 +471,13 @@
                                      "remove_extent" "remove_all_extents" "remove_pointer"
                                      "add_pointer" "aligned_storage" "aligned_union"
                                      "decay" "enable_if" "conditional" "common_type"
-                                     "underlying_type" "result_of")
+                                     "underlying_type" "result_of" "remove_cv_ref"
+                                     "invoke_result")
                                  (zero-or-one "_t")))
                         (* space) "<")
+                   (and "endian::"
+                        (or "little" "big" "native")
+                        symbol-end)
                    (and (or "true_type" "false_type")
                         symbol-end)))))
     ;; [ratio.syn]
@@ -457,14 +498,18 @@
     ;; [time.syn]
     ("chrono" ("chrono::" "*")
      ,(rx (and symbol-start
-               (or (and (or "duration_cast" "time_point_cast")
+               (or (and (or "duration_cast" "time_point_cast" "clock_cast")
                         (* space) (or "(" "<"))
                    (and (or "duration" "time_point"
-                            "treat_as_floating_point" "duration_values")
+                            "treat_as_floating_point" "duration_values"
+                            "is_clock" "is_clock_v" "clock_time_conversion"
+                            "time_of_day")
                         (* space) "<")
                    (and (or "nanoseconds" "microseconds" "milliseconds"
                             "seconds" "minutes" "hours"
-                            "system_clock" "steady_clock" "high_resolution_clock")
+                            "system_clock" "steady_clock" "high_resolution_clock"
+                            "utc_clock" "tai_clock" "gps_clock" "file_clock" "local_t"
+                            "last_spec")
                         symbol-end)))))
     ;; [allocator.adaptor.syn]
     ("scoped_allocator" ("*")
@@ -486,7 +531,7 @@
     ;; [string.classes]
     ("string" ("*") ;; ("initializer_list")
      ,(rx (and symbol-start
-               (or (and (or "to_string" "to_wstring"
+               (or (and (or "to_string" "to_wstring" "getline"
                             "stoi" "stol" "stoul" "stoll" "stoull"
                             "stof" "stod" "stold")
                         (* space) "(")
@@ -514,14 +559,6 @@
      ,(rx (and symbol-start
                "WEOF"
                symbol-end)))
-    ("cwctype" ("*")
-     ,(rx (and symbol-start
-               (or (and (or "memchr" "strcat" "strcspn" "strncpy" "strtok"
-                            "memcmp" "strchr" "strerror" "strpbrk" "strxfrm"
-                            "memcpy" "strcmp" "strlen" "strrchr"
-                            "memmove" "strcoll" "strncat" "strspn"
-                            "memset" "strcpy" "strncmp" "strstr")
-                        (* space) "(")))))
     ("cwchar" ("*")
      ,(rx (and symbol-start
                (or (and (or "btowc" "mbsinit" "vwscanf" "wcsncpy" "wcstoull"
@@ -722,7 +759,8 @@
                "min" "max" "minmax"
                "min_element" "max_element" "minmax_element"
                "lexicographical_compare"
-               "next_permutation" "prev_permutation")
+               "next_permutation" "prev_permutation"
+               "clamp")
            (* space) (or "<" "("))))
     ;; [alg.c.library]
     ("cstdlib" ("*")
@@ -808,7 +846,10 @@
                    "inner_product"
                    "partial_sum"
                    "adjacent_difference"
-                   "iota")
+                   "iota" "reduce"
+                   "transform_reduce" "inclusive_scan" "exclusive_scan"
+                   "transform_inclusive_scan" "transform_exclusive_scan"
+                   "gcd" "lcm")
                (* space) (or "<" "("))))
     ;; [c.math]
     ("cmath" ("*")
@@ -838,6 +879,15 @@
                    "FP_FAST_FMAL" "FP_NAN HUGE_VAL" "NAN" "math_errhandling"
                    "FP_ILOGB0" "FP_NORMAL" "HUGE_VALF")
                symbol-end)))
+    ("cmath" nil
+     ,(rx (and symbol-start
+               (or "assoc_laguerre" "assoc_legendre" "beta" "comp_ellint_1"
+                   "comp_ellint_2" "comp_ellint_3" "cyl_bessel_i" "cyl_bessel_j"
+                   "cyl_bessel_k" "cyl_neumann" "ellint_1" "ellint_2" "ellint_3"
+                   "expint" "hermite" "legendre" "laguerre" "riemann_zeta"
+                   "sph_bessel" "sph_legendre" "sph_neumann")
+               (zero-or-one (or "f" "l"))
+               (* space) "(")))
     ("cstdlib" ("*")
      ,(rx (and symbol-start
                (or (and (or "ldiv" "lldiv"
@@ -1083,7 +1133,7 @@
      ,(rx (and symbol-start
                (or (and (or "lock" "try_lock" "call_once")
                         (* space) (or "<" "("))
-                   (and (or "lock_guard" "unique_lock")
+                   (and (or "lock_guard" "unique_lock" "scoped_lock")
                         (* space) "<")
                    (and (or "mutex" "recursive_mutex"
                             "timed_mutex" "recursive_timed_mutex"
@@ -1095,7 +1145,7 @@
      ,(rx (and symbol-start
                (or (and "shared_lock"
                         (* space) "<")
-                   (and "shared_timed_mutex"
+                   (and (or "shared_timed_mutex" "shared_mutex")
                         symbol-end)))))
     ("condition_variable" ("*")
      ,(rx (and symbol-start
@@ -1113,7 +1163,7 @@
                         (* space) (or "<" "("))
                    (and (or "future_category")
                         (* space) "(")
-                   (and (or "promise" "future" "shared_future")
+                   (and (or "promise" "future" "shared_future" "packaged_task")
                         (* space) "<")
                    (and (or "future_error"
                             (and "future_errc::"
