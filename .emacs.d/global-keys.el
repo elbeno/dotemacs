@@ -1,0 +1,48 @@
+(bind-key "C-z" 'undo)
+(bind-key "C-o" 'goto-line)
+(bind-key "M-r" 'replace-string)
+(bind-key "M-k" 'compile)
+(bind-key "M-SPC" 'cycle-spacing)
+
+;; better searching
+(bind-key "C-s" 'isearch-forward-regexp)
+(bind-key "C-r" 'isearch-backward-regexp)
+(bind-key "C-M-s" 'isearch-forward)
+(bind-key "C-M-r" 'isearch-backward)
+
+;; Action of home key
+(defun beginning-of-line-or-indentation ()
+  "move to beginning of line, or indentation"
+  (interactive)
+  (if (bolp)
+      (back-to-indentation)
+    (beginning-of-line)))
+(bind-key "<home>" 'beginning-of-line-or-indentation)
+
+;; Turn off insert
+(defun do-nothing () (interactive))
+(bind-key "<insert>" 'do-nothing)
+(bind-key "<insertchar>" 'do-nothing)
+
+;; Kill-ring menu
+(defun popup-kill-ring-menu ()
+  "Show the kill ring in a popup menu."
+  (interactive)
+  (popup-menu 'yank-menu))
+(bind-key "C-c y" 'popup-kill-ring-menu)
+
+;; Cycle buffers/windows with F5-F8
+(bind-key "<f5>" 'next-multiframe-window)
+(bind-key "<f6>" 'previous-multiframe-window)
+(bind-key "<f7>" 'previous-buffer)
+(bind-key "<f8>" 'next-buffer)
+
+;; Moving windows
+(bind-key "C-c <left>"  'windmove-left)
+(bind-key "C-c <right>" 'windmove-right)
+(bind-key "C-c <up>"    'windmove-up)
+(bind-key "C-c <down>"  'windmove-down)
+
+;; Highlight symbols
+(bind-key "<f3>" 'highlight-symbol-at-point)
+(bind-key "S-<f3>" 'hi-lock-mode)
