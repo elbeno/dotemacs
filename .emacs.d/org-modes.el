@@ -6,13 +6,13 @@
   :mode ("\\.org$" . org-mode)
   :pin org
   :config
-  (setq org-log-done t)
-  (setq org-support-shift-select t)
-  (setq org-startup-indented t)
-  (setq org-src-fontify-natively t)
-  (setq org-completion-use-ido t)
-  (setq org-export-allow-bind-keywords t)
-  (setq org-latex-listings 'minted)
+  (setq org-log-done t
+        org-support-shift-select t
+        org-startup-indented t
+        org-src-fontify-natively t
+        org-completion-use-ido t
+        org-export-allow-bind-keywords t
+        org-latex-listings 'minted)
   (setq org-latex-pdf-process
         '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
           "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"

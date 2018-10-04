@@ -69,3 +69,11 @@
 (bind-key "M-C-9" (lambda () (interactive) (sanityinc/adjust-opacity nil 2)))
 (bind-key "M-C-0" (lambda () (interactive) (modify-frame-parameters nil `((alpha . 100)))))
 
+;;------------------------------------------------------------------------------
+;; All the icons!
+(use-package all-the-icons
+  :ensure t
+  :config
+  (unless (file-exists-p
+           (concat (getenv "HOME") "/.local/share/fonts/all-the-icons.ttf"))
+    (all-the-icons-install-fonts t)))

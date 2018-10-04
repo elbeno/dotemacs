@@ -133,6 +133,13 @@ This function assumes Boost.SML tables are delimited with
   :hook (c++-mode . company-mode))
 
 ;;------------------------------------------------------------------------------
+;; Header completion
+(use-package company-c-headers
+  :ensure t
+  :config
+  (push 'company-c-headers company-backends))
+
+;;------------------------------------------------------------------------------
 ;; Building & error navigation
 
 (setq compilation-scroll-output t)

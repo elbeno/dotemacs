@@ -187,15 +187,29 @@
         projectile-use-git-grep t)
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
   :bind (("C-x f" . projectile-find-file)
-         ("C-x g" . projectile-grep)
          ("C-c #" . projectile-find-file-dwim)
          ("C-x C-h" . projectile-find-other-file))
   :diminish projectile-mode)
 (projectile-mode +1)
 
 ;;------------------------------------------------------------------------------
+;; RIPGrep
+(use-package ripgrep
+  :ensure t
+  :bind (("C-x g" . projectile-ripgrep)))
+
+;;------------------------------------------------------------------------------
 ;; Flycheck
 (use-package flycheck
   :ensure t
-  :hook (c++-mode . flycheck-mode)
+  :hook ((c++-mode . flycheck-mode)
+         (python-mode . flycheck-mode))
   :diminish flycheck-mode)
+
+;;------------------------------------------------------------------------------
+;; Emojify
+(use-package emojify
+  :ensure t
+  :init (global-emojify-mode)
+  :bind (("C-c e" . emojify-insert-emoji))
+  :diminish emojify-mode)

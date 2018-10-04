@@ -5,6 +5,7 @@
 
 ;;------------------------------------------------------------------------------
 ;; UTF8 defaults
+(set-language-environment "UTF-8")
 (prefer-coding-system 'utf-8)
 (set-default-coding-systems 'utf-8)
 (set-terminal-coding-system 'utf-8)
@@ -23,7 +24,8 @@
 (scroll-bar-mode -1)
 (setq inhibit-startup-screen t
       initial-scratch-message ""
-      visible-bell 1)
+      visible-bell 1
+      x-stretch-cursor t)
 
 ;; Display defaults
 (setq column-wrap-soft 80
@@ -72,8 +74,12 @@
 (delete-backups)
 
 ;;------------------------------------------------------------------------------
-;; use ibuffer instead of list-buffers
+;; More usable defaults
 (defalias 'list-buffers 'ibuffer)
+(defalias 'yes-or-no-p 'y-or-n-p)
+(setq load-prefer-newer t
+      apropos-do-all t)
+(diminish 'abbrev-mode)
 
 ;;------------------------------------------------------------------------------
 ;; Smooth scrolling
@@ -176,3 +182,46 @@
 (use-package smartscan
   :ensure t
   :config (global-smartscan-mode t))
+
+;;------------------------------------------------------------------------------
+;; visual-regexp-steroids: better regexp searching
+(use-package visual-regexp-steroids
+  :ensure t
+  :bind (("C-c r" . vr/replace)
+         ("C-c q" . vr/query-replace)
+         ("C-r" . vr/isearch-backward)
+         ("C-s" . vr/isearch-forward)))
+
+;;------------------------------------------------------------------------------
+;; neotree: tree interface for opening files
+
+;; When opening a file, or a directory with dired, hide the neotree window. Just
+;; using neo-enter-hook doesn't quite do it, because neotree routes all
+;; functionality (eg refresh, toggle hidden, etc) through neo-buffer--execute.
+
+(use-package neotree
+  :ensure t
+  :config
+  (setq neo-smart-open t
+        neo-hidden-regexp-list '("\\.pyc$" "~$" "^#.*#$" "^\\.#\\..*$" "\\.elc$")
+        my/neotree-opening-file nil
+        my/neotree-entering-dired nil)
+  (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
+  (defun neo-hide-on-enter (type path arg)
+    (if (or (and (eq my/neotree-opening-file t)
+                 (equal type 'file))
+            (and (eq my/neotree-entering-dired t)
+                 (equal type 'directory)))
+        (neotree-hide))
+    (setq my/neotree-opening-file nil
+          my/neotree-entering-dired nil))
+  (defun my/before-neobuffer-execute (arg0 &optional file-fn dir-fn &rest args)
+    (when (eq dir-fn 'neo-open-dired)
+      (setq my/neotree-entering-dired t))
+    (when (or (eq file-fn 'neo-open-file)
+              (eq file-fn 'neo-open-file-vertical-split)
+              (eq file-fn 'neo-open-file-horizontal-split))
+      (setq my/neotree-opening-file t)))
+  (advice-add 'neo-buffer--execute :before #'my/before-neobuffer-execute)
+  (add-hook 'neo-enter-hook #'neo-hide-on-enter)
+  :bind (("<f12>" . neotree-toggle)))

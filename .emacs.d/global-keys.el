@@ -4,9 +4,7 @@
 (bind-key "M-k" 'compile)
 (bind-key "M-SPC" 'cycle-spacing)
 
-;; better searching
-(bind-key "C-s" 'isearch-forward-regexp)
-(bind-key "C-r" 'isearch-backward-regexp)
+;; old-style searching
 (bind-key "C-M-s" 'isearch-forward)
 (bind-key "C-M-r" 'isearch-backward)
 
@@ -46,3 +44,6 @@
 ;; Highlight symbols
 (bind-key "<f3>" 'highlight-symbol-at-point)
 (bind-key "S-<f3>" 'hi-lock-mode)
+
+;; Use hippie-expand instead of dabbrev-expand
+(bind-key "M-/" 'hippie-expand)

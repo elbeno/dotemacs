@@ -133,7 +133,11 @@
 ;;------------------------------------------------------------------------------
 ;; Start server
 (require 'server)
-(server-start)
+(unless (server-running-p)
+  (server-start))
+
+;; Restore GC threshold
+(setq gc-cons-threshold 800000)
 
 ;; Local Variables:
 ;; byte-compile-warnings: (not free-vars)

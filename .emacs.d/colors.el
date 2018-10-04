@@ -1,11 +1,20 @@
+;;------------------------------------------------------------------------------
+;; Disable themes completely before applying a new one
+(defadvice load-theme (before theme-dont-propagate activate)
+  "Disable all theme effects before enabling new ones."
+  (mapc #'disable-theme custom-enabled-themes))
+
+;;------------------------------------------------------------------------------
 ;; Colours in graphical mode
 (when (display-graphic-p)
   (load-theme 'hipster))
 
+;;------------------------------------------------------------------------------
 ;; Highlight FIXME/TODO
 (font-lock-add-keywords 'c++-mode
                         '(("\\<\\(FIXME\\|TODO\\).*?:" 0 font-lock-warning-face prepend)))
 
+;;------------------------------------------------------------------------------
 ;; Special types of comments
 (defface font-lock-comment-strike
   '((t (:strike-through t)))
@@ -38,3 +47,10 @@
      ("//+i[[:space:]]*\\(.*?\\)[[:space:]]*\\s>" 1 'font-lock-comment-important prepend))))
 
 (add-hook 'c++-mode-hook #'add-custom-keyw-cpp)
+
+;;------------------------------------------------------------------------------
+;; Diff mode colors
+(eval-after-load 'diff-mode
+  '(progn
+     (set-face-foreground 'diff-added "green4")
+     (set-face-foreground 'diff-removed "red3")))
