@@ -12,6 +12,20 @@
   :bind
   (("C-c f" . clang-format)))
 
+;; clang-format-on-save
+(defcustom my-clang-format-enabled t
+  "If t, run clang-format on cpp buffers upon saving."
+  :group 'clang-format
+  :type 'boolean
+  :safe 'booleanp)
+
+(defun my-clang-format-before-save ()
+  (interactive)
+  (if my-clang-format-enabled
+      (when (eq major-mode 'c++-mode) (clang-format-buffer))
+    (message "my-clang-format-enabled is false")))
+(add-hook 'before-save-hook 'my-clang-format-before-save)
+
 ;; Auto insertion of headers
 (autoload 'cpp-auto-include/namespace-qualify-file "cpp-auto-include"
   "Explicitly qualify uses of the standard library with their namespace(s)." t)
@@ -42,13 +56,30 @@
  (align-regexp start end "[[:space:]]*\\([[:space:]]\\)\\*" 1 0)
  (align-regexp start end "\\([[:space:]]*\\)\\+")
  (align-regexp start end "\\([[:space:]]*\\)\\[")
- (align-regexp start end "\\([[:space:]]*\\)/")
+ (align-regexp start end "\\([[:space:]]*\\)[[:space:]]/[^/]" 1 0)
  (align-regexp start end "\\([[:space:]]*\\)="))
+
+(defun find-and-align-boost-sml ()
+  "Align all Boost.SML tables in the buffer using align-boost-sml.
+This function assumes Boost.SML tables are delimited with
+// clang-format off
+  and
+// clang-format on"
+  (interactive)
+  (if mark-active
+    (align-boost-sml (region-beginning) (region-end))
+    (save-excursion
+      (let ((case-fold-search t))
+        (goto-char (point-min))
+        (while (search-forward "// clang-format off" nil t)
+          (let ((start (point)))
+            (when (search-forward "// clang-format on" nil t)
+              (align-boost-sml start (point)))))))))
 
 (eval-after-load 'cc-mode
   '(bind-keys :map c++-mode-map
               ("C-<tab>" . align)
-              ("C-<insert>" . align-boost-sml)))
+              ("C-]" . find-and-align-boost-sml)))
 
 ;;------------------------------------------------------------------------------
 ;; lsp + clangd + company
@@ -60,13 +91,15 @@
                  (lsp--capability "definitionProvider")))
     (setq-local xref-backend-functions (list #'lsp--xref-backend))))
 
+(setq my-clangd-path "/usr/local/llvm/bin/clangd")
+
 (use-package lsp-mode
   :ensure t
   :config
   (lsp-define-stdio-client lsp-clangd-c++
                            "cpp"
                            #'projectile-project-root
-                           (list "/usr/local/llvm/bin/clangd")
+                           (list my-clangd-path)
                            :ignore-regexps
                            '("^Error -[0-9]+: .+$"))
   :hook ((c++-mode . my-force-lsp-xref)
@@ -101,6 +134,19 @@
 
 ;;------------------------------------------------------------------------------
 ;; Building & error navigation
+
+(setq compilation-scroll-output t)
+
+;; Remove compilation window on success
+(setq compilation-finish-functions
+      (lambda (buf str)
+        (if (null (string-match ".*exited abnormally.*" str))
+            ;;no errors, make the compilation window go away in a few seconds
+            (progn
+              (run-at-time
+               "1 sec" nil 'delete-windows-on
+               (get-buffer-create "*compilation*"))
+              (message "No compilation errors!")))))
 
 (eval-after-load 'cc-mode
   '(bind-keys :map c++-mode-map

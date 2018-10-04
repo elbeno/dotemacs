@@ -1,14 +1,6 @@
 ;; Colours in graphical mode
-(load-theme 'hipster)
-
 (when (display-graphic-p)
-  ;; (set-face-foreground 'font-lock-comment-face "gray")
-  ;; (set-face-foreground 'font-lock-string-face "firebrick")
-  ;; (set-face-foreground 'font-lock-warning-face "black")
-  ;; (set-face-background 'font-lock-warning-face "orange")
-  ;; (set-face-background 'region "moccasin")
-  ;; (set-face-foreground 'region "navy")
-  )
+  (load-theme 'hipster))
 
 ;; Highlight FIXME/TODO
 (font-lock-add-keywords 'c++-mode

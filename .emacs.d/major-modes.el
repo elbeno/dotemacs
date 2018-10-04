@@ -19,3 +19,8 @@
 ;; CMake
 (use-package cmake-mode
   :ensure t)
+
+;;------------------------------------------------------------------------------
+;; Cucumber/Gherkin
+(use-package feature-mode
+  :ensure t)
