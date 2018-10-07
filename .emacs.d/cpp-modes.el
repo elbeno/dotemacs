@@ -44,37 +44,99 @@
   (c-set-offset 'substatement-open 0)
   (c-set-offset 'brace-list-open 0)
   (c-set-offset 'member-init-cont '-)
-  (c-set-offset 'arglist-intro '++)
+  (c-set-offset 'arglist-intro '+)
+  (c-set-offset 'arglist-close 0)
   (c-set-offset 'case-label '+)
   (c-set-offset 'statement-case-open 0))
 (add-hook 'c-mode-common-hook 'indentation-c-mode-hook)
 
 ;; Align boost SML tables
-(defun align-boost-sml (start end)
- (interactive "r")
- (indent-region start end)
- (align-regexp start end "[[:space:]]*\\([[:space:]]\\)\\*" 1 0)
- (align-regexp start end "\\([[:space:]]*\\)\\+")
- (align-regexp start end "\\([[:space:]]*\\)\\[")
- (align-regexp start end "\\([[:space:]]*\\)[[:space:]]/[^/]" 1 0)
- (align-regexp start end "\\([[:space:]]*\\)="))
+(defcustom boost-sml-table-start "// clang-format off"
+  "Marker for the beginning of a Boost SML table."
+  :group 'boost-sml
+  :type 'string
+  :safe 'stringp)
+
+(defcustom boost-sml-table-end "// clang-format on"
+  "Marker for the end of a Boost SML table."
+  :group 'boost-sml
+  :type 'string
+  :safe 'stringp)
+
+(defcustom boost-sml-align-guards-beyond-events nil
+  "When true, align guards at the end of all events."
+  :group 'boost-sml
+  :type 'boolean
+  :safe 'booleanp)
+
+(defcustom boost-sml-spaces-in-guards 0
+  "Put N spaces inside [ and ] for guards."
+  :group 'boost-sml
+  :type 'integer
+  :safe 'integerp)
+
+(defun align-boost-sml-part (start regexp &optional group spacing)
+ (goto-char start)
+ (when (search-forward boost-sml-table-end nil t)
+   (beginning-of-line)
+   (backward-char)
+   (align-regexp start (point) regexp group spacing)))
+
+(defun align-boost-sml (start)
+ (when (search-forward boost-sml-table-end nil t)
+   (beginning-of-line)
+   (backward-char)
+   (indent-region start (point)))
+ (align-boost-sml-part start "[[:space:]]*\\([[:space:]]\\)\\*[^/]" 1 0) ;; back up default *
+ (align-boost-sml-part start "\\([[:space:]]*\\)\\+") ;; align +, one space before
+ (align-boost-sml-part start "\\+\\([[:space:]]*\\)") ;; align +, one space after
+ (align-boost-sml-part start "\\([[:space:]]*\\)\\[") ;; align [, one space before
+ (align-boost-sml-part start "\\[\\([[:space:]]*\\)" 1 boost-sml-spaces-in-guards) ;; align [
+ (align-boost-sml-part start "\\([[:space:]]*\\)\\]" 1 boost-sml-spaces-in-guards) ;; align ]
+ (align-boost-sml-part start "[^/*]\\([[:space:]]*\\)[/][^/*]") ;; align /, one space before
+ (align-boost-sml-part start "[^/*][/]\\([[:space:]]*\\)[^/*]") ;; align /, one space after
+ (when boost-sml-align-guards-beyond-events
+   (align-boost-sml-part start "\\([[:space:]]+\\)[/[][[:space:]]") ;; align [ or /
+   (align-boost-sml-part start "\\([[:space:]]+\\)/[[:space:]]")) ;; re-align /
+ (align-boost-sml-part start "\\([[:space:]]*\\)=") ;; align =, one space before
+ (align-boost-sml-part start "=\\([[:space:]]*\\)")) ;; align =, one space after
 
 (defun find-and-align-boost-sml ()
   "Align all Boost.SML tables in the buffer using align-boost-sml.
-This function assumes Boost.SML tables are delimited with
-// clang-format off
-  and
-// clang-format on"
+
+Boost.SML tables are delimited with the variables:
+
+boost-sml-table-start (default \"// clang-format-off\")
+boost-sml-table-end (default \"// clang-format-on\")
+
+When boost-sml-align-guards-beyond-events is t, guards are
+aligned together after all events like this:
+
+return make_transition_table(
+ *\"state1\"_s + event<long_event>         / action = \"state1\"_s,
+  \"state1\"_s + event<event>      [guard] / action = \"state1\"_s,
+  \"state1\"_s + event<e>          [guard]          = X
+);
+
+rather than like this, where long events without guards do
+not affect guard alignment (the default):
+
+return make_transition_table(
+ *\"state1\"_s + event<long_event>    / action = \"state1\"_s,
+  \"state1\"_s + event<event> [guard] / action = \"state1\"_s,
+  \"state1\"_s + event<e>     [guard]          = X
+);
+
+The variable boost-sml-spaces-in-guards (default 0) controls how
+many spaces are used immediately inside [ and ]."
   (interactive)
   (if mark-active
     (align-boost-sml (region-beginning) (region-end))
     (save-excursion
-      (let ((case-fold-search t))
-        (goto-char (point-min))
-        (while (search-forward "// clang-format off" nil t)
-          (let ((start (point)))
-            (when (search-forward "// clang-format on" nil t)
-              (align-boost-sml start (point)))))))))
+      (goto-char (point-min))
+      (while (search-forward boost-sml-table-start nil t)
+        (forward-char)
+        (align-boost-sml (point))))))
 
 (eval-after-load 'cc-mode
   '(bind-keys :map c++-mode-map
