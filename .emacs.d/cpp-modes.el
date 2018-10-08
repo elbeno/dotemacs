@@ -2,10 +2,13 @@
 ;; C++ mode
 (setq-default c-basic-offset 2)
 
+;;------------------------------------------------------------------------------
+;; syntax highlighting
 (use-package modern-cpp-font-lock
   :ensure t
   :hook (c++-mode . modern-c++-font-lock-mode))
 
+;;------------------------------------------------------------------------------
 ;; clang-format
 (use-package clang-format
   :ensure t
@@ -26,6 +29,7 @@
     (message "my-clang-format-enabled is false")))
 (add-hook 'before-save-hook 'my-clang-format-before-save)
 
+;;------------------------------------------------------------------------------
 ;; Auto insertion of headers
 (autoload 'cpp-auto-include/namespace-qualify-file "cpp-auto-include"
   "Explicitly qualify uses of the standard library with their namespace(s)." t)
@@ -39,6 +43,7 @@
               ("C-c i" . cpp-auto-include/ensure-includes-for-file)
               ("C-c o" . cpp-auto-include/ensure-includes-for-current-line)))
 
+;;------------------------------------------------------------------------------
 ;; indentation rules
 (defun indentation-c-mode-hook ()
   (c-set-offset 'substatement-open 0)
@@ -50,6 +55,7 @@
   (c-set-offset 'statement-case-open 0))
 (add-hook 'c-mode-common-hook 'indentation-c-mode-hook)
 
+;;------------------------------------------------------------------------------
 ;; Align boost SML tables
 (defcustom boost-sml-table-start "// clang-format off"
   "Marker for the beginning of a Boost SML table."
@@ -222,3 +228,20 @@ many spaces are used immediately inside [ and ]."
               ("M-<down>" . next-error)
               ("M-<up>" . previous-error)
               ("M-k" . projectile-compile-project)))
+
+;;------------------------------------------------------------------------------
+;; Debugging
+
+(setq gdb-many-windows t
+      gdb-show-main t)
+
+(defun gdb-run-or-cont (arg)
+  "Run or continue program with numeric argument ARG."
+  (interactive "p")
+  (when (boundp 'gdb-thread-number)
+    (if (eq gdb-thread-number nil)
+        (gud-run arg)
+      (gud-cont arg))))
+
+(use-package gud
+  :bind (("C-x C-a <f5>" . gdb-run-or-cont)))
