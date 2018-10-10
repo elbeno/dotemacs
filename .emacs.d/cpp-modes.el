@@ -90,6 +90,7 @@
 (use-package lsp-mode
   :ensure t
   :config
+  (setq lsp-enable-indentation nil)
   (lsp-define-stdio-client lsp-clangd-c++
                            "cpp"
                            #'projectile-project-root
