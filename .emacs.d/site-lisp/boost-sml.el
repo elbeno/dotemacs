@@ -66,7 +66,7 @@ This function is controlled by variables in the customization group boost-sml."
   (save-excursion
     (ignore-errors
       (goto-char (point-min))
-      (when (search-forward boost-sml-table-start nil t)
+      (while (search-forward boost-sml-table-start nil t)
         (align-boost-sml (point))))))
 
 (provide 'boost-sml)
