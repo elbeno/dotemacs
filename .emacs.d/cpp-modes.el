@@ -56,93 +56,9 @@
 (add-hook 'c-mode-common-hook 'indentation-c-mode-hook)
 
 ;;------------------------------------------------------------------------------
-;; Align boost SML tables
-(defcustom boost-sml-table-start "// clang-format off"
-  "Marker for the beginning of a Boost SML table."
-  :group 'boost-sml
-  :type 'string
-  :safe 'stringp)
-
-(defcustom boost-sml-table-end "// clang-format on"
-  "Marker for the end of a Boost SML table."
-  :group 'boost-sml
-  :type 'string
-  :safe 'stringp)
-
-(defcustom boost-sml-align-guards-beyond-events nil
-  "When true, align guards at the end of all events."
-  :group 'boost-sml
-  :type 'boolean
-  :safe 'booleanp)
-
-(defcustom boost-sml-spaces-in-guards 0
-  "Put N spaces inside [ and ] for guards."
-  :group 'boost-sml
-  :type 'integer
-  :safe 'integerp)
-
-(defun align-boost-sml-part (start regexp &optional group spacing)
- (goto-char start)
- (when (search-forward boost-sml-table-end nil t)
-   (beginning-of-line)
-   (backward-char)
-   (align-regexp start (point) regexp group spacing)))
-
-(defun align-boost-sml (start)
- (when (search-forward boost-sml-table-end nil t)
-   (beginning-of-line)
-   (backward-char)
-   (indent-region start (point)))
- (align-boost-sml-part start "[[:space:]]*\\([[:space:]]\\)\\*[^/]" 1 0) ;; back up default *
- (align-boost-sml-part start "\\([[:space:]]*\\)\\+") ;; align +, one space before
- (align-boost-sml-part start "\\+\\([[:space:]]*\\)") ;; align +, one space after
- (align-boost-sml-part start "\\([[:space:]]*\\)\\[") ;; align [, one space before
- (align-boost-sml-part start "\\[\\([[:space:]]*\\)" 1 boost-sml-spaces-in-guards) ;; align [
- (align-boost-sml-part start "\\([[:space:]]*\\)\\]" 1 boost-sml-spaces-in-guards) ;; align ]
- (align-boost-sml-part start "[^/*]\\([[:space:]]*\\)[/][^/*]") ;; align /, one space before
- (align-boost-sml-part start "[^/*][/]\\([[:space:]]*\\)[^/*]") ;; align /, one space after
- (when boost-sml-align-guards-beyond-events
-   (align-boost-sml-part start "\\([[:space:]]+\\)[/[][[:space:]]") ;; align [ or /
-   (align-boost-sml-part start "\\([[:space:]]+\\)/[[:space:]]")) ;; re-align /
- (align-boost-sml-part start "\\([[:space:]]*\\)=") ;; align =, one space before
- (align-boost-sml-part start "=\\([[:space:]]*\\)")) ;; align =, one space after
-
-(defun find-and-align-boost-sml ()
-  "Align all Boost.SML tables in the buffer using align-boost-sml.
-
-Boost.SML tables are delimited with the variables:
-
-boost-sml-table-start (default \"// clang-format-off\")
-boost-sml-table-end (default \"// clang-format-on\")
-
-When boost-sml-align-guards-beyond-events is t, guards are
-aligned together after all events like this:
-
-return make_transition_table(
- *\"state1\"_s + event<long_event>         / action = \"state1\"_s,
-  \"state1\"_s + event<event>      [guard] / action = \"state1\"_s,
-  \"state1\"_s + event<e>          [guard]          = X
-);
-
-rather than like this, where long events without guards do
-not affect guard alignment (the default):
-
-return make_transition_table(
- *\"state1\"_s + event<long_event>    / action = \"state1\"_s,
-  \"state1\"_s + event<event> [guard] / action = \"state1\"_s,
-  \"state1\"_s + event<e>     [guard]          = X
-);
-
-The variable boost-sml-spaces-in-guards (default 0) controls how
-many spaces are used immediately inside [ and ]."
-  (interactive)
-  (if mark-active
-    (align-boost-sml (region-beginning) (region-end))
-    (save-excursion
-      (goto-char (point-min))
-      (while (search-forward boost-sml-table-start nil t)
-        (forward-char)
-        (align-boost-sml (point))))))
+;; Align Boost.SML tables
+(autoload 'find-and-align-boost-sml "boost-sml"
+  "Find and align Boost.SML tables." t)
 
 (eval-after-load 'cc-mode
   '(bind-keys :map c++-mode-map
@@ -161,6 +77,16 @@ many spaces are used immediately inside [ and ]."
 
 (setq my-clangd-path "/usr/local/llvm/bin/clangd")
 
+;; In c++-mode, start lsp mode etc unless we're in a temp buffer
+;; (don't do it when exporting org-mode blocks)
+(defun my-c++-mode-hook ()
+  (unless (string-match-p (regexp-quote "*temp*") (buffer-name))
+    (company-mode)
+    (lsp-clangd-c++-enable)
+    (lsp-mode)
+    (my-force-lsp-xref)))
+(add-hook 'c++-mode-hook 'my-c++-mode-hook)
+
 (use-package lsp-mode
   :ensure t
   :config
@@ -169,10 +95,7 @@ many spaces are used immediately inside [ and ]."
                            #'projectile-project-root
                            (list my-clangd-path)
                            :ignore-regexps
-                           '("^Error -[0-9]+: .+$"))
-  :hook ((c++-mode . my-force-lsp-xref)
-         (c++-mode . lsp-mode)
-         (c++-mode . lsp-clangd-c++-enable)))
+                           '("^Error -[0-9]+: .+$")))
 
 (use-package lsp-ui
   :ensure t
@@ -197,8 +120,7 @@ many spaces are used immediately inside [ and ]."
   :ensure t
   :config
   (require 'company-lsp)
-  (push 'company-lsp company-backends)
-  :hook (c++-mode . company-mode))
+  (push 'company-lsp company-backends))
 
 ;;------------------------------------------------------------------------------
 ;; Header completion
