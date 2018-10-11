@@ -75,6 +75,15 @@
   :hook (python-mode . elpy-mode))
 
 ;;------------------------------------------------------------------------------
+;; Elixir
+(use-package alchemist
+  :ensure t)
+
+(use-package elixir-mode
+  :ensure t
+  :hook (elixir-mode . company-mode))
+
+;;------------------------------------------------------------------------------
 ;; PDFs
 (when (display-graphic-p)
   (use-package pdf-tools
