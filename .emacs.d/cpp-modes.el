@@ -76,6 +76,21 @@
     (setq-local xref-backend-functions (list #'lsp--xref-backend))))
 
 (setq my-clangd-path "/usr/local/llvm/bin/clangd")
+(setq my-clang-check-path "/usr/local/llvm/bin/clang-check")
+
+;; Use clangcheck for flycheck in C++ mode
+(defun my-select-clangcheck-for-checker ()
+  "Select clang-check for flycheck's checker."
+  (require 'flycheck-clangcheck)
+  (flycheck-set-checker-executable 'c/c++-clangcheck my-clang-check-path)
+  (flycheck-select-checker 'c/c++-clangcheck))
+
+(use-package flycheck-clangcheck
+  :ensure t
+  :config
+  (setq flycheck-clang-analyze 1
+        flycheck-clang-extra-arg '("-Xanalyzer" "-analyzer-output=text"))
+  :hook (c++-mode . my-select-clangcheck-for-checker))
 
 ;; In c++-mode, start lsp mode etc unless we're in a temp buffer
 ;; (don't do it when exporting org-mode blocks)
