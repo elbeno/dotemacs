@@ -27,6 +27,23 @@
   :ensure t
   :hook (cmake-mode . cmake-font-lock-activate))
 
+;; cmake-format-on-save
+(defcustom my-cmake-format-enabled t
+  "If t, run cmake-format on cmake buffers upon saving."
+  :group 'cmake-format
+  :type 'boolean
+  :safe 'booleanp)
+
+(autoload 'cmake-format-buffer "cmake-format"
+  "Format the buffer with cmake-format." t)
+
+(defun my-cmake-format-before-save ()
+  (interactive)
+  (if my-cmake-format-enabled
+      (when (eq major-mode 'cmake-mode) (cmake-format-buffer))
+    (message "my-cmake-format-enabled is false")))
+(add-hook 'before-save-hook 'my-cmake-format-before-save)
+
 ;;------------------------------------------------------------------------------
 ;; Cucumber/Gherkin
 (use-package feature-mode
