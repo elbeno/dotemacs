@@ -101,8 +101,8 @@
 ;; expand-region
 (use-package expand-region
   :ensure t
-  :bind (("C-'" . er/expand-region)
-         ("C-@" . er/contract-region)))
+  :bind (("C-)" . er/expand-region)
+         ("C-(" . er/contract-region)))
 (delete-selection-mode 1)
 
 ;;------------------------------------------------------------------------------
