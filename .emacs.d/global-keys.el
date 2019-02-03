@@ -47,3 +47,10 @@
 
 ;; Use hippie-expand instead of dabbrev-expand
 (bind-key "M-/" 'hippie-expand)
+
+;; Use kill-this-buffer
+(defun bjm/kill-this-buffer ()
+  "Kill the current buffer."
+  (interactive)
+  (kill-buffer (current-buffer)))
+(global-set-key (kbd "C-x k") 'bjm/kill-this-buffer)
