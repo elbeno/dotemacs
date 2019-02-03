@@ -140,12 +140,10 @@
                       :foreground "#b00000")
   (setq ido-vertical-define-keys 'C-n-C-p-up-and-down))
 
-(use-package smex
+(use-package amx
   :ensure t
   :config
-  (smex-initialize)
-  :bind
-  (("M-x" . smex))
+  (amx-mode)
   :demand)
 
 ;;------------------------------------------------------------------------------
@@ -225,3 +223,13 @@
   (advice-add 'neo-buffer--execute :before #'my/before-neobuffer-execute)
   (add-hook 'neo-enter-hook #'neo-hide-on-enter)
   :bind (("<f12>" . neotree-toggle)))
+
+;;------------------------------------------------------------------------------
+;; wttrin: weather
+
+(use-package wttrin
+  :ensure t
+  :config
+  (setq wttrin-default-cities '("Denver")
+        wttrin-default-accept-language '("Accept-Language" . "en-US"))
+  :bind (("C-x w" . wttrin)))
