@@ -97,21 +97,17 @@
 (defun my-c++-mode-hook ()
   (unless (string-match-p (regexp-quote "*temp*") (buffer-name))
     (company-mode)
-    (lsp-clangd-c++-enable)
-    (lsp-mode)
+    (lsp)
     (my-force-lsp-xref)))
 (add-hook 'c++-mode-hook 'my-c++-mode-hook)
 
 (use-package lsp-mode
   :ensure t
-  :config
-  (setq lsp-enable-indentation nil)
-  (lsp-define-stdio-client lsp-clangd-c++
-                           "cpp"
-                           #'projectile-project-root
-                           (list my-clangd-path)
-                           :ignore-regexps
-                           '("^Error -[0-9]+: .+$")))
+  :init
+  (require 'lsp-clients)
+  (setq lsp-enable-indentation nil
+        lsp-auto-guess-root t
+        lsp-clients-clangd-executable my-clangd-path))
 
 (use-package lsp-ui
   :ensure t

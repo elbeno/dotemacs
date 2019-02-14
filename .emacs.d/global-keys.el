@@ -54,3 +54,6 @@
   (interactive)
   (kill-buffer (current-buffer)))
 (global-set-key (kbd "C-x k") 'bjm/kill-this-buffer)
+
+;; quick-calc on C-=
+(global-set-key (kbd "C-=") 'quick-calc)
