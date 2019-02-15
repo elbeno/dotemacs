@@ -22,6 +22,12 @@
   :type 'integer
   :safe 'integerp)
 
+(defcustom boost-sml-align-actions-beyond-guards nil
+  "When true, align actions at the end of all guards."
+  :group 'boost-sml
+  :type 'boolean
+  :safe 'booleanp)
+
 (defun align-boost-sml-part (start regexp &optional group spacing)
  (goto-char start)
  (forward-sexp)
@@ -56,7 +62,10 @@
     (align-boost-sml-part start "\\([[:space:]]+\\)[/[][^/*]") ;; align [ or /
     (align-boost-sml-part start "\\([[:space:]]+\\)/[[:space:]]")) ;; re-align /
   (align-boost-sml-part start "\\([[:space:]]*\\)=") ;; align =, one space before
-  (align-boost-sml-part start "=\\([[:space:]]*\\)")) ;; align =, one space after
+  (align-boost-sml-part start "=\\([[:space:]]*\\)") ;; align =, one space after
+  (when boost-sml-align-actions-beyond-guards
+    (align-boost-sml-part start "\\([[:space:]]+\\)[/=][^/*]") ;; align / or =
+    (align-boost-sml-part start "\\([[:space:]]+\\)=[[:space:]]"))) ;; re-align =
 
 ;;;###autoload
 (defun find-and-align-boost-sml ()
