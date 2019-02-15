@@ -213,3 +213,7 @@
   :init (global-emojify-mode)
   :bind (("C-c e" . emojify-insert-emoji))
   :diminish emojify-mode)
+
+;;------------------------------------------------------------------------------
+;; line numbers
+(global-display-line-numbers-mode)
