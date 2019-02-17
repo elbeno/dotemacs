@@ -217,4 +217,6 @@
 
 ;;------------------------------------------------------------------------------
 ;; line numbers
-(global-display-line-numbers-mode)
+(if (version< emacs-version "26")
+    (global-linum-mode)
+  (global-display-line-numbers-mode))
