@@ -168,3 +168,25 @@ Example of an XCode UUID: a513b85041a3535fc3520c3d."
       (setq current-directory-list (cdr current-directory-list)))
     ;; return the filenames
     el-files-list))
+
+;;------------------------------------------------------------------------------
+;; copy various things to kill ring
+(defun gk-copy-buffer-file-name ()
+  "Push the buffer's file name to the ‘kill-ring’."
+  (interactive)
+  (if-let* ((fil (buffer-file-name)))
+      (with-temp-buffer
+        (insert fil)
+        (clipboard-kill-ring-save (point-min) (point-max))
+        (message fil))
+    (error "Buffer not visiting a file.")))
+
+(defun gk-copy-last-message ()
+  "Copy-as-kill the last echoed message."
+  (interactive)
+  (with-current-buffer (messages-buffer)
+    (save-excursion
+      (goto-char (point-max))
+      (forward-line -1)
+      (clipboard-kill-ring-save
+       (line-beginning-position) (line-end-position)))))

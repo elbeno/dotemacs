@@ -57,3 +57,6 @@
 
 ;; quick-calc on C-=
 (global-set-key (kbd "C-=") 'quick-calc)
+
+;; Copy buffer file name with C-M-y
+(global-set-key (kbd "C-M-y") 'gk-copy-buffer-file-name)
