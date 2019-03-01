@@ -233,3 +233,7 @@
   (setq wttrin-default-cities '("Denver")
         wttrin-default-accept-language '("Accept-Language" . "en-US"))
   :bind (("C-x w" . wttrin)))
+
+;;------------------------------------------------------------------------------
+;; make shell files executable on save
+(add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
