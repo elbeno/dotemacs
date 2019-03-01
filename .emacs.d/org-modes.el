@@ -12,7 +12,8 @@
         org-src-fontify-natively t
         org-completion-use-ido t
         org-export-allow-bind-keywords t
-        org-latex-listings 'minted)
+        org-latex-listings 'minted
+        org-reveal-note-key-char nil)
   (setq org-latex-pdf-process
         '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
           "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
@@ -31,7 +32,8 @@
    '((C . t)
      (js . t)
      (haskell . t)
-     (emacs-lisp . t))))
+     (emacs-lisp . t)))
+  (add-to-list 'org-structure-template-alist '("n" . "notes")))
 
 ;; better header bullets
 (use-package org-bullets
