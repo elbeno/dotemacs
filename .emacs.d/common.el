@@ -242,4 +242,5 @@
 ;; cycle CamelCase, snake_case, kebab-case etc
 (use-package string-inflection
   :ensure t
-  :bind (("C-c -" . string-inflection-all-cycle)))
+  :bind (("C-c -" . string-inflection-all-cycle)
+         ("C-c _" . string-inflection-toggle)))
