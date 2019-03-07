@@ -237,3 +237,9 @@
 ;;------------------------------------------------------------------------------
 ;; make shell files executable on save
 (add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
+
+;;------------------------------------------------------------------------------
+;; cycle CamelCase, snake_case, kebab-case etc
+(use-package string-inflection
+  :ensure t
+  :bind (("C-c -" . string-inflection-all-cycle)))
