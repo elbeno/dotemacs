@@ -220,3 +220,24 @@
 (if (version< emacs-version "26")
     (global-linum-mode)
   (global-display-line-numbers-mode))
+
+;;------------------------------------------------------------------------------
+;; filladapt
+(use-package filladapt
+  :ensure t
+  :diminish filladapt-mode
+  :config
+  (setq-default filladapt-mode t))
+
+;;------------------------------------------------------------------------------
+;; yasnippets
+(use-package yasnippet
+  :ensure t
+  :config
+  (use-package yasnippet-snippets
+    :ensure t)
+  (setq yas-verbosity 1
+        yas-wrap-around-region t)
+  (setq yas-prompt-functions '(yas-ido-prompt))
+  (yas-global-mode t)
+  :diminish yas-minor-mode)

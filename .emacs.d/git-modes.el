@@ -12,7 +12,9 @@
   (("C-c g" . magit-status)
    ("C-c C-b" . magit-blame))
   :init
-  (setq magit-last-seen-setup-instructions "1.4.0"))
+  (setq magit-last-seen-setup-instructions "1.4.0")
+  :config
+  (define-key magit-file-mode-map (kbd "C-x g") nil))
 
 ;; git time machine
 (use-package git-timemachine

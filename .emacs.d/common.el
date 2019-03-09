@@ -226,7 +226,6 @@
 
 ;;------------------------------------------------------------------------------
 ;; wttrin: weather
-
 (use-package wttrin
   :ensure t
   :config
@@ -246,8 +245,13 @@
          ("C-c _" . string-inflection-toggle)))
 
 ;;------------------------------------------------------------------------------
-;; filladapt
-(use-package filladapt
-  :diminish filladapt-mode
-  :config
-  (setq-default filladapt-mode t))
+;; better zap-to-char
+(use-package zzz-to-char
+  :ensure t
+  :bind (("M-z" . zzz-up-to-char)))
+
+;;------------------------------------------------------------------------------
+;; browse kill-ring
+(use-package browse-kill-ring
+  :ensure t
+  :bind (("M-y" . browse-kill-ring)))
