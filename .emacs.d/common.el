@@ -244,3 +244,10 @@
   :ensure t
   :bind (("C-c -" . string-inflection-all-cycle)
          ("C-c _" . string-inflection-toggle)))
+
+;;------------------------------------------------------------------------------
+;; filladapt
+(use-package filladapt
+  :diminish filladapt-mode
+  :config
+  (setq-default filladapt-mode t))
