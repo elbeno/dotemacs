@@ -53,10 +53,11 @@
   "Kill the current buffer."
   (interactive)
   (kill-buffer (current-buffer)))
-(global-set-key (kbd "C-x k") 'bjm/kill-this-buffer)
+(bind-key "C-x k" 'bjm/kill-this-buffer)
 
 ;; quick-calc on C-=
-(global-set-key (kbd "C-=") 'quick-calc)
+(bind-key "C-=" 'quick-calc)
 
-;; Copy buffer file name with C-M-y
-(global-set-key (kbd "C-M-y") 'gk-copy-buffer-file-name)
+;; rotate-text on C-c /
+(bind-key "C-c /" 'rotate-text)
+(bind-key "C-c C-/" 'rotate-text-backward)

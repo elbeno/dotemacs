@@ -254,4 +254,9 @@
 ;; browse kill-ring
 (use-package browse-kill-ring
   :ensure t
-  :bind (("M-y" . browse-kill-ring)))
+  :bind (("C-M-y" . browse-kill-ring)))
+
+;;------------------------------------------------------------------------------
+;; rotate words
+(autoload 'rotate-text "rotate-text" nil t)
+(autoload 'rotate-text-backward "rotate-text" nil t)
