@@ -41,10 +41,6 @@
 (bind-key "C-c <up>"    'windmove-up)
 (bind-key "C-c <down>"  'windmove-down)
 
-;; Highlight symbols
-(bind-key "<f3>" 'highlight-symbol-at-point)
-(bind-key "S-<f3>" 'hi-lock-mode)
-
 ;; Use hippie-expand instead of dabbrev-expand
 (bind-key "M-/" 'hippie-expand)
 

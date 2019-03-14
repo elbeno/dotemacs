@@ -260,3 +260,9 @@
 ;; rotate words
 (autoload 'rotate-text "rotate-text" nil t)
 (autoload 'rotate-text-backward "rotate-text" nil t)
+
+;;------------------------------------------------------------------------------
+;; symbol-overlay
+(use-package symbol-overlay
+  :ensure t
+  :bind (("<f3>" . symbol-overlay-put)))
