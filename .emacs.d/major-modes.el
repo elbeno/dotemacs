@@ -1,7 +1,8 @@
 ;;------------------------------------------------------------------------------
 ;; markdown mode
 (use-package markdown-mode
-  :ensure t)
+  :ensure t
+  :mode ("\\.bs\\'" . markdown-mode))
 
 (use-package markdown-mode+
   :ensure t)
