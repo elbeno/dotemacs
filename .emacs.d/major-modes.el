@@ -83,16 +83,6 @@
   :init (require 'cl))
 
 ;;------------------------------------------------------------------------------
-;; Python
-(use-package elpy
-  :ensure t
-  :init
-  (setq python-indent-offset 4)
-  :bind (:map elpy-mode-map
-              ("M-k" . elpy-check))
-  :hook (python-mode . elpy-mode))
-
-;;------------------------------------------------------------------------------
 ;; Elixir
 (use-package alchemist
   :ensure t)

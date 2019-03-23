@@ -204,8 +204,7 @@
   :ensure t
   :hook ((c++-mode . flycheck-mode)
          (python-mode . flycheck-mode)
-         (sh-mode . flycheck-mode))
-  :diminish flycheck-mode)
+         (sh-mode . flycheck-mode)))
 
 ;;------------------------------------------------------------------------------
 ;; Emojify
