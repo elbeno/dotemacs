@@ -328,6 +328,7 @@
                             "in_place_type_t" "in_place_type"
                             "in_place_index_t" "in_place_index")
                         (* space) "<")
+                   (and "pair" (* space) "{")
                    (and (or "make_pair" "to_chars" "from_chars")
                         (* space) "(")
                    (and "chars_format::"
@@ -344,8 +345,53 @@
                    (and (or "make_tuple" "forward_as_tuple"
                             "tie" "tuple_cat")
                         (* space) (or "(" "<"))
+                   (and "tuple" (* space) "{")
                    (and (or "tuple" "tuple_size" "tuple_element" "tuple_element_t")
                         (* space) "<")))))
+    ;; [any]
+    ("any" ("*")
+     ,(rx (and symbol-start
+               (or (and "any_cast" (* space) "<")
+                   "any" "bad_any_cast"))))
+    ;; [variant]
+    ("variant" ("*")
+     ,(rx (and symbol-start
+               (or (and "visit" (* space) "(")
+                   (and (or "variant"
+                            "variant_size" "variant_size_v"
+                            "variant_alternative" "variant_alternative_t"
+                            "holds_alternative" "get_if")
+                        (* space) "<")
+                   "monostate" "bad_variant_access" "variant_npos"))))
+    ;; [optional]
+    ("optional" ("*")
+     ,(rx (and symbol-start
+               (or (and "make_optional" (* space) "(")
+                   (and "optional" (* space) "<")
+                   "nullopt" "nullopt_t" "bad_optional_access"))))
+    ;; [filesystem]
+    ("filesystem" ("filesystem::" "*")
+     ,(rx (and symbol-start
+               (or (and (or "u8path" "absolute" "canonical" "weakly_canonical"
+                            "relative" "proximate" "copy_file" "copy_symlink"
+                            "create_directory" "create_directories"
+                            "create_hard_link" "create_symlink" "create_directory_symlink"
+                            "current_path" "exists" "equivalent"
+                            "file_size" "hard_link_count" "last_write_time"
+                            "permissions" "read_symlink" "remove_all" "rename"
+                            "resize_file" "space" "status" "symlink_status"
+                            "temp_directory_path"
+                            "is_block_file" "is_character_file"
+                            "is_directory" "is_empty"
+                            "is_fifo" "is_other"
+                            "is_regular_file" "is_socket"
+                            "is_symlink" "status_known")
+                        (* space) "(")
+                   "path" "filesystem_error" "directory_entry"
+                   "directory_iterator" "recursive_directory_iterator"
+                   "file_status" "space_info" "file_type"
+                   "perms" "perm_options" "copy_options"
+                   "directory_options" "file_time_type"))))
     ;; [template.bitset]
     ("bitset" ("*") ;; ("string" "iosfwd")
      ,(rx (and symbol-start
@@ -643,23 +689,23 @@
     ("array" ("*") ;; ("initializer_list")
      ,(rx (and symbol-start
                "array"
-               (* space) "<")))
+               (* space) (or "<" "{"))))
     ("deque" ("*") ;; ("initializer_list")
      ,(rx (and symbol-start
                "deque"
-               (* space) "<")))
+               (* space) (or "<" "{"))))
     ("forward_list" ("*") ;; ("initializer_list")
      ,(rx (and symbol-start
                "forward_list"
-               (* space) "<")))
+               (* space) (or "<" "{"))))
     ("list" ("*") ;; ("initializer_list")
      ,(rx (and symbol-start
                "list"
-               (* space) "<")))
+               (* space) (or "<" "{"))))
     ("vector" ("*") ;; ("initializer_list")
      ,(rx (and symbol-start
                "vector"
-               (* space) "<")))
+               (* space) (or "<" "{"))))
     ;; [associative.map.syn]
     ("map" ("*") ;; ("initializer_list")
      ,(rx (and symbol-start
@@ -684,12 +730,12 @@
     ("queue" ("*") ;; ("initializer_list")
      ,(rx (and symbol-start
                (or "queue" "priority_queue")
-               (* space) "<")))
+               (* space) (or "<" "{"))))
     ;; [stack.syn]
     ("stack" ("*") ;; ("initializer_list")
      ,(rx (and symbol-start
                "stack"
-               (* space) "<")))
+               (* space) (or "<" "{"))))
     ;; [iterator.syn]
     ("iterator" ("*")
      ,(rx (and symbol-start
@@ -739,7 +785,7 @@
                "remove_copy" "remove_copy_if"
                "unique" "unique_copy"
                "reverse" "reverse_copy"
-               "rotate" "shuffle"
+               "rotate" "rotate_copy" "shuffle"
                "is_partitioned"
                "partition" "stable_partition"
                "partition_copy" "partition_point"
@@ -760,7 +806,8 @@
                "min_element" "max_element" "minmax_element"
                "lexicographical_compare"
                "next_permutation" "prev_permutation"
-               "clamp")
+               "clamp" "shift_left" "shift_right"
+               "compare_3way" "lexicographical_compare_3way")
            (* space) (or "<" "("))))
     ;; [alg.c.library]
     ("cstdlib" ("*")
@@ -1178,7 +1225,31 @@
                                  (or "ready"
                                      "timeout"
                                      "deferred")))
-                        symbol-end)))))))
+                        symbol-end)))))
+    ;; [execution.syn]
+    ("execution" ("*")
+     ,(rx (and symbol-start
+               (and (or "is_execution_policy") (* space) "<"))))
+    ("execution" ("execution::" "*")
+     ,(rx (and symbol-start
+               (or "sequenced_policy" "parallel_policy"
+                   "parallel_unsequenced_policy" "unsequenced_policy"
+                   "seq" "par" "par_unseq" "unseq"))))
+    ;; [charconv.syn]
+    ("charconv" ("*")
+     ,(rx (and symbol-start
+               (or (and (or "from_chars" "to_chars") (* space) "(")
+                   "chars_format"))))
+    ;; [mem.res.syn]
+    ("memory_resource" ("pmr::" "*")
+     ,(rx (and symbol-start
+               (or (and "polymorphic_allocator" (* space) "<")
+                   (and (or "new_delete_resource" "null_memory_resource"
+                            "get_default_resource" "set_default_resource")
+                        (* space) "(")
+                   "memory_resource" "pool_options" "synchronized_pool_resource"
+                   "unsynchronized_pool_resource" "monotonic_buffer_resource"))))
+    ))
 
 ;; Headers that are included by other headers
 (defvar cpp-auto-include/subsumed-headers
