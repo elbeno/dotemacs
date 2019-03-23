@@ -188,7 +188,7 @@ Returns point."
   (interactive)
   (while
     (progn (comment-forward most-positive-fixnum)
-      (looking-at "[^,)>]"))
+      (looking-at "[^,)>}]"))
     (forward-sexp))
   (point))
 
