@@ -50,7 +50,7 @@
                            (0 (prog1 () (compose-region (match-beginning 1)
                                                         (match-end 1) "•"))))))
 
-(use-package ox-reveal
+(use-package org-re-reveal
   :ensure t
   :defer)
 
@@ -95,7 +95,7 @@
             (bind-key "M-Q" 'toggle-truncate-lines org-mode-map)
             (require 'ox-latex)
             (require 'ox-beamer)
-            (require 'ox-reveal)
+            (require 'org-re-reveal)
             (require 'htmlize)
             (add-to-list 'org-beamer-environments-extra
 			 '("onlyenv" "O" "\\begin{onlyenv}%a" "\\end{onlyenv}"))))
