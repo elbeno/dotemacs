@@ -113,7 +113,11 @@
 (use-package expand-region
   :ensure t
   :bind (("C-)" . er/expand-region)
-         ("C-(" . er/contract-region)))
+         ("C-(" . er/contract-region))
+  :config
+  (require 'the-org-mode-expansions)
+  (setq expand-region-smart-cursor t
+        expand-region-fast-keys-enabled nil))
 (delete-selection-mode 1)
 
 ;;------------------------------------------------------------------------------
