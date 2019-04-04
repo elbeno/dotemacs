@@ -22,7 +22,8 @@
 ;;------------------------------------------------------------------------------
 ;; CMake
 (use-package cmake-mode
-  :ensure t)
+  :ensure t
+  :hook (cmake-mode . company-mode))
 
 (use-package cmake-font-lock
   :ensure t
