@@ -20,5 +20,5 @@
 (use-package py-autopep8
   :ensure t
   :config
-  (setq py-autopep8-options (list "--global-config=~/.config/flake8" "--experimental"))
+  (setq py-autopep8-options (list "--global-config=~/.config/flake8"))
   :hook (elpy-mode . py-autopep8-enable-on-save))
