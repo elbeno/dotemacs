@@ -217,6 +217,9 @@
 ;; Flycheck
 (use-package flycheck
   :ensure t
+  :config
+  (setq flycheck-flake8rc "~/.config/flake8"
+        flycheck-python-flake8-executable "python3")
   :hook ((c++-mode . flycheck-mode)
          (python-mode . flycheck-mode)
          (sh-mode . flycheck-mode)))

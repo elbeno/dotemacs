@@ -18,5 +18,7 @@
 ;;------------------------------------------------------------------------------
 ;; pyautopep8
 (use-package py-autopep8
-  :ensure t)
-(add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save)
+  :ensure t
+  :config
+  (setq py-autopep8-options (list "--global-config=~/.config/flake8" "--experimental"))
+  :hook (elpy-mode . py-autopep8-enable-on-save))
