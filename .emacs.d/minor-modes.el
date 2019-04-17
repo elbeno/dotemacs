@@ -211,6 +211,8 @@
 ;; RIPGrep
 (use-package ripgrep
   :ensure t
+  :config
+  (setq ripgrep-arguments '("--hidden"))
   :bind (("C-x g" . projectile-ripgrep)))
 
 ;;------------------------------------------------------------------------------

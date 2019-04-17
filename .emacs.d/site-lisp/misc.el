@@ -190,3 +190,24 @@ Example of an XCode UUID: a513b85041a3535fc3520c3d."
       (forward-line -1)
       (clipboard-kill-ring-save
        (line-beginning-position) (line-end-position)))))
+
+;;------------------------------------------------------------------------------
+;; get the paths of all the submodules in the current git repo
+(defun my-git-submodule-paths ()
+  "Get a list of all the git submodule paths in the current
+(projectile-project-root)."
+  (interactive)
+  (let* ((root (projectile-project-root)))
+    (split-string (shell-command-to-string
+                   (concat "cd " root " && "
+                           "git submodule --quiet foreach 'echo $path'")))))
+
+;; advise projectile-ripgrep: don't search in submodules
+(defun my-projectile-ripgrep (func &rest args)
+  (let ((saved projectile-globally-ignored-directories))
+    (setq projectile-globally-ignored-directories
+          (append projectile-globally-ignored-directories (my-git-submodule-paths)))
+    (apply func args)
+    (setq projectile-globally-ignored-directories saved)))
+
+(advice-add #'projectile-ripgrep :around #'my-projectile-ripgrep)
