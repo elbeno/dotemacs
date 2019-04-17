@@ -5,6 +5,8 @@
   :commands (org-mode)
   :mode ("\\.org$" . org-mode)
   :pin org
+  :bind (:map org-mode-map
+              ("C-M-t" . my-org-table-transpose-cells))
   :config
   (setq org-log-done t
         org-support-shift-select t
@@ -101,3 +103,46 @@
 			 '("onlyenv" "O" "\\begin{onlyenv}%a" "\\end{onlyenv}"))))
 
 (setq initial-major-mode 'org-mode)
+
+;; swap org-mode cells
+(defun md-org-table-swap-cells (row col nextrow nextcol)
+  (interactive)
+  (let ((curfield (org-table-get row col))
+        (nextfield (org-table-get nextrow nextcol)))
+    (org-table-analyze)
+    (org-table-put row col nextfield)
+    (org-table-put nextrow nextcol curfield)
+    (org-table-align)
+    (org-table-goto-field (format "@%s$%s" nextrow nextcol))
+    (message "md-org-table-swap-cells %s:%s <-> %s:%s"
+             (format "@%s$%s" row col) curfield (format "@%s$%s" nextrow nextcol) nextfield)))
+
+(defun md-org-table-swap-cell-right ()
+  (interactive)
+  (if (org-at-table-p)
+      (let* ((col (org-table-current-column))
+             (row (org-table-current-dline))
+             (nextrow row)
+             (nextcol (+ col 1)))
+        (md-org-table-swap-cells row col nextrow nextcol)
+        (md-update-todo-status))
+    (org-shiftright)))
+
+(defun md-org-table-swap-cell-left ()
+  (interactive)
+  (if (org-at-table-p)
+      (let* ((col (org-table-current-column))
+             (row (org-table-current-dline))
+             (nextrow row)
+             (nextcol (- col 1)))
+        (md-org-table-swap-cells row col nextrow nextcol)
+        (md-update-todo-status))
+    (org-shiftleft)))
+
+(defun my-org-table-transpose-cells (prefix)
+  "Transpose argument at point with the argument before it.
+With prefix arg ARG, transpose with the argument after it."
+  (interactive "P")
+  (cond ((not prefix) (md-org-table-swap-cell-left))
+        (t (md-org-table-swap-cell-right))))
+
