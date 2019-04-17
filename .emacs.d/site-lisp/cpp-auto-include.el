@@ -1234,12 +1234,13 @@
      ,(rx (and symbol-start
                (or "sequenced_policy" "parallel_policy"
                    "parallel_unsequenced_policy" "unsequenced_policy"
-                   "seq" "par" "par_unseq" "unseq"))))
+                   "seq" "par" "par_unseq" "unseq")
+               symbol-end)))
     ;; [charconv.syn]
     ("charconv" ("*")
      ,(rx (and symbol-start
                (or (and (or "from_chars" "to_chars") (* space) "(")
-                   "chars_format"))))
+                   (and "chars_format" symbol-end)))))
     ;; [mem.res.syn]
     ("memory_resource" ("pmr::" "*")
      ,(rx (and symbol-start
@@ -1247,8 +1248,9 @@
                    (and (or "new_delete_resource" "null_memory_resource"
                             "get_default_resource" "set_default_resource")
                         (* space) "(")
-                   "memory_resource" "pool_options" "synchronized_pool_resource"
-                   "unsynchronized_pool_resource" "monotonic_buffer_resource"))))
+                   (and (or "memory_resource" "pool_options" "synchronized_pool_resource"
+                            "unsynchronized_pool_resource" "monotonic_buffer_resource")
+                        symbol-end)))))
     ))
 
 ;; Headers that are included by other headers
