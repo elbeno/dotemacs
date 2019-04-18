@@ -24,10 +24,10 @@
 
 (defun my-clang-format-before-save ()
   (interactive)
-  (if my-clang-format-enabled
-      (when (eq major-mode 'c++-mode) (clang-format-buffer))
-    (message "my-clang-format-enabled is false")))
-(add-hook 'before-save-hook 'my-clang-format-before-save)
+  (when my-clang-format-enabled
+    (clang-format-buffer)))
+(add-hook 'c++-mode-hook
+          (lambda () (add-hook 'before-save-hook 'my-clang-format-before-save nil t)))
 
 ;;------------------------------------------------------------------------------
 ;; Auto insertion of headers

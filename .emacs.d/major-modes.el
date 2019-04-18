@@ -41,10 +41,10 @@
 
 (defun my-cmake-format-before-save ()
   (interactive)
-  (if my-cmake-format-enabled
-      (when (eq major-mode 'cmake-mode) (cmake-format-buffer))
-    (message "my-cmake-format-enabled is false")))
-(add-hook 'before-save-hook 'my-cmake-format-before-save)
+  (when my-cmake-format-enabled
+    (cmake-format-buffer)))
+(add-hook 'cmake-mode-hook
+          (lambda () (add-hook 'before-save-hook 'my-cmake-format-before-save nil t)))
 
 ;;------------------------------------------------------------------------------
 ;; Cucumber/Gherkin

@@ -20,27 +20,32 @@
 (use-package py-autopep8
   :ensure t
   :config
-  (setq py-autopep8-options (list "--global-config=~/.config/flake8"))
-  :hook (elpy-mode . py-autopep8-enable-on-save))
-
-
+  (setq py-autopep8-options (list "--global-config=~/.config/flake8")))
 
 ;;------------------------------------------------------------------------------
 ;; manage python imports
 (use-package pyimport
-  :ensure t
-  :hook
-  (elpy-mode . (lambda () (add-hook 'before-save-hook 'pyimport-remove-unused))))
+  :ensure t)
 
 (use-package importmagic
-  :ensure t
-  :hook
-  (elpy-mode . (lambda ()
-                 (importmagic-mode)
-                 (add-hook 'before-save-hook 'importmagic-fix-imports))))
+  :ensure t)
 
 (use-package pyimpsort
-  :ensure t
-  :hook
-  (elpy-mode . (lambda () (add-hook 'before-save-hook 'pyimpsort-buffer))))
+  :ensure t)
 
+;; advise pyimpsort-buffer: play nicely with fci-mode
+(defun my-pyimpsort-buffer (func &rest args)
+  (save-excursion
+    (turn-off-fci-mode)
+    (apply func args)
+    (turn-on-fci-mode)))
+(advice-add #'pyimpsort-buffer :around #'my-pyimpsort-buffer)
+
+;;------------------------------------------------------------------------------
+;; on save: fix imports, sort them, remove unused, then pep8
+(add-hook 'elpy-mode-hook
+          (lambda () (importmagic-mode)
+            (add-hook 'before-save-hook 'importmagic-fix-imports t t)
+            (add-hook 'before-save-hook 'pyimpsort-buffer t t)
+            (add-hook 'before-save-hook 'pyimport-remove-unused t t)
+            (add-hook 'before-save-hook 'py-autopep8-buffer t t)))
