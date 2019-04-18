@@ -49,3 +49,10 @@
             (add-hook 'before-save-hook 'pyimpsort-buffer t t)
             (add-hook 'before-save-hook 'pyimport-remove-unused t t)
             (add-hook 'before-save-hook 'py-autopep8-buffer t t)))
+
+;;------------------------------------------------------------------------------
+;; jupyter
+(use-package ein
+  :ensure t
+  :config
+  (setq ein:polymode t))
