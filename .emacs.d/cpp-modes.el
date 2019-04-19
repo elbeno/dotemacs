@@ -91,8 +91,9 @@
 (use-package flycheck-clangcheck
   :ensure t
   :config
-  (setq flycheck-clang-analyze 1
-        flycheck-clang-extra-arg '("-Xanalyzer" "-analyzer-output=text"))
+  (setq flycheck-clangcheck-analyze t
+        flycheck-clangcheck-extra-arg-before '("-std=c++2a")
+        flycheck-clangcheck-extra-arg '("-Xanalyzer" "-analyzer-output=text"))
   :hook (c++-mode . my-select-clangcheck-for-checker))
 
 ;; In c++-mode, start lsp mode etc unless we're in a temp buffer
