@@ -266,3 +266,37 @@
 (use-package symbol-overlay
   :ensure t
   :bind (("<f3>" . symbol-overlay-put)))
+
+;;------------------------------------------------------------------------------
+;; simple modeline
+(defun my-truncate-buffer-name (buf-name)
+  (let ((len (length buf-name)))
+    (cond ((> len 50)
+           (concat "..."
+                   (substring buf-name (- len 47) len)))
+          (t buf-name))))
+
+(setq auto-revert-check-vc-info t)
+(setq-default mode-line-format (list
+  '((:eval
+     (cond
+      (buffer-read-only
+       (propertize " ⚿ " 'face '(:foreground "red" :weight 'bold)))
+      ((buffer-modified-p)
+       (propertize " ⛯ " 'face '(:foreground "orange")))
+      ((not (buffer-modified-p))
+       (propertize " ⛆ " 'face '(:foreground "gray85"))))))
+  '(:eval (propertize (all-the-icons-icon-for-mode major-mode :height (/ all-the-icons-scale-factor 1.4) :v-adjust -0.03)))
+  '(:eval
+    (format " %s " (my-truncate-buffer-name (buffer-file-name))))
+  'mode-line-position
+  "["
+  'mode-name
+  "] "
+  '(:eval
+    (if vc-mode
+        (let* ((noback (replace-regexp-in-string (format "^ %s" (vc-backend buffer-file-name)) " " vc-mode))
+               (face (cond ((string-match "^ -" noback) 'mode-line-vc)
+                           ((string-match "^ [:@]" noback) 'mode-line-vc-edit)
+                           ((string-match "^ [!\\?]" noback) 'mode-line-vc-modified))))
+          (format "[ %s]" (substring noback 2)))))))
