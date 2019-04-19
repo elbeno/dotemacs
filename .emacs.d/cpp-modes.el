@@ -164,8 +164,6 @@
 
 (eval-after-load 'cc-mode
   '(bind-keys :map c++-mode-map
-              ("M-<down>" . next-error)
-              ("M-<up>" . previous-error)
               ("M-k" . projectile-compile-project)))
 
 ;;------------------------------------------------------------------------------

@@ -182,6 +182,10 @@
   :config
   (setq flycheck-flake8rc "~/.config/flake8"
         flycheck-python-flake8-executable "python3")
+  :bind
+  :bind (:map flycheck-mode-map
+              ("M-<down>" . next-error)
+              ("M-<up>" . previous-error))
   :hook ((c++-mode . flycheck-mode)
          (python-mode . flycheck-mode)
          (sh-mode . flycheck-mode)))

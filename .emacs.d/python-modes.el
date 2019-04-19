@@ -10,9 +10,7 @@
   (setq python-indent-offset 4
         elpy-rpc-python-command "python3")
   :bind (:map elpy-mode-map
-              ("M-k" . elpy-check)
-              ("M-<down>" . next-error)
-              ("M-<up>" . previous-error))
+              ("M-k" . elpy-check))
   :hook (python-mode . elpy-mode))
 
 ;;------------------------------------------------------------------------------
