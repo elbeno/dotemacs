@@ -29,6 +29,9 @@
 (add-hook 'c++-mode-hook
           (lambda () (add-hook 'before-save-hook 'my-clang-format-before-save nil t)))
 
+;; clang-format files are YAML
+(add-to-list 'auto-mode-alist '("\\.clang-format\\'" . yaml-mode))
+
 ;;------------------------------------------------------------------------------
 ;; Auto insertion of headers
 (autoload 'cpp-auto-include/namespace-qualify-file "cpp-auto-include"
