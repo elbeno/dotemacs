@@ -33,14 +33,6 @@
 (use-package pyimpsort
   :ensure t)
 
-;; advise pyimpsort-buffer: play nicely with fci-mode
-(defun my-pyimpsort-buffer (func &rest args)
-  (save-excursion
-    (turn-off-fci-mode)
-    (apply func args)
-    (turn-on-fci-mode)))
-(advice-add #'pyimpsort-buffer :around #'my-pyimpsort-buffer)
-
 ;;------------------------------------------------------------------------------
 ;; on save: fix imports, sort them, remove unused, then pep8
 (add-hook 'elpy-mode-hook

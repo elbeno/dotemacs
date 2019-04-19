@@ -144,54 +144,14 @@
 
 ;;------------------------------------------------------------------------------
 ;; Mark the fill column
-(setq-default fill-column column-wrap-soft)
+(setq-default fill-column column-wrap-soft
+              truncate-lines t)
 
-;; fci-mode doesn't play well with popups
-(defun sanityinc/prog-mode-fci-settings ()
-  (turn-on-fci-mode)
-  (when show-trailing-whitespace
-    (set (make-local-variable 'whitespace-style) '(face trailing))
-    (whitespace-mode 1)))
-
-(defun sanityinc/fci-enabled-p ()
-  (and (boundp 'fci-mode) fci-mode))
-
-(defvar sanityinc/fci-mode-suppressed nil)
-
-(defun suspend-fci-mode ()
-  "Suspend fci-mode"
-  (let ((fci-enabled (sanityinc/fci-enabled-p)))
-    (when fci-enabled
-      (set (make-local-variable 'sanityinc/fci-mode-suppressed) fci-enabled)
-      (turn-off-fci-mode))))
-
-(defun unsuspend-fci-mode ()
-  "Restore fci-mode"
-  (when (and sanityinc/fci-mode-suppressed
-             (null popup-instances))
-    (setq sanityinc/fci-mode-suppressed nil)
-    (turn-on-fci-mode)))
-
-(defadvice popup-create (before suppress-fci-mode activate)
-  (suspend-fci-mode))
-
-(defadvice popup-delete (after restore-fci-mode activate)
-  (unsuspend-fci-mode))
-
-;; Regenerate fci-mode line images after switching themes
-(defadvice enable-theme (after recompute-fci-face activate)
-  (dolist (buffer (buffer-list))
-    (with-current-buffer buffer
-      (when (sanityinc/fci-enabled-p)
-        (turn-on-fci-mode)))))
-
-(use-package fill-column-indicator
-  :ensure t
-  :config
-  (setq fci-rule-color "#ff8888")
-  (setq fci-always-use-textual-rule t))
-
-(add-hook 'prog-mode-hook #'sanityinc/prog-mode-fci-settings)
+(setq-default whitespace-line-column column-wrap-soft
+              whitespace-style '(face lines-tail))
+(add-hook 'prog-mode-hook (lambda () (whitespace-mode)
+                            (set-face-attribute 'whitespace-line nil
+                                                :foreground "gray20")))
 
 ;;------------------------------------------------------------------------------
 ;; Projectile
