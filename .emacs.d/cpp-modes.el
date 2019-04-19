@@ -110,7 +110,8 @@
   (require 'lsp-clients)
   (setq lsp-enable-indentation nil
         lsp-auto-guess-root t
-        lsp-clients-clangd-executable my-clangd-path))
+        lsp-clients-clangd-executable my-clangd-path
+        lsp-prefer-flymake nil))
 
 (use-package lsp-ui
   :ensure t
