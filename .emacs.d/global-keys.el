@@ -96,6 +96,32 @@ Return an event vector."
 
 (eval-after-load "xterm" '(my-eval-after-load-xterm))
 
+;; Bindings to make function keys work in terminal
+(define-key function-key-map "\e[1;3P" [M-f1])
+(define-key function-key-map "\e[1;3Q" [M-f2])
+(define-key function-key-map "\e[1;3R" [M-f3])
+(define-key function-key-map "\e[1;3S" [M-f4])
+(define-key function-key-map "\e[1;4P" [M-S-f1])
+(define-key function-key-map "\e[1;4Q" [M-S-f2])
+(define-key function-key-map "\e[1;4R" [M-S-f3])
+(define-key function-key-map "\e[1;4S" [M-S-f4])
+(define-key function-key-map "\e[1;5P" [C-f1])
+(define-key function-key-map "\e[1;5Q" [C-f2])
+(define-key function-key-map "\e[1;5R" [C-f3])
+(define-key function-key-map "\e[1;5S" [C-f4])
+(define-key function-key-map "\e[1;6P" [C-S-f1])
+(define-key function-key-map "\e[1;6Q" [C-S-f2])
+(define-key function-key-map "\e[1;6R" [C-S-f3])
+(define-key function-key-map "\e[1;6S" [C-S-f4])
+(define-key function-key-map "\e[1;7P" [C-M-f1])
+(define-key function-key-map "\e[1;7Q" [C-M-f2])
+(define-key function-key-map "\e[1;7R" [C-M-f3])
+(define-key function-key-map "\e[1;7S" [C-M-f4])
+(define-key function-key-map "\e[1;8P" [C-M-S-f1])
+(define-key function-key-map "\e[1;8Q" [C-M-S-f2])
+(define-key function-key-map "\e[1;8R" [C-M-S-f3])
+(define-key function-key-map "\e[1;8S" [C-M-S-f4])
+
 ;; Make navigation keys behave on Mac like they do on Windows/Linux
 (when (eq system-type 'darwin)
   (bind-key "<end>" 'move-end-of-line))
