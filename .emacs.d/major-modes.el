@@ -94,8 +94,9 @@
 
 ;;------------------------------------------------------------------------------
 ;; PDFs
-(when (display-graphic-p)
-  (use-package pdf-tools
-    :ensure t
-    :init
-    (pdf-tools-install)))
+(when (eq system-type 'gnu/linux)
+  (when (display-graphic-p)
+    (use-package pdf-tools
+      :ensure t
+      :init
+      (pdf-tools-install))))
