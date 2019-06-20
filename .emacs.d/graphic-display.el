@@ -1,14 +1,18 @@
 ;;------------------------------------------------------------------------------
 ;; font: inconsolata
+(setq my-font-height 100)
+(when (eq system-type 'darwin)
+  (setq my-font-height 120))
+
 (set-face-attribute 'default nil
                     :family "Inconsolata"
-                    :height 100
+                    :height my-font-height
                     :weight 'normal
                     :width 'normal)
 (set-fontset-font "fontset-default"
                   '(#x0100 . #xffff)
                   (font-spec :family "DejaVu Sans Mono"
-                             :height 100
+                             :height my-font-height
                              :weight 'normal
                              :width 'normal))
 
