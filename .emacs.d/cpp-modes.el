@@ -71,14 +71,20 @@
 ;;------------------------------------------------------------------------------
 ;; lsp + clangd + company
 
-(setq my-clangd-path "/usr/local/llvm/bin/clangd")
-(setq my-clang-check-path "/usr/local/llvm/bin/clang-check")
+(setq my-clangd-executable
+      (or (executable-find "clangd")
+          (executable-find "/usr/local/llvm/bin/clangd")
+          (executable-find "/usr/lib/llvm/8.0.0/bin/clangd")))
+(setq my-clang-check-executable
+      (or (executable-find "clang-check")
+          (executable-find "/usr/local/llvm/bin/clang-check")
+          (executable-find "/usr/lib/llvm/8.0.0/bin/clang-check")))
 
 ;; Use clangcheck for flycheck in C++ mode
 (defun my-select-clangcheck-for-checker ()
   "Select clang-check for flycheck's checker."
   (require 'flycheck-clangcheck)
-  (flycheck-set-checker-executable 'c/c++-clangcheck my-clang-check-path)
+  (flycheck-set-checker-executable 'c/c++-clangcheck my-clang-check-executable)
   (flycheck-select-checker 'c/c++-clangcheck))
 
 (use-package flycheck-clangcheck
@@ -103,7 +109,7 @@
   (require 'lsp-clients)
   (setq lsp-enable-indentation nil
         lsp-auto-guess-root t
-        lsp-clients-clangd-executable my-clangd-path
+        lsp-clients-clangd-executable my-clangd-executable
         lsp-prefer-flymake nil))
 
 (use-package lsp-ui
