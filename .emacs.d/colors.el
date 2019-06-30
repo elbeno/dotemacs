@@ -7,8 +7,7 @@
 ;;------------------------------------------------------------------------------
 ;; Colours in graphical mode
 (when (display-graphic-p)
-  (load-theme 'hipster)
-  (setq fci-rule-color "dim grey"))
+  (load-theme 'hipster))
 
 ;;------------------------------------------------------------------------------
 ;; Highlight FIXME/TODO

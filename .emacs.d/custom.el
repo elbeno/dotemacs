@@ -29,7 +29,6 @@
  '(elpy-modules
    (quote
     (elpy-module-company elpy-module-eldoc elpy-module-pyvenv elpy-module-highlight-indentation elpy-module-yasnippet elpy-module-sane-defaults)))
- '(fci-rule-color "#000000")
  '(highlight-symbol-idle-delay 0)
  '(highlight-symbol-on-navigation-p t)
  '(org-export-with-sub-superscripts (quote {}))
