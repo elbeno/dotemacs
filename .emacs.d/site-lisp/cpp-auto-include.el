@@ -762,7 +762,7 @@
                         symbol-end)))))
     ;; [algorithms.general]
     ("algorithm" ("*") ;; ("initializer_list")
-     ,(rx (and
+     ,(rx (and symbol-start
            (or "all_of" "any_of" "none_of"
                "for_each"
                "find" "find_if" "find_if_not"
