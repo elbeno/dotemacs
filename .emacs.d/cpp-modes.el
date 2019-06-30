@@ -71,13 +71,6 @@
 ;;------------------------------------------------------------------------------
 ;; lsp + clangd + company
 
-;; because clangd doesn't support find references
-(defun my-force-lsp-xref ()
-  (when (and lsp-enable-xref
-             (or (lsp--capability "referencesProvider")
-                 (lsp--capability "definitionProvider")))
-    (setq-local xref-backend-functions (list #'lsp--xref-backend))))
-
 (setq my-clangd-path "/usr/local/llvm/bin/clangd")
 (setq my-clang-check-path "/usr/local/llvm/bin/clang-check")
 
@@ -101,8 +94,7 @@
 (defun my-c++-mode-hook ()
   (unless (string-match-p (regexp-quote "*temp*") (buffer-name))
     (company-mode)
-    (lsp)
-    (my-force-lsp-xref)))
+    (lsp)))
 (add-hook 'c++-mode-hook 'my-c++-mode-hook)
 
 (use-package lsp-mode
