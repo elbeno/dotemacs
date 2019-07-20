@@ -33,16 +33,17 @@
 
 ;;------------------------------------------------------------------------------
 ;; on save: fix imports, sort them, remove unused, then pep8
+(defun my-python-before-save-hook ()
+  (importmagic-fix-imports)
+  (pyimpsort-remove-unused)
+  (pyimpsort-buffer)
+  (py-autopep8-buffer))
+
 (add-hook 'elpy-mode-hook
           (lambda () (importmagic-mode)
-            (add-hook 'before-save-hook 'importmagic-fix-imports t t)
-            (add-hook 'before-save-hook 'pyimpsort-buffer t t)
-            (add-hook 'before-save-hook 'pyimport-remove-unused t t)
-            (add-hook 'before-save-hook 'py-autopep8-buffer t t)))
+            (add-hook 'before-save-hook 'my-python-before-save-hook t 'local)))
 
 ;;------------------------------------------------------------------------------
 ;; jupyter
 (use-package ein
-  :ensure t
-  :config
-  (setq ein:polymode t))
+  :ensure t)
