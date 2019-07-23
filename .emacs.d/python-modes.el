@@ -46,4 +46,6 @@
 ;;------------------------------------------------------------------------------
 ;; jupyter
 (use-package ein
-  :ensure t)
+  :ensure t
+  :config
+  (setq ein:notebook-autosave-frequency 0))
