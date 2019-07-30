@@ -34,10 +34,11 @@
 ;;------------------------------------------------------------------------------
 ;; on save: fix imports, sort them, remove unused, then pep8
 (defun my-python-before-save-hook ()
-  (importmagic-fix-imports)
-  (pyimpsort-remove-unused)
-  (pyimpsort-buffer)
-  (py-autopep8-buffer))
+  (save-excursion
+    (importmagic-fix-imports)
+    (pyimpsort-remove-unused)
+    (pyimpsort-buffer)
+    (py-autopep8-buffer)))
 
 (add-hook 'elpy-mode-hook
           (lambda () (importmagic-mode)
@@ -45,7 +46,12 @@
 
 ;;------------------------------------------------------------------------------
 ;; jupyter
+(defun my-ein-keybindings ()
+  (bind-keys :map ein:notebook-mode-map
+             ("C-c M-l" . ein:worksheet-clear-all-output)))
+
 (use-package ein
   :ensure t
   :config
-  (setq ein:notebook-autosave-frequency 0))
+  (setq ein:notebook-autosave-frequency 0)
+  :hook (ein:notebook-mode . my-ein-keybindings))
