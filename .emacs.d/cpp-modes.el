@@ -10,6 +10,19 @@
 
 ;;------------------------------------------------------------------------------
 ;; clang-format
+(defun find-file-recursive (directory filename)
+  (let ((found-clang-formats
+         (directory-files-recursively directory
+                                      (concat "^" filename "$"))))
+    (if found-clang-formats
+        (car found-clang-formats)
+      nil)))
+
+(setq clang-format-executable
+      (or (executable-find "clang-format")
+          (executable-find "/usr/local/llvm/bin/clang-format")
+          (find-file-recursive "/usr/lib/llvm9-jit/" "clang-format")))
+
 (use-package clang-format
   :ensure t
   :bind
@@ -74,11 +87,11 @@
 (setq my-clangd-executable
       (or (executable-find "clangd")
           (executable-find "/usr/local/llvm/bin/clangd")
-          (executable-find "/usr/lib/llvm/8.0.0/bin/clangd")))
+          (find-file-recursive "/usr/lib/llvm9-jit/" "clangd")))
 (setq my-clang-check-executable
       (or (executable-find "clang-check")
           (executable-find "/usr/local/llvm/bin/clang-check")
-          (executable-find "/usr/lib/llvm/8.0.0/bin/clang-check")))
+          (find-file-recursive "/usr/lib/llvm9-jit/" "clang-check")))
 
 ;; Use clangcheck for flycheck in C++ mode
 (defun my-select-clangcheck-for-checker ()
