@@ -100,7 +100,6 @@
 
 ;;------------------------------------------------------------------------------
 ;; Dired
-
 (use-package dired
   :defer t
   :bind
@@ -132,6 +131,16 @@
       (dired-find-file)))
   )
 
+(use-package diredfl
+  :ensure t
+  :config
+  (diredfl-global-mode 1))
+
+(use-package dired-git-info
+  :ensure t
+  :bind (:map dired-mode-map
+              (")" . dired-git-info-mode)))
+
 ;; highlight line in dired
 (add-hook 'dired-mode-hook 'hl-line-mode)
-(set-face-background hl-line-face "gray13")
+(add-hook 'hl-line-mode-hook (lambda () (set-face-background hl-line-face "gray13")))
