@@ -136,3 +136,53 @@ With prefix arg ARG, transpose with the argument after it."
   (cond ((not prefix) (md-org-table-swap-cell-left))
         (t (md-org-table-swap-cell-right))))
 
+;; render tables with latex
+;; https://old.reddit.com/r/emacs/comments/d3a8or/pretty_org_tables_in_the_buffer_chapter_2_it/
+
+(defun my-render-org-table-at-point ()
+  (interactive)
+  (save-excursion
+    (beginning-of-line)
+    (if (overlays-at (point))
+        ;; this is a rough solution, because there can
+        ;; be other overlays at point
+        (delete-overlay (car (overlays-at (point))))
+
+      (let* ((element-type (org-element-type (org-element-at-point))))
+        (if (and (not (eq element-type 'table))
+                 (not (eq element-type 'table-row)))
+            (error "not at an org table")
+
+          (while (not (eq 'table (org-element-type (org-element-at-point))))
+            (forward-line -1))
+
+          (my-render-org-table (org-element-at-point)))))))
+
+
+(defun my-render-org-table (table)
+  (interactive)
+  (let* ((begin (org-element-property :begin table))
+         (end (let ((pos (org-element-property :end table)))
+                (goto-char pos)
+                (beginning-of-line)
+                ;; skip possible space after table
+                (while (not (looking-at " *[|#]"))
+                  (setq pos (point))
+                  (forward-line -1))
+                pos))
+         (tabletxt (buffer-substring-no-properties begin end))
+         (img (with-temp-buffer
+                (insert tabletxt)
+                (mark-whole-buffer)
+                (org-latex-convert-region-to-latex)
+                (org-preview-latex-fragment)
+                (goto-char (point-min))
+                (overlay-get  (car (overlays-at (point))) 'display)))
+         (overlay (make-overlay begin end)))
+    (overlay-put overlay 'display img)
+    (forward-line -1)))
+
+
+(defun my-render-org-tables-in-buffer ()
+  (save-excursion
+    (org-element-map (org-element-parse-buffer) 'table 'my-render-org-table)))
