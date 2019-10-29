@@ -11,12 +11,14 @@
 ;;------------------------------------------------------------------------------
 ;; clang-format
 (defun find-file-recursive (directory filename)
-  (let ((found-clang-formats
-         (directory-files-recursively directory
-                                      (concat "^" filename "$"))))
-    (if found-clang-formats
-        (car found-clang-formats)
-      nil)))
+  (if (file-directory-p directory)
+      (let ((found-clang-formats
+             (directory-files-recursively directory
+                                          (concat "^" filename "$"))))
+        (if found-clang-formats
+            (car found-clang-formats)
+          nil))
+    nil))
 
 (setq clang-format-executable
       (or (executable-find "clang-format")
