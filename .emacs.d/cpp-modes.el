@@ -177,6 +177,12 @@
   '(bind-keys :map c++-mode-map
               ("M-k" . projectile-compile-project)))
 
+;; make compilation buffers support ANSI colours
+(require 'ansi-color)
+(defun colorize-compilation-buffer ()
+  (ansi-color-apply-on-region compilation-filter-start (point)))
+(add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
+
 ;;------------------------------------------------------------------------------
 ;; Debugging
 
