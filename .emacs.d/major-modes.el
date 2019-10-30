@@ -103,6 +103,7 @@
 (use-package dired
   :defer t
   :bind
+  (("C-x j" . dired-jump))
   (:map dired-mode-map
         ("M-<up>" . jjgr-dired-up-directory)
         ("\r" . jjgr-dired-find-file))
