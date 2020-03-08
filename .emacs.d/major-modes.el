@@ -90,6 +90,15 @@
   :hook (elixir-mode . company-mode))
 
 ;;------------------------------------------------------------------------------
+;; Haskell
+(use-package haskell-mode
+  :ensure t
+  :hook (haskell-mode . intero-mode))
+
+(use-package intero
+  :ensure t)
+
+;;------------------------------------------------------------------------------
 ;; PDFs
 (when (eq system-type 'gnu/linux)
   (when (display-graphic-p)
