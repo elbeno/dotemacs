@@ -3,13 +3,7 @@
 (setq-default c-basic-offset 2)
 
 ;;------------------------------------------------------------------------------
-;; syntax highlighting
-(use-package modern-cpp-font-lock
-  :ensure t
-  :hook (c++-mode . modern-c++-font-lock-mode))
-
-;;------------------------------------------------------------------------------
-;; clang-format
+;; LLVM root directory
 (defun find-file-recursive (directory filename)
   (if (file-directory-p directory)
       (let ((found-clang-formats
@@ -20,10 +14,34 @@
           nil))
     nil))
 
-(setq clang-format-executable
-      (or (executable-find "clang-format")
-          (executable-find "/usr/local/llvm/bin/clang-format")
-          (find-file-recursive "/usr/lib/llvm9-jit/" "clang-format")))
+(defun apply-macro (macro arg-list)
+  (eval
+   `(,macro ,@(loop for arg in arg-list
+                    collect `(quote ,arg)))))
+
+(defun find-file-first-dir (directories filename)
+  (apply-macro 'or (append (mapcar (lambda (dir) (find-file-recursive dir filename))
+                                   possible-roots)
+                           (list (executable-find filename)))))
+
+(defun find-llvm-root (possible-roots)
+  (let ((clang-exe (find-file-first-dir possible-roots "clang")))
+    (file-truename clang-exe)))
+
+(setq-default llvm-roots '("/usr/lib/llvm10-jit/" "/usr/local/llvm/"))
+(setq-default llvm-root
+              (string-remove-suffix "bin/" (file-name-directory
+                                            (find-llvm-root llvm-roots))))
+
+;;------------------------------------------------------------------------------
+;; syntax highlighting
+(use-package modern-cpp-font-lock
+  :ensure t
+  :hook (c++-mode . modern-c++-font-lock-mode))
+
+;;------------------------------------------------------------------------------
+;; clang-format
+(setq clang-format-executable (find-file-recursive llvm-root "clang-format"))
 
 (use-package clang-format
   :ensure t
@@ -86,14 +104,8 @@
 ;;------------------------------------------------------------------------------
 ;; lsp + clangd + company
 
-(setq my-clangd-executable
-      (or (executable-find "clangd")
-          (executable-find "/usr/local/llvm/bin/clangd")
-          (find-file-recursive "/usr/lib/llvm9-jit/" "clangd")))
-(setq my-clang-check-executable
-      (or (executable-find "clang-check")
-          (executable-find "/usr/local/llvm/bin/clang-check")
-          (find-file-recursive "/usr/lib/llvm9-jit/" "clang-check")))
+(setq my-clangd-executable (find-file-recursive llvm-root "clangd"))
+(setq my-clang-check-executable (find-file-recursive llvm-root "clang-check"))
 
 ;; Use clangcheck for flycheck in C++ mode
 (defun my-select-clangcheck-for-checker ()
@@ -125,6 +137,7 @@
   (setq lsp-enable-indentation nil
         lsp-auto-guess-root t
         lsp-clients-clangd-executable my-clangd-executable
+        lsp-clients-clangd-args (list (concat "--query-driver=" llvm-root "**"))
         lsp-prefer-flymake nil))
 
 (use-package lsp-ui
