@@ -146,3 +146,5 @@
 ;; Local Variables:
 ;; byte-compile-warnings: (not free-vars)
 ;; End:
+
+(put 'narrow-to-region 'disabled nil)
