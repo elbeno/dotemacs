@@ -5,7 +5,7 @@
 ;;------------------------------------------------------------------------------
 ;; LLVM root directory
 (defun find-file-recursive (directory filename)
-  (if (file-directory-p directory)
+  (if (and directory (file-directory-p directory))
       (let ((found-clang-formats
              (directory-files-recursively directory
                                           (concat "^" filename "$"))))
@@ -25,13 +25,14 @@
                            (list (executable-find filename)))))
 
 (defun find-llvm-root (possible-roots)
-  (let ((clang-exe (find-file-first-dir possible-roots "clang")))
+  (let ((clang-exe (find-file-first-dir possible-roots "clangd")))
     (file-truename clang-exe)))
 
 (setq-default llvm-roots '("/usr/lib/llvm10-jit/" "/usr/local/llvm/"))
 (setq-default llvm-root
-              (string-remove-suffix "bin/" (file-name-directory
-                                            (find-llvm-root llvm-roots))))
+              (let ((root (find-llvm-root llvm-roots)))
+                (when root
+                  (string-remove-suffix "bin/" (file-name-directory root)))))
 
 ;;------------------------------------------------------------------------------
 ;; syntax highlighting
