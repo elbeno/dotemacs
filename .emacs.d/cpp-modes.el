@@ -26,13 +26,17 @@
 
 (defun find-llvm-root (possible-roots)
   (let ((clang-exe (find-file-first-dir possible-roots "clangd")))
-    (file-truename clang-exe)))
+    (when clang-exe (file-truename clang-exe))))
 
 (setq-default llvm-roots '("/usr/lib/llvm10-jit/" "/usr/local/llvm/"))
 (setq-default llvm-root
               (let ((root (find-llvm-root llvm-roots)))
                 (when root
                   (string-remove-suffix "bin/" (file-name-directory root)))))
+
+(defun find-exe (root filename)
+  (or (find-file-recursive root filename)
+      (executable-find filename)))
 
 ;;------------------------------------------------------------------------------
 ;; syntax highlighting
@@ -42,7 +46,7 @@
 
 ;;------------------------------------------------------------------------------
 ;; clang-format
-(setq clang-format-executable (find-file-recursive llvm-root "clang-format"))
+(setq clang-format-executable (find-exe llvm-root "clang-format"))
 
 (use-package clang-format
   :ensure t
@@ -105,8 +109,8 @@
 ;;------------------------------------------------------------------------------
 ;; lsp + clangd + company
 
-(setq my-clangd-executable (find-file-recursive llvm-root "clangd"))
-(setq my-clang-check-executable (find-file-recursive llvm-root "clang-check"))
+(setq my-clangd-executable (find-exe llvm-root "clangd"))
+(setq my-clang-check-executable (find-exe llvm-root "clang-check"))
 
 ;; Use clangcheck for flycheck in C++ mode
 (defun my-select-clangcheck-for-checker ()
