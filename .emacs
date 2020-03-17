@@ -143,8 +143,13 @@
 ;; Restore GC threshold
 (setq gc-cons-threshold 800000)
 
+(put 'narrow-to-region 'disabled nil)
+
+;;------------------------------------------------------------------------------
+;; Hacks & late-bound overrides
+(load "hacks.el")
+
 ;; Local Variables:
 ;; byte-compile-warnings: (not free-vars)
 ;; End:
 
-(put 'narrow-to-region 'disabled nil)
