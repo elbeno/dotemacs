@@ -3,6 +3,22 @@
 (setq python-shell-interpreter "python3")
 
 ;;------------------------------------------------------------------------------
+;; make a string into an fstring or vice versa
+(defun toggle-string-to-fstring ()
+  "Toggle between string and fstring at point"
+  (interactive)
+  (when (nth 3 (syntax-ppss))
+    (save-excursion
+      (goto-char (nth 8 (syntax-ppss)))
+      (if (eq (char-before) ?f)
+          (delete-char -1)
+        (insert "f")))))
+
+(add-hook 'python-mode-hook
+          (lambda () (bind-keys :map python-mode-map
+                           ("C-c f" . toggle-string-to-fstring))))
+
+;;------------------------------------------------------------------------------
 ;; elpy
 (use-package elpy
   :ensure t
