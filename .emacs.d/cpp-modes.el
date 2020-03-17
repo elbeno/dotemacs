@@ -49,9 +49,11 @@
 (setq clang-format-executable (find-exe llvm-root "clang-format"))
 
 (use-package clang-format
-  :ensure t
-  :bind
-  (("C-c f" . clang-format)))
+  :ensure t)
+
+(eval-after-load 'cc-mode
+  '(bind-keys :map c++-mode-map
+              ("C-c f" . clang-format)))
 
 ;; clang-format-on-save
 (defcustom my-clang-format-enabled t
@@ -64,8 +66,6 @@
   (interactive)
   (when my-clang-format-enabled
     (clang-format-buffer)))
-(add-hook 'c++-mode-hook
-          (lambda () (add-hook 'before-save-hook 'my-clang-format-before-save nil t)))
 
 ;; clang-format files are YAML
 (add-to-list 'auto-mode-alist '("\\.clang-format\\'" . yaml-mode))
@@ -131,6 +131,7 @@
 ;; (don't do it when exporting org-mode blocks)
 (defun my-c++-mode-hook ()
   (unless (string-match-p (regexp-quote "*temp*") (buffer-name))
+    (add-hook 'before-save-hook 'my-clang-format-before-save nil t)
     (company-mode)
     (lsp)))
 (add-hook 'c++-mode-hook 'my-c++-mode-hook)
