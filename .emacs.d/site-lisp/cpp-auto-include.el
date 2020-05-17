@@ -318,8 +318,11 @@
                          symbol-end)))))
     ;; [utility]
     ("utility" ("*") ;; ("initializer_list")
+     ,(rx (and symbol-start "move"
+               (* space) "(" (or alpha "_") (* (or alnum "_")) ")")))
+    ("utility" ("*") ;; ("initializer_list")
      ,(rx (and symbol-start
-               (or (and (or "swap" "exchange" "move" "move_if_noexcept")
+               (or (and (or "swap" "exchange" "move_if_noexcept")
                         (* space) (or "(" "<"))
                    (and (or "forward" "pair" "declval"
                             "integer_sequence" "index_sequence"
@@ -762,6 +765,10 @@
                         symbol-end)))))
     ;; [algorithms.general]
     ("algorithm" ("*") ;; ("initializer_list")
+     ,(rx (and symbol-start "move"
+               (* space) "(" (or alpha "_") (* (or alnum "_"))
+               (* space) ",")))
+    ("algorithm" ("*") ;; ("initializer_list")
      ,(rx (and symbol-start
            (or "all_of" "any_of" "none_of"
                "for_each"
@@ -774,7 +781,7 @@
                "search" "search_n"
                "copy" "copy_n"
                "copy_if" "copy_backward"
-               "move" "move_backward"
+               "move_backward"
                "swap_ranges" "iter_swap"
                "transform"
                "replace" "replace_if"
