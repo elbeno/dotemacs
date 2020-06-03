@@ -76,6 +76,8 @@ This function is controlled by variables in the customization group boost-sml."
     (ignore-errors
       (goto-char (point-min))
       (while (search-forward boost-sml-table-start nil t)
+        (when (looking-at "<")
+          (forward-sexp))
         (align-boost-sml (point))))))
 
 (provide 'boost-sml)
