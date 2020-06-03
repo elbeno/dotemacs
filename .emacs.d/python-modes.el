@@ -44,7 +44,9 @@
     (pyimpsort-buffer)))
 
 (add-hook 'elpy-mode-hook
-          (lambda () (add-hook 'before-save-hook 'my-python-before-save-hook t 'local)))
+          (lambda () (add-hook 'before-save-hook 'my-python-before-save-hook t 'local)
+            (define-key elpy-mode-map (kbd "<M-up>") nil)
+            (define-key elpy-mode-map (kbd "<M-down>") nil)))
 
 ;;------------------------------------------------------------------------------
 ;; jupyter
