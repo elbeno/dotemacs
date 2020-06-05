@@ -28,6 +28,12 @@
   :type 'boolean
   :safe 'booleanp)
 
+(defcustom boost-sml-spaces-after-default-star 0
+  "The number of spaces to put after the default state marker (*)."
+  :group 'boost-sml
+  :type 'integer
+  :safe 'integerp)
+
 (defun align-boost-sml-part (start regexp &optional group spacing)
  (goto-char start)
  (forward-sexp)
@@ -48,7 +54,11 @@
 (defun align-boost-sml (start)
   (forward-sexp)
   (indent-region start (point))
-  (align-boost-sml-part start "[[:space:]]*\\([[:space:]]\\)\\*[^/]" 1 0) ;; back up default *
+  (align-boost-sml-part start
+                        (concat "\\([[:space:]]\\{"
+                                (number-to-string (+ 1 boost-sml-spaces-after-default-star))
+                                "\\}\\)\\*[^/]") 1 0) ;; back up default *
+  (align-boost-sml-part start "\\*\\([[:space:]]*\\)" 1 boost-sml-spaces-after-default-star) ;; spaces after default *
   (align-boost-sml-part start "\\([[:space:]]*\\)\\+") ;; align +, one space before
   (align-boost-sml-part start "\\+\\([[:space:]]*\\)") ;; align +, one space after
   (align-boost-sml-part start "\\([[:space:]]*\\)\\[") ;; align [, one space before
