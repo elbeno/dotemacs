@@ -61,8 +61,8 @@
   (align-boost-sml-part start "\\*\\([[:space:]]*\\)" 1 boost-sml-spaces-after-default-star) ;; spaces after default *
   (align-boost-sml-part start "\\([[:space:]]*\\)\\+") ;; align +, one space before
   (align-boost-sml-part start "\\+\\([[:space:]]*\\)") ;; align +, one space after
-  (align-boost-sml-part start "\\([[:space:]]*\\)\\[") ;; align [, one space before
-  (align-boost-sml-part start "\\[\\([[:space:]]*\\)" 1 boost-sml-spaces-in-guards) ;; align [
+  (align-boost-sml-part start "[^/]\\([[:space:]]*\\)\\[") ;; align [, one space before (guard against lambda after /)
+  (align-boost-sml-part start "[^/]\\[\\([[:space:]]*\\)" 1 boost-sml-spaces-in-guards) ;; align [ (guard against lambda after /)
   (if boost-sml-align-guard-closes
       (align-boost-sml-part start "\\([[:space:]]*\\)\\]" 1 boost-sml-spaces-in-guards) ;; align ]
     (position-boost-sml-guard-closes start))
@@ -77,6 +77,18 @@
     (align-boost-sml-part start "\\([[:space:]]+\\)[/=][^/*]") ;; align / or =
     (align-boost-sml-part start "\\([[:space:]]+\\)=[[:space:]]"))) ;; re-align =
 
+(defun boost-sml/whitespace-p (c)
+  (string-match-p "[[:space:]]" (char-to-string c)))
+
+(defun boost-sml/skip-whitespace ()
+  (while (boost-sml/whitespace-p (char-after)) (forward-char)))
+
+(defun boost-sml/skip-to (sep)
+  (while (not (looking-at sep))
+    (cond ((eolp) (forward-char))
+          ((looking-at "[[:space:]]") (boost-sml/skip-whitespace))
+          (t (forward-sexp)))))
+
 ;;;###autoload
 (defun find-and-align-boost-sml ()
   "Align all Boost.SML tables in the buffer using align-boost-sml.
@@ -86,8 +98,7 @@ This function is controlled by variables in the customization group boost-sml."
     (ignore-errors
       (goto-char (point-min))
       (while (search-forward boost-sml-table-start nil t)
-        (when (looking-at "<")
-          (forward-sexp))
+        (boost-sml/skip-to "(")
         (align-boost-sml (point))))))
 
 (provide 'boost-sml)
