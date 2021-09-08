@@ -28,7 +28,7 @@
   (let ((clang-exe (find-file-first-dir possible-roots "clangd")))
     (when clang-exe (file-truename clang-exe))))
 
-(setq-default llvm-roots '("/usr/lib/llvm10-jit/" "/usr/local/llvm/"))
+(setq-default llvm-roots '("/usr/local/llvm/"))
 (setq-default llvm-root
               (let ((root (find-llvm-root llvm-roots)))
                 (when root
@@ -109,6 +109,14 @@
 ;;------------------------------------------------------------------------------
 ;; lsp + clangd + company
 
+(use-package company
+  :ensure t)
+
+(when (display-graphic-p)
+  (use-package company-box
+    :ensure t
+    :hook (company-mode . company-box-mode)))
+
 (setq my-clangd-executable (find-exe llvm-root "clangd"))
 (setq my-clang-check-executable (find-exe llvm-root "clang-check"))
 
@@ -139,7 +147,7 @@
 (use-package lsp-mode
   :ensure t
   :init
-  (require 'lsp-clients)
+  (require 'lsp-clangd)
   (setq lsp-enable-indentation nil
         lsp-auto-guess-root t
         lsp-clients-clangd-executable my-clangd-executable
@@ -163,13 +171,6 @@
   (define-key lsp-ui-mode-map (kbd "M-RET") #'lsp-ui-sideline-apply-code-actions)
   :hook ((lsp-mode . lsp-enable-imenu)
          (lsp-mode . lsp-ui-mode)))
-
-(use-package company-lsp
-  :after company
-  :ensure t
-  :config
-  (require 'company-lsp)
-  (push 'company-lsp company-backends))
 
 ;;------------------------------------------------------------------------------
 ;; Header completion
