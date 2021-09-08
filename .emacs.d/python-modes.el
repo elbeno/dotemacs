@@ -3,6 +3,15 @@
 (setq python-shell-interpreter "python3")
 
 ;;------------------------------------------------------------------------------
+;; flycheck
+(setq flycheck-python-flake8-executable "python3"
+      flycheck-python-pycompile-executable "python3"
+      flycheck-python-pylint-executable "python3")
+
+(add-hook 'python-mode-hook (lambda ()
+                              (flycheck-select-checker 'python-flake8)))
+
+;;------------------------------------------------------------------------------
 ;; make a string into an fstring or vice versa
 (defun toggle-string-to-fstring ()
   "Toggle between string and fstring at point"
@@ -14,39 +23,35 @@
           (delete-char -1)
         (insert "f")))))
 
-(add-hook 'python-mode-hook
-          (lambda () (bind-keys :map python-mode-map
-                           ("C-c s" . toggle-string-to-fstring))))
+;;------------------------------------------------------------------------------
+;; manage python imports
+(use-package py-isort
+  :ensure t)
+
+(add-hook 'elpy-mode-hook (lambda ()
+                            (add-hook 'before-save-hook
+                                      'py-isort-before-save nil t)))
 
 ;;------------------------------------------------------------------------------
 ;; elpy
 (use-package elpy
   :ensure t
+  :defer t
   :init
+  (advice-add 'python-mode :before 'elpy-enable)
   (setq python-indent-offset 4
         elpy-rpc-python-command "python3"
         elpy-rpc-timeout 10)
   :bind (:map elpy-mode-map
               ("M-k" . elpy-check)
-              ("C-c f" . elpy-black-fix-code))
-  :hook (python-mode . elpy-mode))
+              ("C-c f" . elpy-black-fix-code)
+              ("C-c s" . toggle-string-to-fstring)
+              ("M-<up>" . nil)
+              ("M-<down>" . nil)))
 
-;;------------------------------------------------------------------------------
-;; manage python imports
-(use-package pyimpsort
-  :ensure t)
-
-;;------------------------------------------------------------------------------
-;; on save: remove unused imports, sort them, then format with black
-(defun my-python-before-save-hook ()
-  (save-excursion
-    (elpy-black-fix-code)
-    (pyimpsort-buffer)))
-
-(add-hook 'elpy-mode-hook
-          (lambda () (add-hook 'before-save-hook 'my-python-before-save-hook t 'local)
-            (define-key elpy-mode-map (kbd "<M-up>") nil)
-            (define-key elpy-mode-map (kbd "<M-down>") nil)))
+(add-hook 'elpy-mode-hook (lambda ()
+                            (add-hook 'before-save-hook
+                                      'elpy-black-fix-code nil t)))
 
 ;;------------------------------------------------------------------------------
 ;; jupyter
