@@ -4,9 +4,6 @@
   :ensure t
   :mode ("\\.bs\\'" . markdown-mode))
 
-(use-package markdown-mode+
-  :ensure t)
-
 ;;------------------------------------------------------------------------------
 ;; vlfi
 (use-package vlf
@@ -78,7 +75,7 @@
 ;; Protobufs
 (use-package protobuf-mode
   :ensure t
-  :init (require 'cl))
+  :init (require 'cl-lib))
 
 ;;------------------------------------------------------------------------------
 ;; Elixir
@@ -88,15 +85,6 @@
 (use-package elixir-mode
   :ensure t
   :hook (elixir-mode . company-mode))
-
-;;------------------------------------------------------------------------------
-;; Haskell
-(use-package haskell-mode
-  :ensure t
-  :hook (haskell-mode . intero-mode))
-
-(use-package intero
-  :ensure t)
 
 ;;------------------------------------------------------------------------------
 ;; PDFs

@@ -16,7 +16,7 @@
 
 (defun apply-macro (macro arg-list)
   (eval
-   `(,macro ,@(loop for arg in arg-list
+   `(,macro ,@(cl-loop for arg in arg-list
                     collect `(quote ,arg)))))
 
 (defun find-file-first-dir (directories filename)
