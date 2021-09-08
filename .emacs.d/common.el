@@ -160,8 +160,20 @@
 ;; Google-this
 (use-package google-this
   :ensure t
+  :commands (google-this-parse-and-search-string)
   :bind
-  (("C-c <f1>" . google-this-cpp-reference)))
+  (("C-c <f1>" . duckduckgo-this-cpp-reference)))
+
+(defun duckduckgo-this-lucky-search-url ()
+  "Return the url for a feeling-ducky duckduckgo search."
+  (format "https://duckduckgo.com/?q=\\%%s"))
+
+(defun duckduckgo-this-cpp-reference ()
+  "Visit the most probable cppreference.com page for this word."
+  (interactive)
+  (google-this-parse-and-search-string
+   (concat (thing-at-point 'symbol) " site:cppreference.com")
+   nil (duckduckgo-this-lucky-search-url)))
 
 ;;------------------------------------------------------------------------------
 ;; Avy
