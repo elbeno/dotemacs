@@ -187,8 +187,8 @@
         flycheck-python-flake8-executable "python3")
   :bind
   :bind (:map flycheck-mode-map
-              ("M-<down>" . next-error)
-              ("M-<up>" . previous-error))
+              ("M-<down>" . flycheck-next-error)
+              ("M-<up>" . flycheck-previous-error))
   :hook ((c++-mode . flycheck-mode)
          (python-mode . flycheck-mode)
          (sh-mode . flycheck-mode)))

@@ -118,22 +118,7 @@
     :hook (company-mode . company-box-mode)))
 
 (setq my-clangd-executable (find-exe llvm-root "clangd"))
-(setq my-clang-check-executable (find-exe llvm-root "clang-check"))
-
-;; Use clangcheck for flycheck in C++ mode
-(defun my-select-clangcheck-for-checker ()
-  "Select clang-check for flycheck's checker."
-  (require 'flycheck-clangcheck)
-  (flycheck-set-checker-executable 'c/c++-clangcheck my-clang-check-executable)
-  (flycheck-select-checker 'c/c++-clangcheck))
-
-(use-package flycheck-clangcheck
-  :ensure t
-  :config
-  (setq flycheck-clangcheck-analyze t
-        flycheck-clangcheck-extra-arg-before '("-std=c++2a")
-        flycheck-clangcheck-extra-arg '("-Xanalyzer" "-analyzer-output=text"))
-  :hook (c++-mode . my-select-clangcheck-for-checker))
+(setq my-clang-tidy-executable (find-exe llvm-root "clang-tidy"))
 
 ;; In c++-mode, start lsp mode etc unless we're in a temp buffer
 ;; (don't do it when exporting org-mode blocks)
@@ -143,6 +128,14 @@
     (company-mode)
     (lsp)))
 (add-hook 'c++-mode-hook 'my-c++-mode-hook)
+
+(use-package flycheck-clang-tidy
+  :ensure t
+  :init
+  (setq flycheck-clang-tidy-executable my-clang-tidy-executable)
+  :after flycheck
+  :hook
+  (flycheck-mode . flycheck-clang-tidy-setup))
 
 (use-package lsp-mode
   :ensure t
