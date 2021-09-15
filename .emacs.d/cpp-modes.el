@@ -117,6 +117,7 @@
     :ensure t
     :hook (company-mode . company-box-mode)))
 
+(setq company-clang-executable (find-exe llvm-root "clang"))
 (setq my-clangd-executable (find-exe llvm-root "clangd"))
 (setq my-clang-tidy-executable (find-exe llvm-root "clang-tidy"))
 
@@ -129,22 +130,13 @@
     (lsp)))
 (add-hook 'c++-mode-hook 'my-c++-mode-hook)
 
-(use-package flycheck-clang-tidy
-  :ensure t
-  :init
-  (setq flycheck-clang-tidy-executable my-clang-tidy-executable)
-  :after flycheck
-  :hook
-  (flycheck-mode . flycheck-clang-tidy-setup))
-
 (use-package lsp-mode
   :ensure t
   :init
   (require 'lsp-clangd)
   (setq lsp-enable-indentation nil
         lsp-auto-guess-root t
-        lsp-clients-clangd-executable my-clangd-executable
-        lsp-clients-clangd-args (list (concat "--query-driver=" llvm-root "**"))
+        lsp-clangd-binary-path my-clangd-executable
         lsp-prefer-flymake nil))
 
 (use-package lsp-ui
@@ -311,3 +303,32 @@ With prefix arg ARG, transpose with the argument after it."
 (eval-after-load 'cc-mode
   '(bind-keys :map c++-mode-map
               ("C-M-t" . c-transpose-args)))
+
+;;------------------------------------------------------------------------------
+;; Flycheck setup for c++-mode
+(use-package flycheck-clang-tidy
+  :ensure t
+  :init
+  (setq flycheck-clang-tidy-executable my-clang-tidy-executable)
+  :after flycheck
+  :hook
+  ((flycheck-mode . flycheck-clang-tidy-setup)))
+
+;; From https://github.com/flycheck/flycheck/issues/1762#issuecomment-749789589
+;; Add buffer local Flycheck checkers after LSP for different major modes.
+(defvar-local my-flycheck-local-cache nil)
+
+(defun my-flycheck-local-checker-get (fn checker property)
+  ;; Only check the buffer local cache for the LSP checker, otherwise we get
+  ;; infinite loops.
+  (if (eq checker 'lsp)
+      (or (alist-get property my-flycheck-local-cache)
+          (funcall fn checker property))
+    (funcall fn checker property)))
+
+(advice-add 'flycheck-checker-get
+            :around 'my-flycheck-local-checker-get)
+(add-hook 'lsp-managed-mode-hook
+          (lambda ()
+            (when (derived-mode-p 'c++-mode)
+              (setq my-flycheck-local-cache '((next-checkers . (c/c++-clang-tidy)))))))
