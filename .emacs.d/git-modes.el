@@ -37,3 +37,6 @@
   (setq diff-hl-side 'right)
   (global-diff-hl-mode)
   (diff-hl-flydiff-mode))
+
+;; prevent annoying reverts during conflict editing
+(setq auto-revert-vc-info nil)
