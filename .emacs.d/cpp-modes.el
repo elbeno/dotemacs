@@ -154,6 +154,7 @@
         lsp-ui-imenu-enable t)
   (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
   (define-key lsp-ui-mode-map (kbd "M-RET") #'lsp-ui-sideline-apply-code-actions)
+  (define-key lsp-ui-mode-map (kbd "C-c m") #'lsp-ui-imenu)
   :hook ((lsp-mode . lsp-enable-imenu)
          (lsp-mode . lsp-ui-mode)))
 
