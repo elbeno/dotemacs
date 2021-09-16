@@ -58,6 +58,7 @@
       `((".*" . , "~/.emacs.d/backups/")))
 (setq auto-save-file-name-transforms
       `((".*" ,"~/.emacs.d/autosaves/" t)))
+(setq create-lockfiles nil)
 
 ;; Delete backups older than one month
 (defun delete-backups ()
