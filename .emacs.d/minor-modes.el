@@ -156,6 +156,9 @@
                               (set-face-attribute 'whitespace-line nil
                                                   :foreground my-post-fill-column-fg))))
 
+(when (> emacs-major-version 27)
+  (add-hook 'prog-mode-hook #'display-fill-column-indicator-mode))
+
 ;;------------------------------------------------------------------------------
 ;; Projectile
 (use-package projectile
