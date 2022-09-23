@@ -1,8 +1,6 @@
 ;;------------------------------------------------------------------------------
 ;; Git interactions
 ;; modes
-(use-package gitconfig-mode :ensure t)
-(use-package gitignore-mode :ensure t)
 (use-package git-commit :ensure t)
 
 ;; magit
