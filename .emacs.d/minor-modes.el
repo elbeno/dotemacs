@@ -149,12 +149,14 @@
 
 (setq-default whitespace-line-column column-wrap-soft
               whitespace-style '(face lines-tail))
-(setq my-post-fill-column-fg (if (display-graphic-p) "gray20" "yellow"))
-(add-hook 'prog-mode-hook (lambda ()
-                            (unless (string-match-p (regexp-quote "*temp*") (buffer-name))
-                              (whitespace-mode)
-                              (set-face-attribute 'whitespace-line nil
-                                                  :foreground my-post-fill-column-fg))))
+
+(unless (> emacs-major-version 27)
+  (setq my-post-fill-column-fg (if (display-graphic-p) "gray20" "yellow"))
+  (add-hook 'prog-mode-hook (lambda ()
+                              (unless (string-match-p (regexp-quote "*temp*") (buffer-name))
+                                (whitespace-mode)
+                                (set-face-attribute 'whitespace-line nil
+                                                    :foreground my-post-fill-column-fg)))))
 
 (when (> emacs-major-version 27)
   (add-hook 'prog-mode-hook #'display-fill-column-indicator-mode))
