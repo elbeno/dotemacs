@@ -5,14 +5,18 @@
   (mapc #'disable-theme custom-enabled-themes))
 
 ;;------------------------------------------------------------------------------
-;; Colours in graphical mode
-(when (display-graphic-p)
-  (load-theme 'hipster))
+;; Nice theme
+(load-theme 'hipster)
 
 ;;------------------------------------------------------------------------------
 ;; Highlight FIXME/TODO
 (font-lock-add-keywords 'c++-mode
                         '(("\\<\\(FIXME\\|TODO\\).*?:" 0 font-lock-warning-face prepend)))
+
+;;------------------------------------------------------------------------------
+;; More visible comments
+(set-face-foreground 'font-lock-comment-face "magenta")
+(set-face-foreground 'font-lock-comment-delimiter-face "magenta")
 
 ;;------------------------------------------------------------------------------
 ;; Special types of comments

@@ -72,17 +72,17 @@
 
 ;;------------------------------------------------------------------------------
 ;; Auto insertion of headers
-(autoload 'cpp-auto-include/namespace-qualify-file "cpp-auto-include"
-  "Explicitly qualify uses of the standard library with their namespace(s)." t)
-(autoload 'cpp-auto-include/ensure-includes-for-file "cpp-auto-include"
-  "Auto-insert #include line(s) required for the current buffer." t)
-(autoload 'cpp-auto-include/ensure-includes-for-current-line "cpp-auto-include"
-  "Auto-insert #include line(s) required for the current line." t)
-(eval-after-load 'cc-mode
-  '(bind-keys :map c++-mode-map
-              ("C-c q" . cpp-auto-include/namespace-qualify-file)
-              ("C-c i" . cpp-auto-include/ensure-includes-for-file)
-              ("C-c o" . cpp-auto-include/ensure-includes-for-current-line)))
+;; (autoload 'cpp-auto-include/namespace-qualify-file "cpp-auto-include"
+;;   "Explicitly qualify uses of the standard library with their namespace(s)." t)
+;; (autoload 'cpp-auto-include/ensure-includes-for-file "cpp-auto-include"
+;;   "Auto-insert #include line(s) required for the current buffer." t)
+;; (autoload 'cpp-auto-include/ensure-includes-for-current-line "cpp-auto-include"
+;;   "Auto-insert #include line(s) required for the current line." t)
+;; (eval-after-load 'cc-mode
+;;   '(bind-keys :map c++-mode-map
+;;               ("C-c q" . cpp-auto-include/namespace-qualify-file)
+;;               ("C-c i" . cpp-auto-include/ensure-includes-for-file)
+;;               ("C-c o" . cpp-auto-include/ensure-includes-for-current-line)))
 
 ;;------------------------------------------------------------------------------
 ;; indentation rules
@@ -98,19 +98,16 @@
 
 ;;------------------------------------------------------------------------------
 ;; Align Boost.SML tables
-(autoload 'find-and-align-boost-sml "boost-sml"
-  "Find and align Boost.SML tables." t)
+;; (autoload 'find-and-align-boost-sml "boost-sml"
+;;   "Find and align Boost.SML tables." t)
 
-(eval-after-load 'cc-mode
-  '(bind-keys :map c++-mode-map
-              ("C-<tab>" . align)
-              ("C-]" . find-and-align-boost-sml)))
+;; (eval-after-load 'cc-mode
+;;   '(bind-keys :map c++-mode-map
+;;               ("C-<tab>" . align)
+;;               ("C-]" . find-and-align-boost-sml)))
 
 ;;------------------------------------------------------------------------------
 ;; lsp + clangd + company
-
-(use-package company
-  :ensure t)
 
 (when (display-graphic-p)
   (use-package company-box

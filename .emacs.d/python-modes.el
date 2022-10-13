@@ -42,6 +42,7 @@
   (setq python-indent-offset 4
         elpy-rpc-python-command "python3"
         elpy-rpc-timeout 10)
+  (elpy-enable)
   :bind (:map elpy-mode-map
               ("M-k" . elpy-check)
               ("C-c f" . elpy-black-fix-code)
@@ -53,14 +54,3 @@
                             (add-hook 'before-save-hook
                                       'elpy-black-fix-code nil t)))
 
-;;------------------------------------------------------------------------------
-;; jupyter
-(defun my-ein-keybindings ()
-  (bind-keys :map ein:notebook-mode-map
-             ("C-c M-l" . ein:worksheet-clear-all-output)))
-
-(use-package ein
-  :ensure t
-  :config
-  (setq ein:notebook-autosave-frequency 0)
-  :hook (ein:notebook-mode . my-ein-keybindings))

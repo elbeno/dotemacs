@@ -1,13 +1,13 @@
 ;;------------------------------------------------------------------------------
+;; company
+(use-package company
+  :ensure t)
+
+;;------------------------------------------------------------------------------
 ;; markdown mode
 (use-package markdown-mode
   :ensure t
   :mode ("\\.bs\\'" . markdown-mode))
-
-;;------------------------------------------------------------------------------
-;; vlfi
-(use-package vlf
-  :ensure t)
 
 ;; Shells
 (setq ls-lisp-use-insert-directory-program t)
@@ -46,54 +46,14 @@
   :ensure t)
 
 ;;------------------------------------------------------------------------------
-;; Lua
-(use-package lua-mode
-  :ensure t
-  :init
-  (setq lua-indent-level 4))
-
-;;------------------------------------------------------------------------------
 ;; Yaml
 (use-package yaml-mode
   :ensure t)
 
 ;;------------------------------------------------------------------------------
-;; Javascript
-(use-package js2-mode
-  :ensure t
-  :init
-  (setq js-indent-level 4
-        js2-basic-offset 4)
-  :bind (:map js2-mode-map
-              ("M-<up>" . js2-prev-error)
-              ("M-<down>" . js2-next-error)))
-
+;; JSON
 (use-package json-mode
   :ensure t)
-
-;;------------------------------------------------------------------------------
-;; Protobufs
-(use-package protobuf-mode
-  :ensure t
-  :init (require 'cl-lib))
-
-;;------------------------------------------------------------------------------
-;; Elixir
-(use-package alchemist
-  :ensure t)
-
-(use-package elixir-mode
-  :ensure t
-  :hook (elixir-mode . company-mode))
-
-;;------------------------------------------------------------------------------
-;; PDFs
-(when (eq system-type 'gnu/linux)
-  (when (display-graphic-p)
-    (use-package pdf-tools
-      :ensure t
-      :init
-      (pdf-tools-install))))
 
 ;;------------------------------------------------------------------------------
 ;; Dired

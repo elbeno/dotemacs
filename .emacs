@@ -31,10 +31,11 @@
 
 ;;------------------------------------------------------------------------------
 ;; package setup
-(setq package-archives '(("org" . "http://orgmode.org/elpa/")
-                         ("gnu" . "http://elpa.gnu.org/packages/")
+(setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
                          ("stable-melpa" . "http://stable.melpa.org/packages/")
-                         ("melpa" . "http://melpa.org/packages/")))
+                         ("melpa" . "http://melpa.org/packages/")
+			 ("org-contrib" . "http://elpa.nongnu.org/nongnu/")
+			 ("cselpa" . "https://elpa.thecybershadow.net/packages/")))
 
 (package-initialize)
 (setq package-enable-at-startup nil)
@@ -55,13 +56,19 @@
 
 ;;------------------------------------------------------------------------------
 ;; Startup profiling
-(use-package esup
-  :ensure t
-  :defer t)
+;; (use-package esup
+;;   :ensure t
+;;   :defer t)
 
 ;;------------------------------------------------------------------------------
 ;; Common settings
 (load "common.el")
+
+;;------------------------------------------------------------------------------
+;; Graphic or terminal mode?
+(if (display-graphic-p)
+  (load "graphic-display.el")
+  (load "terminal.el"))
 
 ;;------------------------------------------------------------------------------
 ;; Minor modes
@@ -123,8 +130,6 @@
 ;;------------------------------------------------------------------------------
 ;; Graphic window settings
 (when (display-graphic-p)
-  (load "graphic-display.el")
-
   (setq default-frame-height (frame-height))
   (setq default-frame-alist
         (append

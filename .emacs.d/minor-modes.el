@@ -221,14 +221,23 @@
   (setq-default filladapt-mode t))
 
 ;;------------------------------------------------------------------------------
-;; yasnippets
-(use-package yasnippet
+;; grugru (rotate text at point)
+(use-package grugru
   :ensure t
+  :init
+  ;; (grugru-default-setup)
+  (grugru-highlight-mode)
   :config
-  (use-package yasnippet-snippets
-    :ensure t)
-  (setq yas-verbosity 1
-        yas-wrap-around-region t)
-  (setq yas-prompt-functions '(yas-ido-prompt))
-  (yas-global-mode t)
-  :diminish yas-minor-mode)
+  (grugru-define-global 'symbol (grugru-metagenerator-keep-case '("yes" "no")))
+  (grugru-define-global 'symbol (grugru-metagenerator-keep-case '("true" "false")))
+  (grugru-define-global 'symbol (grugru-metagenerator-keep-case '("width" "height")))
+  (grugru-define-global 'symbol (grugru-metagenerator-keep-case '("left" "right")))
+  (grugru-define-global 'symbol (grugru-metagenerator-keep-case '("top" "bottom")))
+  (grugru-define-global 'symbol (grugru-metagenerator-keep-case '("north" "south" "east" "west")))
+  (grugru-define-on-major-mode '(c++-mode) 'symbol '("public" "protected" "private"))
+  (grugru-define-on-major-mode '(c++-mode) 'symbol '("class" "struct"))
+  (grugru-define-on-major-mode '(c++-mode) 'symbol '("static_cast" "dynamic_cast" "reinterpret_cast" "const_cast" "bit_cast"))
+  :bind
+  (("C-c /" . grugru-forward)
+   ("C-c C-/" . grugru-backward))
+  :diminish grugru-highlight-mode)

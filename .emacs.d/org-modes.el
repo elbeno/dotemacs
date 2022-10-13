@@ -1,10 +1,9 @@
 ;;------------------------------------------------------------------------------
 ;; Org-mode
 (use-package org
-  :ensure org-plus-contrib
+  :ensure t
   :commands (org-mode)
   :mode ("\\.org$" . org-mode)
-  :pin org
   :bind (:map org-mode-map
               ("C-M-t" . my-org-table-transpose-cells))
   :config
