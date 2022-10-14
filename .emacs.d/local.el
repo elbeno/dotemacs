@@ -37,5 +37,6 @@
     ;; return the filenames
     el-files-list))
 
-(if (file-directory-p ".emacs.d/local/")
-    (mapc 'load (files-in-below-directory (concat dotfile-dir ".emacs.d/local/"))))
+(let ((local-dir (concat dotfile-dir ".emacs.d/local/")))
+  (when (file-directory-p local-dir)
+    (mapc 'load (files-in-below-directory local-dir))))
