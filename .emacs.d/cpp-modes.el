@@ -118,13 +118,22 @@
 (setq my-clangd-executable (find-exe llvm-root "clangd"))
 (setq my-clang-tidy-executable (find-exe llvm-root "clang-tidy"))
 
+(use-package flycheck-clang-tidy
+  :ensure t
+  :init
+  (setq flycheck-clang-tidy-executable my-clang-tidy-executable)
+  :after flycheck
+  :hook
+  ((flycheck-mode . flycheck-clang-tidy-setup)))
+
 ;; In c++-mode, start lsp mode etc unless we're in a temp buffer
 ;; (don't do it when exporting org-mode blocks)
 (defun my-c++-mode-hook ()
   (unless (string-match-p (regexp-quote "*temp*") (buffer-name))
     (add-hook 'before-save-hook 'my-clang-format-before-save nil t)
     (company-mode)
-    (lsp)))
+    (lsp)
+    (flycheck-add-next-checker 'lsp '(t . c/c++-clang-tidy))))
 (add-hook 'c++-mode-hook 'my-c++-mode-hook)
 
 (use-package lsp-mode
@@ -149,11 +158,13 @@
         lsp-ui-sideline-ignore-duplicate t
         lsp-ui-flycheck-enable t
         lsp-ui-imenu-enable t)
+  (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
   (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
   (define-key lsp-ui-mode-map (kbd "M-RET") #'lsp-ui-sideline-apply-code-actions)
   (define-key lsp-ui-mode-map (kbd "C-c m") #'lsp-ui-imenu)
   :hook ((lsp-mode . lsp-enable-imenu)
          (lsp-mode . lsp-ui-mode)))
+
 
 ;;------------------------------------------------------------------------------
 ;; Header completion
@@ -301,32 +312,3 @@ With prefix arg ARG, transpose with the argument after it."
 (eval-after-load 'cc-mode
   '(bind-keys :map c++-mode-map
               ("C-M-t" . c-transpose-args)))
-
-;;------------------------------------------------------------------------------
-;; Flycheck setup for c++-mode
-(use-package flycheck-clang-tidy
-  :ensure t
-  :init
-  (setq flycheck-clang-tidy-executable my-clang-tidy-executable)
-  :after flycheck
-  :hook
-  ((flycheck-mode . flycheck-clang-tidy-setup)))
-
-;; From https://github.com/flycheck/flycheck/issues/1762#issuecomment-749789589
-;; Add buffer local Flycheck checkers after LSP for different major modes.
-(defvar-local my-flycheck-local-cache nil)
-
-(defun my-flycheck-local-checker-get (fn checker property)
-  ;; Only check the buffer local cache for the LSP checker, otherwise we get
-  ;; infinite loops.
-  (if (eq checker 'lsp)
-      (or (alist-get property my-flycheck-local-cache)
-          (funcall fn checker property))
-    (funcall fn checker property)))
-
-(advice-add 'flycheck-checker-get
-            :around 'my-flycheck-local-checker-get)
-(add-hook 'lsp-managed-mode-hook
-          (lambda ()
-            (when (derived-mode-p 'c++-mode)
-              (setq my-flycheck-local-cache '((next-checkers . (c/c++-clang-tidy)))))))
