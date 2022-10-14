@@ -112,8 +112,8 @@
 ;; expand-region
 (use-package expand-region
   :ensure t
-  :bind (("C-)" . er/expand-region)
-         ("C-(" . er/contract-region))
+  :bind (("C-S-}" . er/expand-region)
+         ("C-S-{" . er/contract-region))
   :config
   (require 'the-org-mode-expansions)
   (setq expand-region-smart-cursor t
