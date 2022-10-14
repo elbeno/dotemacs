@@ -1,7 +1,4 @@
-.emacs.d/init.el
 *.elc
 .emacs.d/packages
-.emacs.d/site-bin/ghc-mod
-.emacs.d/site-bin/hoogle
 .emacs.d/custom
 .emacs.d/snippets
