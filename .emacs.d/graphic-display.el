@@ -1,25 +1,6 @@
 ;;------------------------------------------------------------------------------
 ;; font: Inconsolata
-(setq my-font-family "Inconsolata")
-(setq my-font-height 100)
-(setq my-font-weight 'normal)
-(setq my-font-width 'normal)
-
-(when (eq system-type 'darwin)
-  (setq my-font-height 120))
-
-(set-face-attribute 'default nil
-                    :family my-font-family
-                    :height my-font-height
-                    :weight my-font-weight
-                    :width my-font-width)
-
-(set-fontset-font "fontset-default"
-                  '(#x0100 . #xffff)
-                  (font-spec :family "DejaVu Sans Mono"
-                             :height my-font-height
-                             :weight 'normal
-                             :width 'normal))
+(set-frame-font "Inconsolata-12")
 
 ;;------------------------------------------------------------------------------
 (use-package dash
