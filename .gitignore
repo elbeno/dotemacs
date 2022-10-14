@@ -1,4 +1,4 @@
 *.elc
 .emacs.d/packages
-.emacs.d/custom
+.emacs.d/local
 .emacs.d/snippets
