@@ -12,9 +12,13 @@
 (defun beginning-of-line-or-indentation ()
   "move to beginning of line, or indentation"
   (interactive)
+  (when this-command-keys-shift-translated
+      (unless mark-active (push-mark nil t t)))
   (if (bolp)
       (back-to-indentation)
-    (beginning-of-line)))
+    (beginning-of-line))
+  (when this-command-keys-shift-translated
+    (setq transient-mark-mode (cons 'only transient-mark-mode))))
 (bind-key "<home>" 'beginning-of-line-or-indentation)
 
 ;; Turn off insert
