@@ -21,8 +21,8 @@
 
 ;;------------------------------------------------------------------------------
 ;; apply custom variables
-(let ((custom-file (concat dotfile-dir ".emacs.d/custom.el")))
-  (load custom-file))
+(setq custom-file (concat dotfile-dir ".emacs.d/custom.el"))
+(load custom-file)
 
 ;------------------------------------------------------------------------------
 ;; apply local site-specific changes
