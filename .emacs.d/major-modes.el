@@ -1,13 +1,19 @@
 ;;------------------------------------------------------------------------------
 ;; company
 (use-package company
-  :ensure t)
+  :ensure t
+  :hook prog-mode)
+
+(when (display-graphic-p)
+  (use-package company-box
+    :ensure t
+    :hook company-mode))
 
 ;;------------------------------------------------------------------------------
 ;; markdown mode
 (use-package markdown-mode
   :ensure t
-  :mode ("\\.bs\\'" . markdown-mode))
+  :mode ("\\.md\\'" . markdown-mode))
 
 ;; Shells
 (setq ls-lisp-use-insert-directory-program t)
@@ -15,15 +21,6 @@
 
 ;;------------------------------------------------------------------------------
 ;; CMake
-(use-package cmake-mode
-  :ensure t
-  :hook (cmake-mode . company-mode))
-
-(use-package cmake-font-lock
-  :ensure t
-  :hook (cmake-mode . cmake-font-lock-activate))
-
-;; cmake-format-on-save
 (defcustom my-cmake-format-enabled t
   "If t, run cmake-format on cmake buffers upon saving."
   :group 'cmake-format
@@ -33,37 +30,51 @@
 (autoload 'cmake-format-buffer "cmake-format"
   "Format the buffer with cmake-format." t)
 
-(defun my-cmake-format-before-save ()
-  (interactive)
-  (when my-cmake-format-enabled
-    (cmake-format-buffer)))
-(add-hook 'cmake-mode-hook
-          (lambda () (add-hook 'before-save-hook 'my-cmake-format-before-save nil t)))
+(use-package cmake-mode
+  :ensure t
+  :config
+  (defun my/config-cmake-format ()
+    (when my-cmake-format-enabled
+      (add-hook 'before-save-hook 'cmake-format-buffer nil t))
+    (bind-keys :map cmake-mode-map
+               ("C-c f" . cmake-format-buffer))
+    (company-mode))
+  :mode (("\\.cmake\\'" . cmake-mode)
+         ("^CMakeLists.txt$" . cmake-mode))
+  :hook (cmake-mode . my/config-cmake-format))
+
+(use-package cmake-font-lock
+  :ensure t
+  :hook (cmake-mode . cmake-font-lock-activate))
 
 ;;------------------------------------------------------------------------------
 ;; Cucumber/Gherkin
 (use-package feature-mode
-  :ensure t)
+  :ensure t
+  :mode ("\\.feature$" . feature-mode))
 
 ;;------------------------------------------------------------------------------
 ;; Yaml
 (use-package yaml-mode
-  :ensure t)
+  :ensure t
+  :mode ("\\.yml$" . yaml-mode))
 
 ;;------------------------------------------------------------------------------
 ;; JSON
 (use-package json-mode
-  :ensure t)
+  :ensure t
+  :mode ("\\.json$" . json-mode))
 
 ;;------------------------------------------------------------------------------
 ;; Dired
 (use-package dired
-  :defer t
   :bind
   (("C-x j" . dired-jump))
   (:map dired-mode-map
         ("M-<up>" . jjgr-dired-up-directory)
-        ("\r" . jjgr-dired-find-file))
+        ("<return>" . jjgr-dired-find-file)
+        ("g" . dired-git-info-mode)
+        ("r" . revert-buffer))
   :custom
   (dired-find-subdir t "Reuse buffers for opened directories")
   :config
@@ -87,18 +98,16 @@
     (if prefix
         (org-open-file (dired-get-file-for-visit) 'system)
       (dired-find-file)))
-  )
+  (defun my/dired-config ()
+    (diredfl-mode)
+    (hl-line-mode)
+    (set-face-background hl-line-face "gray13"))
+  :hook (dired-mode . my/dired-config))
 
 (use-package diredfl
   :ensure t
-  :config
-  (diredfl-global-mode 1))
+  :defer)
 
 (use-package dired-git-info
   :ensure t
-  :bind (:map dired-mode-map
-              (")" . dired-git-info-mode)))
-
-;; highlight line in dired
-(add-hook 'dired-mode-hook 'hl-line-mode)
-(add-hook 'hl-line-mode-hook (lambda () (set-face-background hl-line-face "gray13")))
+  :after dired-mode)

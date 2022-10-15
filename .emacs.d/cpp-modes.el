@@ -46,26 +46,22 @@
 
 ;;------------------------------------------------------------------------------
 ;; clang-format
-(setq clang-format-executable (find-exe llvm-root "clang-format"))
-
-(use-package clang-format
-  :ensure t)
-
-(eval-after-load 'cc-mode
-  '(bind-keys :map c++-mode-map
-              ("C-c f" . clang-format)))
-
-;; clang-format-on-save
 (defcustom my-clang-format-enabled t
   "If t, run clang-format on cpp buffers upon saving."
   :group 'clang-format
   :type 'boolean
   :safe 'booleanp)
 
-(defun my-clang-format-before-save ()
-  (interactive)
-  (when my-clang-format-enabled
-    (clang-format-buffer)))
+(use-package clang-format
+  :ensure t
+  :config
+  (setq clang-format-executable (find-exe llvm-root "clang-format"))
+  (defun my/config-clang-format ()
+    (when my-clang-format-enabled
+      (add-hook 'before-save-hook 'clang-format-buffer nil t))
+    (bind-keys :map c++-mode-map
+               ("C-c f" . clang-format-buffer)))
+  :hook (c++-mode . my/config-clang-format))
 
 ;; clang-format files are YAML
 (add-to-list 'auto-mode-alist '("\\.clang-format\\'" . yaml-mode))
@@ -83,6 +79,18 @@
               ("C-c q" . cpp-auto-include/namespace-qualify-file)
               ("C-c i" . cpp-auto-include/ensure-includes-for-file)
               ("C-c o" . cpp-auto-include/ensure-includes-for-current-line)))
+
+;;------------------------------------------------------------------------------
+;; Transposing arguments
+(autoload 'c-transpose-args "c-transpose-args"
+  "Transpose function arguments." t)
+(autoload 'c-transpose-args-forward "c-transpose-args"
+  "Transpose function arguments forward." t)
+(autoload 'c-transpose-args-backward "c-transpose-args"
+  "Transpose function arguments backward." t)
+(eval-after-load 'cc-mode
+  '(bind-keys :map c++-mode-map
+              ("C-M-t" . c-transpose-args)))
 
 ;;------------------------------------------------------------------------------
 ;; indentation rules
@@ -109,41 +117,48 @@
 ;;------------------------------------------------------------------------------
 ;; lsp + clangd + company
 
-(when (display-graphic-p)
-  (use-package company-box
-    :ensure t
-    :hook (company-mode . company-box-mode)))
+;; (setq company-clang-executable (find-exe llvm-root "clang"))
+;; (setq my-clangd-executable (find-exe llvm-root "clangd"))
+;; (setq my-clang-tidy-executable (find-exe llvm-root "clang-tidy"))
 
-(setq company-clang-executable (find-exe llvm-root "clang"))
-(setq my-clangd-executable (find-exe llvm-root "clangd"))
-(setq my-clang-tidy-executable (find-exe llvm-root "clang-tidy"))
-
-(use-package flycheck-clang-tidy
-  :ensure t
-  :init
-  (setq flycheck-clang-tidy-executable my-clang-tidy-executable)
-  :after flycheck
-  :hook
-  ((flycheck-mode . flycheck-clang-tidy-setup)))
+;; (use-package flycheck-clang-tidy
+;;   :ensure t
+;;   :init
+;;   (setq flycheck-clang-tidy-executable my-clang-tidy-executable)
+;;   :after flycheck
+;;   :hook
+;;   ((flycheck-mode . flycheck-clang-tidy-setup)))
 
 ;; In c++-mode, start lsp mode etc unless we're in a temp buffer
 ;; (don't do it when exporting org-mode blocks)
-(defun my-c++-mode-hook ()
-  (unless (string-match-p (regexp-quote "*temp*") (buffer-name))
-    (add-hook 'before-save-hook 'my-clang-format-before-save nil t)
-    (company-mode)
-    (lsp)
-    (flycheck-add-next-checker 'lsp '(t . c/c++-clang-tidy))))
-(add-hook 'c++-mode-hook 'my-c++-mode-hook)
+;; (defun my-c++-mode-hook ()
+;;   (unless (string-match-p (regexp-quote "*temp*") (buffer-name))
+;;     (company-mode)
+;;     (lsp)
+;;     (flycheck-add-next-checker 'lsp '(t . c/c++-clang-tidy))))
+;; (add-hook 'c++-mode-hook 'my-c++-mode-hook)
+
+(use-package flycheck-clang-tidy
+  :ensure t
+  :defer)
 
 (use-package lsp-mode
   :ensure t
-  :init
-  (require 'lsp-clangd)
-  (setq lsp-enable-indentation nil
-        lsp-auto-guess-root t
-        lsp-clangd-binary-path my-clangd-executable
-        lsp-prefer-flymake nil))
+  :config
+  (defun my/config-lsp-mode ()
+    (require 'lsp-clangd)
+    (setq lsp-enable-indentation nil
+          lsp-auto-guess-root t
+          lsp-clangd-binary-path (find-exe llvm-root "clangd")
+          lsp-prefer-flymake nil
+          flycheck-clang-tidy-executable (find-exe llvm-root "clang-tidy"))
+    (lsp)
+    (flycheck-clang-tidy-setup)
+    (flycheck-add-next-checker 'lsp 'c/c++-clang-tidy)
+    (bind-keys :map flycheck-mode-map
+               ("M-<down>" . flycheck-next-error)
+               ("M-<up>" . flycheck-previous-error)))
+  :hook (c++-mode . my/config-lsp-mode))
 
 (use-package lsp-ui
   :ensure t
@@ -165,17 +180,17 @@
   :hook ((lsp-mode . lsp-enable-imenu)
          (lsp-mode . lsp-ui-mode)))
 
-
 ;;------------------------------------------------------------------------------
 ;; Header completion
 (use-package company-c-headers
   :ensure t
   :config
-  (push 'company-c-headers company-backends))
+  (defun my/company-c-headers-config ()
+    (add-to-list 'company-backends 'company-c-headers))
+  :hook (c++-mode . my/company-c-headers-config))
 
 ;;------------------------------------------------------------------------------
-;; Building & error navigation
-
+;; building & error navigation
 (setq compilation-scroll-output t)
 
 ;; Remove compilation window on success
@@ -189,13 +204,13 @@
                (get-buffer-create "*compilation*"))
               (message "No compilation errors!")))))
 
-(eval-after-load 'cc-mode
+(eval-after-load 'c++-mode
   '(bind-keys :map c++-mode-map
               ("M-k" . projectile-compile-project)))
 
 ;; make compilation buffers support ANSI colours
-(require 'ansi-color)
 (defun colorize-compilation-buffer ()
+  (require 'ansi-color)
   (ansi-color-apply-on-region compilation-filter-start (point)))
 (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
 
@@ -215,100 +230,3 @@
 
 (use-package gud
   :bind (("C-x C-a <f5>" . gdb-run-or-cont)))
-
-;;------------------------------------------------------------------------------
-;; Transpose function args
-(defun c-forward-to-argsep ()
-  "Move to the end of the current c function argument.
-Returns point."
-  (interactive)
-  (while
-    (progn (comment-forward most-positive-fixnum)
-      (looking-at "[^,)>}]"))
-    (forward-sexp))
-  (point))
-
-(defun c-backward-to-argsep ()
-  "Move to the beginning of the current c function argument.
-Returns point."
-  (interactive)
-  (let ((pt (point)) cur)
-    (up-list -1)
-    (forward-char)
-    (while
-      (progn
-        (setq cur (point))
-        (> pt (c-forward-to-argsep)))
-      (forward-char))
-    (goto-char cur)))
-
-(defun c-transpose-args-direction (is_forward)
-  "Transpose two arguments of a c-function.
-The first arg is the one with point in it."
-  (interactive)
-  (let*
-      (;; only different to pt when not 'is_forward'
-       (pt-original (point))
-       (pt
-        (progn
-          (when (not is_forward)
-            (goto-char (- (c-backward-to-argsep) 1))
-            (unless (looking-at ",")
-              (goto-char pt-original)
-              (user-error "Argument separator not found")))
-          (point)))
-       (b (c-backward-to-argsep))
-       (sep
-        (progn (goto-char pt)
-               (c-forward-to-argsep)))
-       (e
-        (progn
-          (unless (looking-at ",")
-            (goto-char pt-original)
-            (user-error "Argument separator not found"))
-          (forward-char)
-          (c-forward-to-argsep)))
-       (ws-first
-        (buffer-substring-no-properties
-         (goto-char b)
-         (progn (skip-chars-forward "[[:space:]\n]")
-                (point))))
-       (first (buffer-substring-no-properties (point) sep))
-       (ws-second
-        (buffer-substring-no-properties
-         (goto-char (1+ sep))
-         (progn (skip-chars-forward "[[:space:]\n]")
-                (point))))
-       (second (buffer-substring-no-properties (point) e)))
-    (delete-region b e)
-    (insert ws-first second "," ws-second first)
-
-    ;; Correct the cursor location to be on the same character.
-    (if is_forward
-        (goto-char
-         (+
-          ;; word start.
-          (- (point) (length first))
-          ;; Apply initial offset within the word.
-          (- pt b (length ws-first))))
-      (goto-char
-       (+
-        b (length ws-first)
-        ;; Apply initial offset within the word.
-        (- pt-original (+ pt 1 (length ws-second))))))))
-
-
-(defun c-transpose-args-forward () (interactive) (c-transpose-args-direction t))
-(defun c-transpose-args-backward () (interactive) (c-transpose-args-direction nil))
-
-(defun c-transpose-args (prefix)
-  "Transpose argument at point with the argument before it.
-With prefix arg ARG, transpose with the argument after it."
-  (interactive "P")
-  (cond ((not prefix) (c-transpose-args-backward))
-        (t (c-transpose-args-forward))))
-
-
-(eval-after-load 'cc-mode
-  '(bind-keys :map c++-mode-map
-              ("C-M-t" . c-transpose-args)))

@@ -10,8 +10,11 @@
   :bind ("M-]" . syntactic-close))
 
 ;;------------------------------------------------------------------------------
-;; Show column numbers
+;; Show column/line numbers
 (column-number-mode)
+(if (version< emacs-version "26")
+    (global-linum-mode)
+  (global-display-line-numbers-mode))
 
 ;;------------------------------------------------------------------------------
 ;; Auto-revert buffers
@@ -41,26 +44,25 @@
 	   (0 (rainbow-colorize-itself)))
 	  ("\\(?:[Cc][Ii][Ee]\\(?:[Xx][Yy][Zz]\\|[Uu][Vv][Yy]\\|[Xx][Yy][Yy]\\|[Ll][Aa][Bb]\\|[Ll][Uu][Vv]\\)\\|[Tt][Ee][Kk][Hh][Vv][Cc]\\):[+-]?[0-9.]+\\(?:[Ee][+-]?[0-9]+\\)?/[+-]?[0-9.]+\\(?:[Ee][+-]?[0-9]+\\)?/[+-]?[0-9.]+\\(?:[Ee][+-]?[0-9]+\\)?"
 	   (0 (rainbow-colorize-itself)))))
-  :hook (prog-mode css-mode)
+  :hook
+  (prog-mode . rainbow-mode)
+  (css-mode . rainbow-mode)
   :diminish rainbow-mode)
 
 ;;------------------------------------------------------------------------------
 ;; Highlight numbers, quoted things, escape sequences
 (use-package highlight-numbers
   :ensure t
-  :config
   :hook (prog-mode . highlight-numbers-mode)
   :diminish highlight-numbers-mode)
 
 (use-package highlight-quoted
   :ensure t
-  :config
   :hook (prog-mode . highlight-quoted-mode)
   :diminish highlight-quoted-mode)
 
 (use-package highlight-escape-sequences
   :ensure t
-  :config
   :hook (prog-mode . hes-mode)
   :diminish hes-mode)
 
@@ -95,8 +97,8 @@
 ;; expand-region
 (use-package expand-region
   :ensure t
-  :bind (("C-S-}" . er/expand-region)
-         ("C-S-{" . er/contract-region))
+  :bind (("C-}" . er/expand-region)
+         ("C-{" . er/contract-region))
   :config
   (require 'the-org-mode-expansions)
   (setq expand-region-smart-cursor t
@@ -155,8 +157,9 @@
   :bind (("C-x f" . projectile-find-file)
          ("C-c #" . projectile-find-file-dwim)
          ("C-x C-h" . projectile-find-other-file))
+  :hook
+  (prog-mode . projectile-mode)
   :diminish projectile-mode)
-(projectile-mode +1)
 
 ;;------------------------------------------------------------------------------
 ;; RIPGrep
@@ -170,16 +173,7 @@
 ;; Flycheck
 (use-package flycheck
   :ensure t
-  :config
-  (setq flycheck-flake8rc "~/.config/flake8"
-        flycheck-python-flake8-executable "python3")
-  :bind
-  :bind (:map flycheck-mode-map
-              ("M-<down>" . flycheck-next-error)
-              ("M-<up>" . flycheck-previous-error))
-  :hook ((c++-mode . flycheck-mode)
-         (python-mode . flycheck-mode)
-         (sh-mode . flycheck-mode)))
+  :hook sh-mode)
 
 ;;------------------------------------------------------------------------------
 ;; Emojify
@@ -188,12 +182,6 @@
   :init (global-emojify-mode)
   :bind (("C-c e" . emojify-insert-emoji))
   :diminish emojify-mode)
-
-;;------------------------------------------------------------------------------
-;; line numbers
-(if (version< emacs-version "26")
-    (global-linum-mode)
-  (global-display-line-numbers-mode))
 
 ;;------------------------------------------------------------------------------
 ;; filladapt
@@ -207,10 +195,8 @@
 ;; grugru (rotate text at point)
 (use-package grugru
   :ensure t
-  :init
-  ;; (grugru-default-setup)
-  (grugru-highlight-mode)
   :config
+  (grugru-highlight-mode)
   (grugru-define-global 'symbol (grugru-metagenerator-keep-case '("yes" "no")))
   (grugru-define-global 'symbol (grugru-metagenerator-keep-case '("true" "false")))
   (grugru-define-global 'symbol (grugru-metagenerator-keep-case '("width" "height")))

@@ -96,7 +96,7 @@
 (setq large-file-warning-threshold 100000000)
 
 ;;------------------------------------------------------------------------------
-;; IDO & smex
+;; IDO & amx
 (use-package ido
   :ensure t
   :preface
@@ -118,14 +118,16 @@
   (setq ido-use-filename-at-point nil)
   (setq ido-create-new-buffer 'always)
   (flx-ido-mode 1)
-  (setq ido-use-faces t))
+  (setq ido-use-faces t)
+  :after ido)
 
 (use-package ido-completing-read+
   :ensure t
   :preface
   (defvar ido-ubiquitous-debug-mode nil)
   :config
-  (ido-ubiquitous-mode))
+  (ido-ubiquitous-mode)
+  :after ido)
 
 (use-package ido-vertical-mode
   :ensure t
@@ -139,7 +141,8 @@
                       :foreground "white")
   (set-face-attribute 'ido-vertical-match-face nil
                       :foreground "#b00000")
-  (setq ido-vertical-define-keys 'C-n-C-p-up-and-down))
+  (setq ido-vertical-define-keys 'C-n-C-p-up-and-down)
+  :after ido)
 
 (use-package amx
   :ensure t
@@ -157,7 +160,9 @@
         undo-tree-visualizer-diff t
         undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo"))
         undo-tree-auto-save-history nil)
-  :diminish undo-tree-mode)
+  :diminish undo-tree-mode
+  :bind (("C-z" . undo-tree-undo)
+         ("C-x u" . undo-tree-visualize)))
 
 ;;------------------------------------------------------------------------------
 ;; Google-this
@@ -240,15 +245,6 @@
   :bind (("<f12>" . neotree-toggle)))
 
 ;;------------------------------------------------------------------------------
-;; wttrin: weather
-(use-package wttrin
-  :ensure t
-  :config
-  (setq wttrin-default-cities '("Denver")
-        wttrin-default-accept-language '("Accept-Language" . "en-US"))
-  :bind (("C-x w" . wttrin)))
-
-;;------------------------------------------------------------------------------
 ;; make shell files executable on save
 (add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
 
@@ -270,11 +266,6 @@
 (use-package browse-kill-ring
   :ensure t
   :bind (("C-M-y" . browse-kill-ring)))
-
-;;------------------------------------------------------------------------------
-;; rotate words
-(autoload 'rotate-text "rotate-text" nil t)
-(autoload 'rotate-text-backward "rotate-text" nil t)
 
 ;;------------------------------------------------------------------------------
 ;; symbol-overlay

@@ -1,7 +1,9 @@
 ;;------------------------------------------------------------------------------
 ;; Git interactions
 ;; modes
-(use-package git-commit :ensure t)
+(use-package git-commit
+  :ensure t
+  :mode "COMMIT_EDITMSG$")
 
 ;; magit
 (use-package magit
@@ -33,8 +35,9 @@
   :ensure t
   :config
   (setq diff-hl-side 'right)
-  (global-diff-hl-mode)
-  (diff-hl-flydiff-mode))
+  (diff-hl-flydiff-mode)
+  :hook
+  (prog-mode . diff-hl-mode))
 
 ;; prevent annoying reverts during conflict editing
 (setq auto-revert-vc-info nil)

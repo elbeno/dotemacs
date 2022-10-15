@@ -28,6 +28,10 @@
   (setq org-todo-keywords '((sequence "☛ TODO(t)" "|" "✔ DONE(d)")
                             (sequence "⚑ WAITING(w)" "|")
                             (sequence "|" "✘ CANCELLED(c)")))
+  (font-lock-add-keywords 'org-mode
+                          '(("^ +\\([-*]\\) "
+                             (0 (prog1 () (compose-region (match-beginning 1)
+                                                          (match-end 1) "•"))))))
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((C . t)
@@ -39,17 +43,10 @@
 ;; better header bullets
 (use-package org-bullets
   :ensure t
-  :init
+  :config
   (setq org-bullets-bullet-list
         '("◉" "✸" "✿" "◎" "►" "◇"))
-  :config
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
-
-;; better inline list bullets
-(font-lock-add-keywords 'org-mode
-                        '(("^ +\\([-*]\\) "
-                           (0 (prog1 () (compose-region (match-beginning 1)
-                                                        (match-end 1) "•"))))))
+  :hook org-mode)
 
 (use-package org-re-reveal
   :ensure t

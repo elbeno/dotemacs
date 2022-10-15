@@ -1,4 +1,3 @@
-(bind-key "C-z" 'undo)
 (bind-key "C-o" 'goto-line)
 (bind-key "M-r" 'replace-string)
 (bind-key "M-k" 'compile)
