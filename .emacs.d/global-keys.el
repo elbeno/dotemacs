@@ -57,3 +57,16 @@
 
 ;; quick-calc on C-=
 (bind-key "C-=" 'quick-calc)
+
+;; comments
+(defun my/comment-dwim ()
+  "Comment region if active, else comment line.
+
+This avoids the excess region commenting of `comment-line' while also avoiding the weird single-line
+behavior of `comment-dwim'."
+  (interactive)
+  (save-excursion
+    (if (use-region-p)
+        (call-interactively #'comment-or-uncomment-region)
+      (call-interactively #'comment-line))))
+(bind-key "M-;" 'my/comment-dwim)

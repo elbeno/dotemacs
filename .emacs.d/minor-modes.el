@@ -75,23 +75,6 @@
   :diminish eldoc-mode)
 
 ;;------------------------------------------------------------------------------
-;; comments
-(defun my/comment-or-uncomment-lines ()
-  "Toggle commenting on all the lines that the region spans."
-  (if (eq (line-number-at-pos (point))
-		  (line-number-at-pos (mark)))
-	  (cd2/comment-or-uncomment-region)
-	(comment-or-uncomment-region
-	 (save-excursion (goto-char (region-beginning)) (line-beginning-position))
-	 (save-excursion (goto-char (1- (region-end))) (line-end-position)))))
-
-(use-package comment-dwim-2
-  :ensure t
-  :bind ("M-;" . comment-dwim-2)
-  :config
-  (setq cd2/region-command 'my/comment-or-uncomment-lines))
-
-;;------------------------------------------------------------------------------
 ;; smart tabs
 (use-package smart-tab
   :ensure t
