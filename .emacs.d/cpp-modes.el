@@ -115,29 +115,7 @@
               ("C-]" . find-and-align-boost-sml)))
 
 ;;------------------------------------------------------------------------------
-;; lsp + clangd + company
-
-;; (setq company-clang-executable (find-exe llvm-root "clang"))
-;; (setq my-clangd-executable (find-exe llvm-root "clangd"))
-;; (setq my-clang-tidy-executable (find-exe llvm-root "clang-tidy"))
-
-;; (use-package flycheck-clang-tidy
-;;   :ensure t
-;;   :init
-;;   (setq flycheck-clang-tidy-executable my-clang-tidy-executable)
-;;   :after flycheck
-;;   :hook
-;;   ((flycheck-mode . flycheck-clang-tidy-setup)))
-
-;; In c++-mode, start lsp mode etc unless we're in a temp buffer
-;; (don't do it when exporting org-mode blocks)
-;; (defun my-c++-mode-hook ()
-;;   (unless (string-match-p (regexp-quote "*temp*") (buffer-name))
-;;     (company-mode)
-;;     (lsp)
-;;     (flycheck-add-next-checker 'lsp '(t . c/c++-clang-tidy))))
-;; (add-hook 'c++-mode-hook 'my-c++-mode-hook)
-
+;; lsp + clangd
 (use-package flycheck-clang-tidy
   :ensure t
   :defer)
@@ -146,18 +124,21 @@
   :ensure t
   :config
   (defun my/config-lsp-mode ()
-    (require 'lsp-clangd)
-    (setq lsp-enable-indentation nil
-          lsp-auto-guess-root t
-          lsp-clangd-binary-path (find-exe llvm-root "clangd")
-          lsp-prefer-flymake nil
-          flycheck-clang-tidy-executable (find-exe llvm-root "clang-tidy"))
-    (lsp)
-    (flycheck-clang-tidy-setup)
-    (flycheck-add-next-checker 'lsp 'c/c++-clang-tidy)
-    (bind-keys :map flycheck-mode-map
-               ("M-<down>" . flycheck-next-error)
-               ("M-<up>" . flycheck-previous-error)))
+    ;; Start lsp mode etc unless we're in a temp buffer
+    ;; (don't do it when exporting org-mode blocks)
+    (unless (string-match-p (regexp-quote "*temp*") (buffer-name))
+      (require 'lsp-clangd)
+      (setq lsp-enable-indentation nil
+            lsp-auto-guess-root t
+            lsp-clangd-binary-path (find-exe llvm-root "clangd")
+            lsp-prefer-flymake nil
+            flycheck-clang-tidy-executable (find-exe llvm-root "clang-tidy"))
+      (lsp)
+      (flycheck-clang-tidy-setup)
+      (flycheck-add-next-checker 'lsp 'c/c++-clang-tidy)
+      (bind-keys :map flycheck-mode-map
+                 ("M-<down>" . flycheck-next-error)
+                 ("M-<up>" . flycheck-previous-error))))
   :hook (c++-mode . my/config-lsp-mode))
 
 (use-package lsp-ui
