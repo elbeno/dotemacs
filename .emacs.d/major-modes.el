@@ -74,7 +74,8 @@
         ("M-<up>" . jjgr-dired-up-directory)
         ("<return>" . jjgr-dired-find-file)
         ("g" . dired-git-info-mode)
-        ("r" . revert-buffer))
+        ("r" . revert-buffer)
+        ([remap dired-summary] . which-key-show-major-mode))
   :custom
   (dired-find-subdir t "Reuse buffers for opened directories")
   :config
