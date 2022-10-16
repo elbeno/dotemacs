@@ -115,7 +115,7 @@
 
 ;;------------------------------------------------------------------------------
 ;; My stuff
-(load "misc")
+(load "utilities.el")
 
 (bind-key "C-x C-S-e" 'eval-and-replace)
 (bind-key "C-c C-w" 'toggle-window-split)
