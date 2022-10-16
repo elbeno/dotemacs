@@ -93,7 +93,7 @@
               ("C-M-t" . c-transpose-args)))
 
 ;;------------------------------------------------------------------------------
-;; Transposing arguments
+;; Toggling include quote styles
 (autoload 'c-toggle-include-quotes "c-change-brackets"
   "Toggle between angled includes and quoted includes." t)
 (eval-after-load 'cc-mode
@@ -139,9 +139,11 @@
       (setq lsp-enable-indentation nil
             lsp-auto-guess-root t
             lsp-clangd-binary-path (find-exe llvm-root "clangd")
-            lsp-prefer-flymake nil
-            flycheck-clang-tidy-executable (find-exe llvm-root "clang-tidy"))
+            lsp-prefer-flymake nil)
       (lsp)
+      (require 'lsp-diagnostics)
+      (lsp-diagnostics-flycheck-enable)
+      (setq flycheck-clang-tidy-executable (find-exe llvm-root "clang-tidy"))
       (flycheck-clang-tidy-setup)
       (flycheck-add-next-checker 'lsp 'c/c++-clang-tidy)
       (bind-keys :map flycheck-mode-map
@@ -166,8 +168,10 @@
   (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
   (define-key lsp-ui-mode-map (kbd "C-<return>") #'lsp-ui-sideline-apply-code-actions)
   (define-key lsp-ui-mode-map (kbd "C-c m") #'lsp-ui-imenu)
-  :hook ((lsp-mode . lsp-enable-imenu)
-         (lsp-mode . lsp-ui-mode)))
+  (defun my/config-lsp-ui-mode ()
+      (lsp-enable-imenu)
+      (lsp-ui-mode))
+  :hook (lsp-mode . my/config-lsp-ui-mode))
 
 ;;------------------------------------------------------------------------------
 ;; Header completion
@@ -186,7 +190,7 @@
                   `("." ,include-location)
                 '(".")))))
     (add-to-list 'company-backends 'company-c-headers)
-    (setq-local 'smart-tab-user-provided-completion-function 'company-complete))
+    (setq-local smart-tab-user-provided-completion-function 'company-complete))
   :hook (c++-mode . my/company-c-headers-config))
 
 ;;------------------------------------------------------------------------------
