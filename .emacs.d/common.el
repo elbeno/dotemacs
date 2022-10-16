@@ -99,41 +99,33 @@
 ;; IDO & amx
 (use-package ido
   :ensure t
-  :preface
-  (defvar ido-cur-item               nil)
-  (defvar ido-default-item           nil)
-  (defvar inherit-input-method       nil)
-  (defvar ido-cur-list               nil)
-  (defvar ido-context-switch-command nil)
-  (defvar ido-cr+-enable-next-call   nil)
-  (defvar ido-cr+-replace-completely nil)
-  (defvar ido-cr+-debug-mode         nil)
-  (defvar ido-require-match          nil))
+  :config
+  (setq ido-everywhere t
+        ido-use-filename-at-point nil
+        ido-create-new-buffer 'always
+        ido-use-faces t
+        ido-virtual-buffers t)
+  (ido-mode))
 
 (use-package flx-ido
   :ensure t
   :config
-  (ido-mode 1)
-  (setq ido-everywhere t)
-  (setq ido-use-filename-at-point nil)
-  (setq ido-create-new-buffer 'always)
-  (flx-ido-mode 1)
-  (setq ido-use-faces t)
+  (flx-ido-mode)
   :after ido)
 
 (use-package ido-completing-read+
   :ensure t
-  :preface
-  (defvar ido-ubiquitous-debug-mode nil)
   :config
+  (setq ido-ubiquitous-max-items 50000
+        ido-cr+-max-items 50000)
   (ido-ubiquitous-mode)
   :after ido)
 
 (use-package ido-vertical-mode
   :ensure t
   :config
-  (setq ido-vertical-show-count t)
-  (ido-vertical-mode 1)
+  (setq ido-vertical-show-count t
+        ido-vertical-define-keys 'C-n-C-p-up-and-down)
   (set-face-attribute 'ido-vertical-first-match-face nil
                       :background "#e5b7c0")
   (set-face-attribute 'ido-vertical-only-match-face nil
@@ -141,7 +133,7 @@
                       :foreground "white")
   (set-face-attribute 'ido-vertical-match-face nil
                       :foreground "#b00000")
-  (setq ido-vertical-define-keys 'C-n-C-p-up-and-down)
+  (ido-vertical-mode)
   :after ido)
 
 (use-package amx
