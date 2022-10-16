@@ -76,7 +76,7 @@
   "Auto-insert #include line(s) required for the current line." t)
 (eval-after-load 'cc-mode
   '(bind-keys :map c++-mode-map
-              ("C-c q" . cpp-auto-include/namespace-qualify-file)
+              ("C-c n" . cpp-auto-include/namespace-qualify-file)
               ("C-c i" . cpp-auto-include/ensure-includes-for-file)
               ("C-c o" . cpp-auto-include/ensure-includes-for-current-line)))
 
@@ -91,6 +91,14 @@
 (eval-after-load 'cc-mode
   '(bind-keys :map c++-mode-map
               ("C-M-t" . c-transpose-args)))
+
+;;------------------------------------------------------------------------------
+;; Transposing arguments
+(autoload 'c-toggle-include-quotes "c-change-brackets"
+  "Toggle between angled includes and quoted includes." t)
+(eval-after-load 'cc-mode
+  '(bind-keys :map c++-mode-map
+              ("C-c q" . c-toggle-include-quotes)))
 
 ;;------------------------------------------------------------------------------
 ;; indentation rules
@@ -167,7 +175,18 @@
   :ensure t
   :config
   (defun my/company-c-headers-config ()
-    (add-to-list 'company-backends 'company-c-headers))
+    (let ((iostream-location (find-file-recursive llvm-root "iostream")))
+      (when iostream-location
+        (add-to-list 'company-c-headers-path-system
+                     (file-name-directory iostream-location))))
+    (setq company-c-headers-path-user
+          (lambda ()
+            (let ((include-location (concat (projectile-project-root) "include/")))
+              (if (file-directory-p include-location)
+                  `("." ,include-location)
+                '(".")))))
+    (add-to-list 'company-backends 'company-c-headers)
+    (setq-local 'smart-tab-user-provided-completion-function 'company-complete))
   :hook (c++-mode . my/company-c-headers-config))
 
 ;;------------------------------------------------------------------------------
