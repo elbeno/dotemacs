@@ -88,8 +88,8 @@
       scroll-step 1
       scroll-conservatively 10000
       scroll-preserve-screen-position 1)
-(setq mouse-wheel-follow-mouse 't)
-(setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
+(setq mouse-wheel-follow-mouse t
+      mouse-wheel-scroll-amount '(1 ((shift) . 1)))
 
 ;;------------------------------------------------------------------------------
 ;; Prevent prompt on opening large TAGS file
