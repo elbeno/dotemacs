@@ -19,6 +19,11 @@
 (setq ls-lisp-use-insert-directory-program t)
 (setq insert-directory-program "/bin/ls")
 
+;; For editing command-line in bash:
+;; When $EDITOR="emacsclient -nw", C-x C-e on the command line
+;; allows editing the line in emacs
+(add-to-list 'auto-mode-alist '("\\`/tmp/bash-fc\.[a-z0-9A-Z]+\\'" . sh-mode))
+
 ;;------------------------------------------------------------------------------
 ;; CMake
 (defcustom my-cmake-format-enabled t
