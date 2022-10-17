@@ -68,6 +68,11 @@
            (concat (getenv "HOME") "/.local/share/fonts/all-the-icons.ttf"))
     (all-the-icons-install-fonts t)))
 
+(use-package all-the-icons-dired
+  :ensure t
+  :hook dired-mode
+  :after all-the-icons)
+
 ;;------------------------------------------------------------------------------
 ;; Prettier modeline
 (setq my/read-only-indicator " 🔑 ")
