@@ -47,12 +47,8 @@
 ;; Use hippie-expand instead of dabbrev-expand
 (bind-key "M-/" 'hippie-expand)
 
-;; Use kill-this-buffer
-(defun bjm/kill-this-buffer ()
-  "Kill the current buffer."
-  (interactive)
-  (kill-buffer (current-buffer)))
-(bind-key "C-x k" 'bjm/kill-this-buffer)
+;; Don't ask for which buffer to kill
+(bind-key "C-x k" 'kill-current-buffer)
 
 ;; quick-calc on C-=
 (bind-key "C-=" 'quick-calc)
