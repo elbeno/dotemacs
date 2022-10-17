@@ -50,7 +50,8 @@
 
 (require 'use-package)
 (setq use-package-minimum-reported-time 0
-      use-package-verbose t)
+      use-package-verbose t
+      use-package-compute-statistics t)
 
 (setq personal-keybindings nil)
 
