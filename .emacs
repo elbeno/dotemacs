@@ -24,11 +24,6 @@
 (setq custom-file (concat dotfile-dir ".emacs.d/custom.el"))
 (load custom-file)
 
-;------------------------------------------------------------------------------
-;; apply local site-specific changes
-(let ((local-file (concat dotfile-dir ".emacs.d/local.el")))
-  (load local-file))
-
 ;;------------------------------------------------------------------------------
 ;; package setup
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
@@ -150,6 +145,11 @@
 ;;------------------------------------------------------------------------------
 ;; Hacks & late-bound overrides
 (load "hacks.el")
+
+;------------------------------------------------------------------------------
+;; apply local site-specific changes
+(let ((local-file (concat dotfile-dir ".emacs.d/local.el")))
+  (load local-file))
 
 ;; Local Variables:
 ;; byte-compile-warnings: (not free-vars)
