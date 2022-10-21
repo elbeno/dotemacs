@@ -275,3 +275,10 @@
           (t buf-name))))
 
 (setq auto-revert-check-vc-info t)
+
+;;------------------------------------------------------------------------------
+;; keep track of the cursor
+(use-package beacon
+  :ensure t
+  :config
+  (beacon-mode 1))
