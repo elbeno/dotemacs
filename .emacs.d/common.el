@@ -96,51 +96,11 @@
 (setq large-file-warning-threshold 100000000)
 
 ;;------------------------------------------------------------------------------
-;; IDO & amx
-(use-package ido
+;; selectrum
+(use-package selectrum
   :ensure t
   :config
-  (setq ido-everywhere t
-        ido-use-filename-at-point nil
-        ido-create-new-buffer 'always
-        ido-use-faces t
-        ido-virtual-buffers t)
-  (ido-mode))
-
-(use-package flx-ido
-  :ensure t
-  :config
-  (flx-ido-mode)
-  :after ido)
-
-(use-package ido-completing-read+
-  :ensure t
-  :config
-  (setq ido-ubiquitous-max-items 50000
-        ido-cr+-max-items 50000)
-  (ido-ubiquitous-mode)
-  :after ido)
-
-(use-package ido-vertical-mode
-  :ensure t
-  :config
-  (setq ido-vertical-show-count t
-        ido-vertical-define-keys 'C-n-C-p-up-and-down)
-  (set-face-attribute 'ido-vertical-first-match-face nil
-                      :background "#e5b7c0")
-  (set-face-attribute 'ido-vertical-only-match-face nil
-                      :background "#e52b50"
-                      :foreground "white")
-  (set-face-attribute 'ido-vertical-match-face nil
-                      :foreground "#b00000")
-  (ido-vertical-mode)
-  :after ido)
-
-(use-package amx
-  :ensure t
-  :config
-  (amx-mode)
-  :demand)
+  (selectrum-mode 1))
 
 ;;------------------------------------------------------------------------------
 ;; Undo-tree

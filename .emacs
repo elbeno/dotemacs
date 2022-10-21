@@ -16,8 +16,6 @@
 (add-to-list 'load-path (concat dotfile-dir ".emacs.d/site-lisp/"))
 ;; packages
 (setq package-user-dir (concat dotfile-dir ".emacs.d/packages/"))
-;; themes
-(setq custom-theme-directory (concat dotfile-dir ".emacs.d/themes/"))
 
 ;;------------------------------------------------------------------------------
 ;; apply custom variables

@@ -6,17 +6,15 @@
 
 ;;------------------------------------------------------------------------------
 ;; Nice theme
-(load-theme 'hipster)
+(use-package cyberpunk-theme
+  :ensure t
+  :config
+  (load-theme 'cyberpunk t))
 
 ;;------------------------------------------------------------------------------
 ;; Highlight FIXME/TODO
 (font-lock-add-keywords 'c++-mode
                         '(("\\<\\(FIXME\\|TODO\\).*?:" 0 font-lock-warning-face prepend)))
-
-;;------------------------------------------------------------------------------
-;; More visible comments
-(set-face-foreground 'font-lock-comment-face "magenta")
-(set-face-foreground 'font-lock-comment-delimiter-face "magenta")
 
 ;;------------------------------------------------------------------------------
 ;; Special types of comments
