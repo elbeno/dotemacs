@@ -102,6 +102,12 @@
   :config
   (selectrum-mode 1))
 
+(use-package hotfuzz
+  :ensure t
+  :config
+  (hotfuzz-selectrum-mode)
+  :after selectrum)
+
 ;;------------------------------------------------------------------------------
 ;; Undo-tree
 (use-package undo-tree
