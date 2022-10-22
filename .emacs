@@ -3,6 +3,8 @@
 (setq debug-on-error nil)
 ;; plenty of memory, GC threshold is 100MB
 (setq gc-cons-threshold 100000000)
+;; don't resize the frame on font changes etc
+(setq frame-inhibit-implied-resize t)
 
 ;; this file's true directory
 (setq dotfile-dir (file-name-directory
