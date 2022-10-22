@@ -229,7 +229,7 @@ tree."
                (get-buffer-create "*compilation*"))
               (message "No compilation errors!")))))
 
-(eval-after-load 'c++-mode
+(eval-after-load 'cc-mode
   '(bind-keys :map c++-mode-map
               ("M-k" . projectile-compile-project)))
 
