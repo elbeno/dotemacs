@@ -118,6 +118,8 @@
 (bind-key "C-c d" 'insert-current-date)
 (bind-key "C-c t" 'insert-current-time)
 (bind-key "C-c u" 'insert-uuid)
+(bind-key "C-c C-f" 'my-search-forward-1)
+(bind-key "C-c C-b" 'my-search-backward-1)
 
 ;;------------------------------------------------------------------------------
 ;; Graphic window settings

@@ -170,3 +170,28 @@ Example of an XCode UUID: a513b85041a3535fc3520c3d."
     (setq projectile-globally-ignored-directories saved)))
 
 (advice-add #'projectile-ripgrep :around #'my-projectile-ripgrep)
+
+;; forward to next indicated character
+(defun my-search-forward-1 (char &optional count)
+  "Search forward for CHAR COUNT times in current line."
+  (interactive
+   (list (read-char "1> ")
+         current-prefix-arg))
+  (forward-char)
+  (unwind-protect
+      (search-forward (char-to-string char) (line-end-position) nil (or count 1))
+    (backward-char)
+    (point)))
+
+;; back to previous indicated character
+(defun my-search-backward-1 (char &optional count)
+  "Search backward for CHAR COUNT times in current line."
+  (interactive
+   (list (read-char "1> ")
+         current-prefix-arg))
+  (backward-char)
+  (unwind-protect
+      (search-backward (char-to-string char) (line-beginning-position) nil
+                       (or count 1))
+    (forward-char)
+    (point)))
