@@ -11,10 +11,13 @@
         org-support-shift-select t
         org-startup-indented t
         org-src-fontify-natively t
-        org-completion-use-ido t
         org-export-allow-bind-keywords t
         org-latex-listings 'minted
-        org-reveal-note-key-char nil)
+        org-reveal-note-key-char nil
+        org-directory (concat (getenv "HOME") "/.org_notes"))
+  (unless (file-exists-p org-directory)
+    (make-directory org-directory))
+  (setq org-default-notes-file (concat org-directory "/notes.org"))
   (setq org-latex-pdf-process
         '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
           "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
@@ -56,6 +59,23 @@
   :ensure t
   :defer)
 
+(use-package org-roam
+  :ensure t
+  :config
+  (setq org-roam-directory org-directory
+        org-roam-v2-ack t
+        org-roam-completion-everywhere t)
+  (org-roam-db-autosync-mode)
+  (org-roam-setup)
+  :bind (("C-c n f" . org-roam-node-find)
+         ("C-c n r" . org-roam-node-random)
+         (:map org-mode-map
+               (("C-c n i" . org-roam-node-insert)
+                ("C-c n o" . org-id-get-create)
+                ("C-c n t" . org-roam-tag-add)
+                ("C-c n a" . org-roam-alias-add)
+                ("C-c n l" . org-roam-buffer-toggle)))))
+
 (defvar modi/htmlize-initial-flyspell-state nil
   "Variable to store the state of `flyspell-mode' when `htmlize-buffer' is called.")
 
@@ -75,7 +95,6 @@
 (bind-key "C-c l" 'org-store-link)
 (bind-key "C-c c" 'org-capture)
 (bind-key "C-c a" 'org-agenda)
-(bind-key "C-c i" 'org-iswitchb)
 
 (add-hook 'org-mode-hook
           (lambda ()
