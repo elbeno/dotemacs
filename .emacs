@@ -115,9 +115,9 @@
 
 (bind-key "C-x C-S-e" 'eval-and-replace)
 (bind-key "C-c C-w" 'toggle-window-split)
-(bind-key "C-c d" 'insert-current-date)
-(bind-key "C-c t" 'insert-current-time)
-(bind-key "C-c u" 'insert-uuid)
+(bind-key "C-c C-d" 'insert-current-date)
+(bind-key "C-c C-t" 'insert-current-time)
+(bind-key "C-c C-u" 'insert-uuid)
 (bind-key "C-c C-f" 'my-search-forward-1)
 (bind-key "C-c C-b" 'my-search-backward-1)
 

@@ -1,18 +1,16 @@
 ;;------------------------------------------------------------------------------
 ;; Git interactions
-;; modes
-(use-package git-commit
-  :ensure t
-  :mode "COMMIT_EDITMSG$")
 
 ;; magit
 (use-package magit
   :ensure t
   :bind
   (("C-c g" . magit-status)
-   ("C-c C-b" . magit-blame))
-  :init
-  (setq magit-last-seen-setup-instructions "1.4.0"))
+   ("C-c B" . magit-blame)))
+
+(use-package git-commit
+  :ensure t
+  :after magit)
 
 ;; git time machine
 (use-package git-timemachine
@@ -41,3 +39,9 @@
 
 ;; prevent annoying reverts during conflict editing
 (setq auto-revert-vc-info nil)
+
+;; get url links
+(use-package git-link
+  :ensure t
+  :bind
+  (("C-c u" . git-link)))
