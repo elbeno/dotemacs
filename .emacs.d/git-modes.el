@@ -9,8 +9,7 @@
    ("C-c B" . magit-blame)))
 
 (use-package git-commit
-  :ensure t
-  :after magit)
+  :ensure t)
 
 ;; git time machine
 (use-package git-timemachine
