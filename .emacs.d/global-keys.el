@@ -1,4 +1,4 @@
-(bind-key "C-o" 'goto-line)
+;; (bind-key "C-o" 'goto-line) ;; replaced by consult
 (bind-key "M-r" 'replace-string)
 (bind-key "M-k" 'compile)
 (bind-key "M-SPC" 'cycle-spacing)
