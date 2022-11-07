@@ -174,6 +174,10 @@
   :ensure t
   :hook sh-mode)
 
+(use-package flycheck-pos-tip
+  :ensure t
+  :hook flycheck-mode)
+
 ;;------------------------------------------------------------------------------
 ;; Emojify
 (use-package emojify
