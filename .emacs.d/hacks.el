@@ -97,3 +97,9 @@
 	(setq org-table-may-need-update nil))))))
 
 (advice-add #'org-table-align :override #'my-org-table-align)
+
+(defun my-clang-tidy-error-to-url-slug (args)
+  (list (replace-regexp-in-string "^\\([^-]*\\)-" "\\1/" (car args))))
+
+(advice-add #'lsp-cpp-flycheck-clang-tidy--show-documentation
+            :filter-args #'my-clang-tidy-error-to-url-slug)
