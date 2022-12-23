@@ -6,6 +6,11 @@
 ;; font: Inconsolata
 (set-frame-font "Inconsolata-12")
 
+(custom-set-faces
+ '(fixed-pitch ((t (:family "Inconsolata")))))
+(custom-set-faces
+ '(org-document-title ((t (:family "Inconsolata" :height 1.0)))))
+
 ;;------------------------------------------------------------------------------
 (use-package dash
   :ensure t)
