@@ -23,38 +23,20 @@ A string containing the name (without path) of the cmake-format config file."
   :type '(file :must-match t)
   :risky t)
 
-(defun cmake-config-argument (filename)
-  (if (> (length cmake-format-config-file) 0)
-      `("-c" ,(concat (locate-dominating-file filename cmake-format-config-file)
-                      cmake-format-config-file))
-    nil))
+(defun cmake-format-command-line (filename)
+  (concat cmake-format-executable " -"
+          (if (> (length cmake-format-config-file) 0)
+              (concat " -c " (locate-dominating-file filename cmake-format-config-file)
+                       cmake-format-config-file)
+            "")))
 
 ;;;###autoload
 (defun cmake-format-buffer ()
   "Use cmake-format to format the current buffer."
   (interactive)
-  (let ((filename (make-temp-file "tmp-cmake-format"))
-        (config-arg (cmake-config-argument (buffer-file-name))))
-    ;; write current buffer to temp file
-    (let ((coding-system-for-write 'binary)
-          (contents (buffer-string)))
-      (with-temp-file filename
-        (set-buffer-multibyte nil)
-        (encode-coding-string contents 'utf-8 nil (current-buffer))))
-    ;; run cmake-format on temp file
-    (let ((old-point (point))
-          (replacement (with-temp-buffer
-                         (when (eq (apply #'call-process
-                                          (append `(,cmake-format-executable nil t nil ,filename)
-                                                  config-arg)) 0)
-                           (buffer-string)))))
-      ;; replace contents of current buffer
-      (when (not (= (length replacement) 0))
-        (erase-buffer)
-        (insert replacement)
-        (goto-char old-point)))
-    ;; get rid of temp file
-    (delete-file filename)))
+  (shell-command-on-region (point-min) (point-max)
+                           (cmake-format-command-line (buffer-file-name))
+                           (current-buffer) t))
 
 ;;;###autoload
 (defalias 'cmake-format 'cmake-format-buffer)
