@@ -64,4 +64,5 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(fixed-pitch ((t (:family "Inconsolata"))))
+ '(org-document-title ((t (:family "Inconsolata" :height 1.0)))))
