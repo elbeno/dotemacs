@@ -65,3 +65,10 @@ behavior of `comment-dwim'."
         (call-interactively #'comment-or-uncomment-region)
       (call-interactively #'comment-line))))
 (bind-key "M-;" 'my/comment-dwim)
+
+;; wrap selection in delimiters
+(defvar insert-pair-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map [t] #'insert-pair)
+    map))
+(bind-key "C-(" insert-pair-map)
