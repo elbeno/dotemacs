@@ -4,12 +4,12 @@
 
 ;;------------------------------------------------------------------------------
 ;; font: Inconsolata
-(set-frame-font "Inconsolata-12")
+(set-frame-font "Berkeley Mono-11")
 
 (custom-set-faces
- '(fixed-pitch ((t (:family "Inconsolata")))))
+ '(fixed-pitch ((t (:family "Berkeley Mono")))))
 (custom-set-faces
- '(org-document-title ((t (:family "Inconsolata" :height 1.0)))))
+ '(org-document-title ((t (:family "Berkeley Mono" :height 1.0)))))
 
 ;;------------------------------------------------------------------------------
 (use-package dash
