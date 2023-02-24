@@ -82,6 +82,8 @@
   :ensure t
   :config
   (global-smart-tab-mode 1)
+  (setq smart-tab-completion-functions-alist nil
+        smart-tab-user-provided-completion-function #'completion-at-point)
   :diminish smart-tab-mode)
 
 ;;------------------------------------------------------------------------------
@@ -213,3 +215,12 @@
   (("C-c /" . grugru-forward)
    ("C-c C-/" . grugru-backward))
   :diminish grugru-highlight-mode)
+
+;;------------------------------------------------------------------------------
+;; yasnippet
+(use-package yasnippet
+  :ensure t
+  :diminish yas-minor-mode
+  :config
+  (yas-reload-all)
+  (add-hook 'prog-mode-hook #'yas-minor-mode))

@@ -1,15 +1,4 @@
 ;;------------------------------------------------------------------------------
-;; company
-(use-package company
-  :ensure t
-  :hook prog-mode)
-
-(when (display-graphic-p)
-  (use-package company-box
-    :ensure t
-    :hook company-mode))
-
-;;------------------------------------------------------------------------------
 ;; markdown mode
 (use-package markdown-mode
   :ensure t
@@ -42,8 +31,7 @@
     (when my-cmake-format-enabled
       (add-hook 'before-save-hook 'cmake-format-buffer nil t))
     (bind-keys :map cmake-mode-map
-               ("C-c f" . cmake-format-buffer))
-    (company-mode))
+               ("C-c f" . cmake-format-buffer)))
   :mode (("\\.cmake\\'" . cmake-mode)
          ("^CMakeLists.txt$" . cmake-mode))
   :hook (cmake-mode . my/config-cmake-format))

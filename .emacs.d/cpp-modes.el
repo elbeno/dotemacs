@@ -135,30 +135,39 @@
 ;; lsp + clangd
 (use-package flycheck-clang-tidy
   :ensure t
+  :config
+  (setq flycheck-clang-tidy-executable (find-exe (find-llvm-root) "clang-tidy"))
   :defer)
 
 (use-package lsp-mode
   :ensure t
-  :config
+  :custom
+  (lsp-completion-provider :none)
+  :init
+  (defun my/lsp-mode-setup-completion ()
+    (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+          '(orderless)))
   (defun my/config-lsp-mode ()
     ;; Start lsp mode etc unless we're in a temp buffer
     ;; (don't do it when exporting org-mode blocks)
     (unless (string-match-p (regexp-quote "*temp*") (buffer-name))
       (require 'lsp-clangd)
-      (setq lsp-enable-indentation nil
-            lsp-auto-guess-root t
-            lsp-clangd-binary-path (find-exe (find-llvm-root) "clangd")
-            lsp-prefer-flymake nil)
       (lsp)
       (require 'lsp-diagnostics)
       (lsp-diagnostics-flycheck-enable)
-      (setq flycheck-clang-tidy-executable (find-exe (find-llvm-root) "clang-tidy"))
       (flycheck-clang-tidy-setup)
       (flycheck-add-next-checker 'lsp 'c/c++-clang-tidy)
       (bind-keys :map flycheck-mode-map
                  ("M-<down>" . flycheck-next-error)
                  ("M-<up>" . flycheck-previous-error))))
-  :hook (c++-mode . my/config-lsp-mode))
+  :config
+  (setq lsp-enable-indentation nil
+        lsp-auto-guess-root t
+        lsp-clangd-binary-path (find-exe (find-llvm-root) "clangd")
+        lsp-prefer-flymake nil)
+  :hook ((lsp-mode . lsp-enable-which-key-integration)
+         (c++-mode . my/config-lsp-mode)
+         (lsp-completion-mode . my/lsp-mode-setup-completion)))
 
 (use-package lsp-ui
   :ensure t
@@ -181,38 +190,6 @@
       (lsp-enable-imenu)
       (lsp-ui-mode))
   :hook (lsp-mode . my/config-lsp-ui-mode))
-
-;;------------------------------------------------------------------------------
-;; Header completion
-(defcustom my-cpp-system-include-path nil
-  "Override the path to search for system includes. Wherever <iostream> lives
-under this directory will be used as a system include path for company-c-headers.
-If nil, find-llvm-root will be called to detect the root of the llvm directory
-tree."
-  :group 'my-cpp-config
-  :type 'string
-  :safe 'stringp)
-
-(use-package company-c-headers
-  :ensure t
-  :config
-  (defun my/company-c-headers-config ()
-    (if my-cpp-system-include-path
-        (add-to-list 'company-c-headers-path-system
-                     my-cpp-system-include-path)
-      (let ((iostream-location (find-file-recursive (find-llvm-root) "iostream")))
-        (when iostream-location
-          (add-to-list 'company-c-headers-path-system
-                       (file-name-directory iostream-location)))))
-    (setq company-c-headers-path-user
-          (lambda ()
-            (let ((include-location (concat (projectile-project-root) "include/")))
-              (if (file-directory-p include-location)
-                  `("." ,include-location)
-                '(".")))))
-    (add-to-list 'company-backends 'company-c-headers)
-    (setq-local smart-tab-user-provided-completion-function 'company-complete))
-  :hook (c++-mode . my/company-c-headers-config))
 
 ;;------------------------------------------------------------------------------
 ;; building & error navigation
