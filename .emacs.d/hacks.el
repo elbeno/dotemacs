@@ -103,3 +103,6 @@
 
 (advice-add #'lsp-cpp-flycheck-clang-tidy--show-documentation
             :filter-args #'my-clang-tidy-error-to-url-slug)
+
+(advice-add #'flycheck-clang-tidy--show-documentation
+            :filter-args #'my-clang-tidy-error-to-url-slug)
