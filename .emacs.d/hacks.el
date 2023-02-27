@@ -106,3 +106,34 @@
 
 (advice-add #'flycheck-clang-tidy--show-documentation
             :filter-args #'my-clang-tidy-error-to-url-slug)
+
+;;------------------------------------------------------------------------------
+;; workaround for broken bm package
+;; https://github.com/joodland/bm/issues/45
+
+(defun my/bm-lists (&optional direction predicate)
+  "Return a pair of lists giving all the bookmarks of the current buffer.
+The car has all the bookmarks before the overlay center;
+the cdr has all the bookmarks after the overlay center.
+A bookmark implementation of `overlay-lists'.
+
+If optional argument DIRECTION is provided, only return bookmarks
+in the specified direction.
+
+If optional argument PREDICATE is provided, it is used as a
+selection criteria for filtering the lists."
+  (if (null predicate)
+    (setq predicate 'bm-bookmarkp))
+
+  (overlay-recenter (point))
+  (cond ((equal 'forward direction)
+         (cons nil (remq nil (mapcar predicate (overlays-in (point) (point-max))))))
+        ((equal 'backward direction)
+         (cons (remq nil (mapcar predicate (overlays-in (point-min) (point)))) nil))
+        (t
+         (cons
+          (remq nil (mapcar predicate (overlays-in (point-min) (point))))
+          (remq nil (mapcar predicate (overlays-in (point) (point-max))))))))
+
+(advice-add #'bm-lists
+            :override #'my/bm-lists)
