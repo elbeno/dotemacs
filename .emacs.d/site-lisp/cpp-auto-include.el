@@ -370,7 +370,7 @@
     ("optional" ("*")
      ,(rx (and symbol-start
                (or (and "make_optional" (* space) "(")
-                   (and "optional" (* space) "<")
+                   (and "optional" (* space) (or "<" "{"))
                    "nullopt" "nullopt_t" "bad_optional_access"))))
     ;; [filesystem]
     ("filesystem" ("filesystem::" "*")
@@ -418,7 +418,8 @@
                             "uninitialized_value_construct"
                             "uninitialized_value_construct_n"
                             "destroy_at" "destroy" "destroy_n"
-                            "to_address")
+                            "to_address"
+                            "uninitialized_construct_using_allocator")
                         (* space) (or "(" "<"))
                    (and (or "unique_ptr" "shared_ptr" "weak_ptr"
                             "pointer_traits" "uses_allocator"
@@ -428,7 +429,11 @@
                             "make_unique" "make_shared" "allocate_shared"
                             (and (or "static" "dynamic" "const" "reinterpret")
                                  "_pointer_cast")
-                            "get_deleter" "owner_less")
+                            "get_deleter" "owner_less" "assume_aligned"
+                            "make_obj_using_allocator"
+                            "uses_allocator_construction_args"
+                            "make_unique_for_overwrite"
+                            "make_shared_for_overwrite")
                         (* space) "<")
                    (and (or (and "pointer_safety::"
                                  (or "relaxed" "preferred" "strict"))
@@ -467,8 +472,12 @@
                             "function" "hash"
                             "default_searcher" "boyer_moore_searcher"
                             "boyer_moore_horspool_searcher")
+                        (* space) (or "<" "{"))
+                   (and (or "unwrap_reference" "unwrap_ref_decay")
+                        (zero-or-one "_t")
                         (* space) "<")
-                   (and "bad_function_call"
+                   (and "bind_front" (* space) "(")
+                   (and (or "bad_function_call" "identity")
                         symbol-end)))))
     ;; deprecated stuff omitted
     ("functional" ("placeholders::" "*")
@@ -511,7 +520,8 @@
                                   "is_nothrow_swappable_with" "is_nothrow_swappable"
                                   "is_invocable" "is_invocable_r"
                                   "is_nothrow_invocable" "is_nothrow_invocable_r"
-                                  "conjunction" "disjunction" "negation")
+                                  "conjunction" "disjunction" "negation"
+                                  "is_bounded_array" "is_unbounded_array")
                                  (zero-or-one "_v"))
                             (and (or "remove_const" "remove_volatile" "remove_cv"
                                      "add_const" "add_volatile" "add_cv"
@@ -520,7 +530,7 @@
                                      "remove_extent" "remove_all_extents" "remove_pointer"
                                      "add_pointer" "aligned_storage" "aligned_union"
                                      "decay" "enable_if" "conditional" "common_type"
-                                     "underlying_type" "result_of" "remove_cv_ref"
+                                     "underlying_type" "result_of" "remove_cvref"
                                      "invoke_result")
                                  (zero-or-one "_t")))
                         (* space) "<")
@@ -547,18 +557,50 @@
     ;; [time.syn]
     ("chrono" ("chrono::" "*")
      ,(rx (and symbol-start
-               (or (and (or "duration_cast" "time_point_cast" "clock_cast")
-                        (* space) (or "(" "<"))
+               (or (and (or "duration_cast" "time_point_cast" "clock_cast"
+                            "zoned_traits" "zoned_time")
+                        (* space) "<")
+                   (and (or "is_am" "is_pm" "make12" "make24"
+                            "get_tzdb" "get_tzdb_list"
+                            "locate_zone" "current_zone"
+                            "reload_tzdb" "remote_version"
+                            "get_leap_second_info" "parse")
+                        (* space) "(")
+                   (and "choose::"
+                        (or "earliest"
+                            "latest")
+                        symbol-end)
                    (and (or "duration" "time_point"
                             "treat_as_floating_point" "duration_values"
                             "is_clock" "is_clock_v" "clock_time_conversion"
-                            "time_of_day")
-                        (* space) "<")
+                            "time_of_day" "sys_time" "utc_time" "file_time"
+                            "local_time" "hh_mm_ss")
+                        (* space) (or "<" "{"))
                    (and (or "nanoseconds" "microseconds" "milliseconds"
                             "seconds" "minutes" "hours"
+                            "days" "weeks" "months" "years"
                             "system_clock" "steady_clock" "high_resolution_clock"
-                            "utc_clock" "tai_clock" "gps_clock" "file_clock" "local_t"
-                            "last_spec")
+                            "utc_clock" "tai_clock" "gps_clock" "file_clock"
+                            "local_t" "last_spec"
+                            "sys_seconds" "sys_days" "utc_seconds"
+                            "leap_second_info" "tai_seconds" "gps_seconds"
+                            "local_seconds" "local_days"
+                            "day" "month" "year" "weekday"
+                            "weekday_indexed" "weekday_last"
+                            "month_day" "month_day_last"
+                            "month_weekday" "month_weekday_last"
+                            "year_month" "year_month_day" "year_month_day_last"
+                            "year_month_weekday" "year_month_weekday_last"
+                            "nonexistent_local_time"
+                            "ambiguous_local_time"
+                            "tzdb" "tzdb_list" "sys_info" "local_info"
+                            "time_zone" "zoned_seconds" "leap_second"
+                            "time_zone_link"
+                            "last" "Sunday" "Monday" "Tuesday" "Wednesday"
+                            "Thursday" "Friday" "Saturday"
+                            "January" "February" "March" "April"
+                            "May" "June" "July" "August"
+                            "September" "October" "November" "December")
                         symbol-end)))))
     ;; [allocator.adaptor.syn]
     ("scoped_allocator" ("*")
@@ -586,7 +628,7 @@
                         (* space) "(")
                    (and (or "char_traits" "basic_string")
                         (* space) "<")
-                   (and (or "string" "wstring" "u16string" "u32string")
+                   (and (or "string" "wstring" "u16string" "u32string" "u8string")
                         symbol-end)))))
     ;; [c.strings]
     ("cctype" ("*")
@@ -642,7 +684,8 @@
                symbol-end)))
     ("cuchar" ("*")
      ,(rx (and symbol-start
-               (or "mbrtoc16" "c16rtomb" "mbrtoc32" "c32rtomb")
+               (or "mbrtoc16" "c16rtomb" "mbrtoc32" "c32rtomb"
+                   "mbrtoc8" "c8rtomb")
                (* space) "(")))
     ("cuchar" nil
      ,(rx (and symbol-start
@@ -755,7 +798,7 @@
                             "make_move_iterator"
                             "begin" "end" "cbegin" "cend"
                             "rbegin" "rend" "crbegin" "crend"
-                            "size" "empty" "data")
+                            "size" "ssize" "empty" "data")
                         (* space) (or "<" "("))
                    (and (or "input_iterator_tag"
                             "output_iterator_tag"
@@ -903,7 +946,7 @@
                    "iota" "reduce"
                    "transform_reduce" "inclusive_scan" "exclusive_scan"
                    "transform_inclusive_scan" "transform_exclusive_scan"
-                   "gcd" "lcm")
+                   "gcd" "lcm" "midpoint")
                (* space) (or "<" "("))))
     ;; [c.math]
     ("cmath" ("*")
@@ -922,7 +965,7 @@
                             "cos" "fmin" "log2" "remainder" "trunc"
                             "fpclassify" "isgreaterequal" "islessequal" "isnan" "isunordered"
                             "isfinite" "isinf" "islessgreater" "isnormal" "signbit"
-                            "isgreater" "isless")
+                            "isgreater" "isless" "lerp")
                         (* space) "(")
                    (and (or "float_t" "double_t")
                         symbol-end)))))
@@ -1174,7 +1217,7 @@
     ;; [thread.threads]
     ("thread" ("*")
      ,(rx (and symbol-start
-               "thread"
+               (or "thread" "jthread")
                symbol-end)))
     ("thread" ("this_thread::" "*")
      ,(rx (and symbol-start
@@ -1258,11 +1301,124 @@
                    (and (or "memory_resource" "pool_options" "synchronized_pool_resource"
                             "unsynchronized_pool_resource" "monotonic_buffer_resource")
                         symbol-end)))))
+    ;; [bit]
+    ("bit" ("*")
+     ,(rx (and symbol-start
+               (or (and "bit_cast" (* space) "<")
+                   (and (or "has_single_bit" "bit_ceil" "bit_floor" "bit_width"
+                            "rotl" "rotr" "countl_zero" "countl_one"
+                            "countr_zero" "countr_one" "popcount") (* space) "(")
+                   (and "endian::"
+                        (or "little"
+                            "big"
+                            "native"))))))
+    ;; [cmp]
+    ("compare" ("*")
+     ,(rx (and symbol-start
+               (or (and (or "three_way_comparable" "three_way_comparable_with")
+                        (* space) "<")
+                   (and (or "strong_order" "weak_order" "partial_order"
+                            "compare_strong_order_fallback"
+                            "compare_weak_order_fallback"
+                            "compare_partial_order_fallback"
+                            "is_eq" "is_neq" "is_lt" "is_lteq" "is_gt" "is_gteq")
+                        (* space) "(")
+                   (and (or "common_comparison_category"
+                            "compare_three_way_result")
+                        (zero-or-one "_t"))
+                   (and (or "partial_ordering" "strong_ordering"
+                            "weak_ordering" "compare_three_way")
+                        symbol-end)))))
+    ;; [concepts.syn]
+    ("concepts" ("*")
+     ,(rx (and symbol-start
+               (or (and (or "same_as" "derived_from" "convertible_to"
+                            "common_reference_with" "common_with"
+                            "integral" "signed_integral" "unsigned_integral"
+                            "floating_point" "assignable_from"
+                            "swappable" "swappable_with"
+                            "destructible" "constructible_from"
+                            "default_initializable" "move_constructible"
+                            "copy_constructible" "equality_comparable"
+                            "equality_comparable_with" "totally_ordered"
+                            "totally_ordered_with" "movable" "copyable"
+                            "semiregular" "regular" "regular_invocable"
+                            "predicate" "relation" "equivalence_relation"
+                            "strict_weak_order")
+                        (* space) "<")
+                   (and "ranges::swap" (* space) "(")))))
+    ;; [numbers]
+    ("numbers" ("*")
+     ,(rx (and symbol-start
+               (or "e" "log2e" "log10e"
+                   "pi" "inv_pi" "invsqrt_pi"
+                   "ln2" "ln10" "sqrt2" "sqrt3"
+                   "inv_sqrt3" "egamma" "phi")
+               (or (and "_v" (* space) "<")
+                   symbol-end))))
+    ;; [source.location.syn]
+    ("source_location" ("*")
+     ,(rx (and symbol-start "source_location" symbol-end)))
+    ;; [span.syn]
+    ("span" ("*")
+     ,(rx (and symbol-start
+               (or (and "span" (* space) (or "<" "{"))
+                   (and (or "as_bytes" "as_writable_bytes")
+                        (* space) "(")
+                   (and "dynamic_extent" symbol-end)))))
+    ;; [barrier.syn]
+    ("barrier" ("*")
+     ,(rx (and symbol-start
+               "barrier"
+               (* space)
+               (or "<" "{"))))
+    ;; [latch.syn]
+    ("latch" ("*")
+     ,(rx (and symbol-start "latch" symbol-end)))
+    ;; [semaphore.syn]
+    ("barrier" ("*")
+     ,(rx (and symbol-start
+               (or (and "counting_semaphore"
+                        (* space)
+                        (or "<" "{"))
+                   (and "binary_semaphore" symbol-end)))))
+    ;; [thread.stop_token.syn]
+    ("stop_token" ("*")
+     ,(rx (and symbol-start
+               (or (and (or "stop_token" "stop_source"
+                            "nostopstate" "nostopstate_t")
+                        symbol-end)
+                   (and "stop_callback" (* space) (or "<" "{"))))))
+    ;; [syncstream.syn]
+    ("syncstream" ("*")
+     ,(rx (and symbol-start
+               (or (and (or "basic_syncbuf" "basic_osyncstream")
+                        (* space)
+                        "<")
+                   (and (or "syncbuf" "wsyncbuf"
+                            "osyncstream" "wosyncstream")
+                        symbol-end)))))
+    ;; [coroutine.syn]
+    ("coroutine" ("*")
+     ,(rx (and symbol-start
+               (or (and (or "coroutine_traits" "coroutine_handle")
+                        (* space)
+                        "<")
+                   (and "noop_coroutine" (* space) "(")
+                   (and (or "noop_coroutine_promise" "noop_coroutine_handle"
+                            "suspend_never" "suspend_always")
+                        symbol-end)))))
     ))
 
 ;; Headers that are included by other headers
 (defvar cpp-auto-include/subsumed-headers
-  '(("initializer_list" . ("utility" "string"
+  '(("compare" . ("array" "chrono" "coroutine" "deque" "filesystem"
+                  "forward_list" "iterator" "list" "map" "memory"
+                  "optional" "queue" "ranges" "regex" "set"
+                  "stack" "string" "string_view" "system_error" "thread"
+                  "tuple" "typeindex" "unordered_map" "unordered_set"
+                  "utility" "variant" "vector"))
+    ("initializer_list" . ("utility" "string"
                            "array" "deque" "forward_list" "list" "vector"
                            "map" "set" "unordered_map" "unordered_set"
                            "queue" "stack"
@@ -1270,7 +1426,7 @@
     ("string" . ("bitset"))
     ("streambuf" . ("iostream"))
     ("istream" . ("iostream"))
-    ("ostream" . ("iostream"))
+    ("ostream" . ("iostream" "syncstream"))
     ("ios" . ("iostream"))))
 
 (defvar cpp-auto-include/member-access-regexp
