@@ -34,3 +34,9 @@
   :config
   (term-keys-mode t)
   :diminish term-keys-mode)
+
+;;------------------------------------------------------------------------------
+;; Use system clipboard
+(use-package xclip
+  :ensure t
+  :init (xclip-mode 1))
