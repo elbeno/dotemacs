@@ -71,9 +71,7 @@
 (use-package eldoc
   :ensure t
   :hook
-  (emacs-lisp-mode . eldoc-mode)
-  (lisp-interaction-mode . eldoc-mode)
-  (c++-mode . eldoc-mode)
+  (emacs-lisp-mode lisp-interaction-mode c++-mode)
   :diminish eldoc-mode)
 
 ;;------------------------------------------------------------------------------
