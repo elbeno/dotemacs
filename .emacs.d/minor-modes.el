@@ -224,3 +224,16 @@
   :config
   (yas-reload-all)
   (add-hook 'prog-mode-hook #'yas-minor-mode))
+
+;;------------------------------------------------------------------------------
+;; format-all
+(use-package format-all
+  :ensure t
+  :init
+  (defun my/format-all-buffer-setup ()
+    (format-all-mode)
+    (let ((language (format-all--language-id-buffer)))
+      (format-all--set-chain language
+                             (format-all--get-default-chain language))))
+  :hook ((c++-mode cmake-mode) . my/format-all-buffer-setup)
+  :bind (("C-c f" . format-all-buffer)))

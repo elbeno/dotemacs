@@ -15,26 +15,10 @@
 
 ;;------------------------------------------------------------------------------
 ;; CMake
-(defcustom my-cmake-format-enabled t
-  "If t, run cmake-format on cmake buffers upon saving."
-  :group 'cmake-format
-  :type 'boolean
-  :safe 'booleanp)
-
-(autoload 'cmake-format-buffer "cmake-format"
-  "Format the buffer with cmake-format." t)
-
 (use-package cmake-mode
   :ensure t
-  :config
-  (defun my/config-cmake-format ()
-    (when my-cmake-format-enabled
-      (add-hook 'before-save-hook 'cmake-format-buffer nil t))
-    (bind-keys :map cmake-mode-map
-               ("C-c f" . cmake-format-buffer)))
   :mode (("\\.cmake\\'" . cmake-mode)
-         ("^CMakeLists.txt$" . cmake-mode))
-  :hook (cmake-mode . my/config-cmake-format))
+         ("^CMakeLists.txt$" . cmake-mode)))
 
 (use-package cmake-font-lock
   :ensure t

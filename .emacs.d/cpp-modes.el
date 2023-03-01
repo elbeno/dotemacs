@@ -55,22 +55,11 @@
 
 ;;------------------------------------------------------------------------------
 ;; clang-format
-(defcustom my-clang-format-enabled t
-  "If t, run clang-format on cpp buffers upon saving."
-  :group 'clang-format
-  :type 'boolean
-  :safe 'booleanp)
-
-(use-package clang-format
-  :ensure t
-  :config
-  (setq clang-format-executable (find-exe (find-llvm-root) "clang-format"))
-  (defun my/config-clang-format ()
-    (when my-clang-format-enabled
-      (add-hook 'before-save-hook 'clang-format-buffer nil t))
-    (bind-keys :map c++-mode-map
-               ("C-c f" . clang-format-buffer)))
-  :hook (c++-mode . my/config-clang-format))
+(eval-after-load 'format-all
+  '(progn
+     (puthash 'clang-format (find-exe (find-llvm-root) "clang-format")
+              format-all--executable-table)
+     (puthash "C++" '(clang-format) format-all--language-table)))
 
 ;; clang-format files are YAML
 (add-to-list 'auto-mode-alist '("\\.clang-format\\'" . yaml-mode))
