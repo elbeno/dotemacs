@@ -6,11 +6,11 @@
 ;; LLVM root directory
 (defun find-file-recursive (directory filename)
   (if (and directory (file-directory-p directory))
-      (let ((found-clang-formats
+      (let ((found-files
              (directory-files-recursively directory
                                           (concat "^" filename "$"))))
-        (if found-clang-formats
-            (car found-clang-formats)
+        (if found-files
+            (car found-files)
           nil))
     nil))
 
