@@ -44,3 +44,8 @@
   :ensure t
   :bind
   (("C-c u" . git-link)))
+
+;; display TODOs
+(use-package magit-todos
+  :ensure t
+  :config (magit-todos-mode 1))

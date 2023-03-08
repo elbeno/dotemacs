@@ -12,9 +12,10 @@
   (load-theme 'cyberpunk t))
 
 ;;------------------------------------------------------------------------------
-;; Highlight FIXME/TODO
-(font-lock-add-keywords 'c++-mode
-                        '(("\\<\\(FIXME\\|TODO\\).*?:" 0 font-lock-warning-face prepend)))
+;; Highlight FIXME/TODO/etc
+(use-package hl-todo
+  :ensure t
+  :hook c++-mode)
 
 ;;------------------------------------------------------------------------------
 ;; Special types of comments
