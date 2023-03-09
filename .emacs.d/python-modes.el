@@ -8,8 +8,9 @@
 ;; elpy
 (use-package elpy
   :ensure t
-  :config
+  :init
   (elpy-enable)
+  :config
   (defun my/elpy-mode ()
     (add-hook 'before-save-hook 'py-isort-before-save nil t)
     (add-hook 'before-save-hook 'elpy-black-fix-code nil t)
