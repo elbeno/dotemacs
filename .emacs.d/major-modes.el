@@ -90,3 +90,8 @@
 (use-package dired-git-info
   :ensure t
   :after dired-mode)
+
+;;------------------------------------------------------------------------------
+;; AsciiDoc
+(use-package adoc-mode
+  :ensure t)
