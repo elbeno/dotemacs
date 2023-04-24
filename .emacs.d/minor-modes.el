@@ -12,9 +12,7 @@
 ;;------------------------------------------------------------------------------
 ;; Show column/line numbers
 (column-number-mode)
-(if (version< emacs-version "26")
-    (global-linum-mode)
-  (global-display-line-numbers-mode))
+(global-display-line-numbers-mode)
 
 ;;------------------------------------------------------------------------------
 ;; Auto-revert buffers
@@ -237,3 +235,11 @@
                              (format-all--get-default-chain language))))
   :hook ((c++-mode cmake-mode) . my/format-all-buffer-setup)
   :bind (("C-c f" . format-all-buffer)))
+
+;;------------------------------------------------------------------------------
+;; jinx for spellchecking
+(use-package jinx
+  :ensure t
+  :hook (emacs-startup . global-jinx-mode)
+  :bind ([remap ispell-word] . jinx-correct)
+  :config (setq jinx-languages "en_GB"))
