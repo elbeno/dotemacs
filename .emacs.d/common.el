@@ -452,3 +452,10 @@
   (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
   :config
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+
+;;------------------------------------------------------------------------------
+;; powerthesaurus
+(use-package powerthesaurus
+  :ensure t
+  :bind
+  (("C-c <f2>" . powerthesaurus-lookup-dwim)))
