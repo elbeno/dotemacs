@@ -243,3 +243,11 @@
   :hook (emacs-startup . global-jinx-mode)
   :bind ([remap ispell-word] . jinx-correct)
   :config (setq jinx-languages "en_GB"))
+
+;;------------------------------------------------------------------------------
+;; writegood-mode to avoid lazy writing
+(use-package writegood-mode
+  :ensure t
+  :bind (("C-c C-r m" . writegood-mode)
+         ("C-c C-r l" . writegood-grade-level)
+         ("C-c C-r e" . writegood-reading-ease)))
