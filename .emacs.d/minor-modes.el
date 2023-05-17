@@ -254,7 +254,12 @@
 
 ;;------------------------------------------------------------------------------
 ;; zone out
+(use-package zone-rainbow
+  :ensure t
+  :config
+  (setq zone-programs '[zone-rainbow]))
+
 (when (locate-file "wn" exec-path)
   (require 'zone-words)
-  (setq zone-programs '[zone-words])
+  (setq zone-programs (vconcat [zone-words] zone-programs))
   (zone-when-idle 120))
