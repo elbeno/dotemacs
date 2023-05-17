@@ -43,6 +43,7 @@
   (message "`use-package' not found.  Installing...")
   (package-install 'use-package))
 
+(setq use-package-enable-imenu-support t)
 (require 'use-package)
 (setq use-package-minimum-reported-time 0
       use-package-verbose t
@@ -153,7 +154,18 @@
 (let ((local-file (concat dotfile-dir ".emacs.d/local.el")))
   (load local-file))
 
+;------------------------------------------------------------------------------
+;; welcome dashboard
+(when (display-graphic-p)
+  (use-package welcome-dashboard
+    :ensure nil ;; when using local file and not straight nor use-package
+    :config
+    (setq welcome-dashboard-latitude 39.9237
+          welcome-dashboard-longitude -104.9201
+          welcome-dashboard-image-file (concat dotfile-dir ".emacs.d/site-lisp/lorikeet.png")
+          welcome-dashboard-title (concat "Welcome " user-full-name ", have a great day!"))
+    (welcome-dashboard-create-welcome-hook)))
+
 ;; Local Variables:
 ;; byte-compile-warnings: (not free-vars)
 ;; End:
-

@@ -12,7 +12,7 @@
 ;;------------------------------------------------------------------------------
 ;; Show column/line numbers
 (column-number-mode)
-(global-display-line-numbers-mode)
+(add-hook 'prog-mode-hook 'display-line-numbers-mode)
 
 ;;------------------------------------------------------------------------------
 ;; Auto-revert buffers
@@ -251,3 +251,10 @@
   :bind (("C-c C-r m" . writegood-mode)
          ("C-c C-r l" . writegood-grade-level)
          ("C-c C-r e" . writegood-reading-ease)))
+
+;;------------------------------------------------------------------------------
+;; zone out
+(when (locate-file "wn" exec-path)
+  (require 'zone-words)
+  (setq zone-programs '[zone-words])
+  (zone-when-idle 120))
