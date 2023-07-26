@@ -16,7 +16,8 @@
 
 ;;------------------------------------------------------------------------------
 ;; Auto-revert buffers
-(global-auto-revert-mode)
+(global-auto-revert-mode 1)
+(setq global-auto-revert-non-file-buffers t)
 (diminish 'auto-revert-mode)
 
 ;;------------------------------------------------------------------------------
