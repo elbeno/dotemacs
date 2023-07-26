@@ -238,11 +238,12 @@
 
 ;;------------------------------------------------------------------------------
 ;; jinx for spellchecking
-(use-package jinx
-  :ensure t
-  :hook (emacs-startup . global-jinx-mode)
-  :bind ([remap ispell-word] . jinx-correct)
-  :config (setq jinx-languages "en_GB"))
+(when (locate-file "enchant-2" exec-path)
+  (use-package jinx
+    :ensure t
+    :hook (emacs-startup . global-jinx-mode)
+    :bind ([remap ispell-word] . jinx-correct)
+    :config (setq jinx-languages "en_GB")))
 
 ;;------------------------------------------------------------------------------
 ;; writegood-mode to avoid lazy writing
