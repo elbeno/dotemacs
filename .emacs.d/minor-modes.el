@@ -263,3 +263,12 @@
   (require 'zone-words)
   (setq zone-programs (vconcat [zone-words] zone-programs))
   (zone-when-idle 120))
+
+;;------------------------------------------------------------------------------
+;; show keystrokes/functions
+(use-package keycast
+  :ensure t
+  :init
+  (setq keycast-mode-line-insert-after "] "
+        keycast-mode-line-remove-tail-elements nil)
+  (keycast-mode-line-mode))

@@ -237,9 +237,9 @@
 ;; simple modeline
 (defun my-truncate-buffer-name (buf-name)
   (let ((len (length buf-name)))
-    (cond ((> len 50)
+    (cond ((> len 30)
            (concat "..."
-                   (substring buf-name (- len 47) len)))
+                   (substring buf-name (- len 27) len)))
           (t buf-name))))
 
 (setq auto-revert-check-vc-info t)

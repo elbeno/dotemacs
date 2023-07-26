@@ -153,7 +153,8 @@
   (setq lsp-enable-indentation nil
         lsp-auto-guess-root t
         lsp-clangd-binary-path (find-exe (find-llvm-root) "clangd")
-        lsp-prefer-flymake nil)
+        lsp-prefer-flymake nil
+        lsp-headerline-breadcrumb-enable t)
   :hook ((lsp-mode . lsp-enable-which-key-integration)
          (c++-mode . my/config-lsp-mode)
          (lsp-completion-mode . my/lsp-mode-setup-completion)))
