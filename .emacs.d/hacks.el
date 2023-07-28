@@ -137,3 +137,23 @@ selection criteria for filtering the lists."
 
 (advice-add #'bm-lists
             :override #'my/bm-lists)
+
+;;------------------------------------------------------------------------------
+;; workaround for broken clipetty with local tmux
+(defun my/clipetty--emit (string)
+  "Emit STRING, optionally wrapped in a DCS, to an appropriate tty."
+  (let ((tmux    (getenv "TMUX" (selected-frame)))
+        (term    (getenv "TERM" (selected-frame)))
+        (ssh-tty (or (getenv "SSH_TTY" (selected-frame)) (terminal-name))))
+    (if (<= (length string) clipetty--max-cut)
+        (write-region
+         (clipetty--dcs-wrap string tmux term ssh-tty)
+         nil
+         (clipetty--tty ssh-tty tmux)
+         t
+         0)
+      (message "Selection too long to send to terminal %d" (length string))
+      (sit-for 1))))
+
+(advice-add #'clipetty--emit
+            :override #'my/clipetty--emit)
