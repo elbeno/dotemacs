@@ -6,16 +6,20 @@
 
 ;;------------------------------------------------------------------------------
 ;; Nice theme
+(defun load-theme-cyberpunk ()
+  (interactive)
+  (load-theme 'cyberpunk t))
+
 (use-package cyberpunk-theme
   :ensure t
-  :config
-  (load-theme 'cyberpunk t))
+  :bind (("C-c t c" . load-theme-cyberpunk)))
+(load-theme-cyberpunk)
 
 ;;------------------------------------------------------------------------------
 ;; Highlight FIXME/TODO/etc
 (use-package hl-todo
   :ensure t
-  :hook c++-mode)
+  :hook prog-mode)
 
 ;;------------------------------------------------------------------------------
 ;; Special types of comments
@@ -57,3 +61,33 @@
   '(progn
      (set-face-foreground 'diff-added "green4")
      (set-face-foreground 'diff-removed "red3")))
+
+;;------------------------------------------------------------------------------
+;; modus themes
+(defun load-theme-modus-operandi ()
+  (interactive)
+  (load-theme 'modus-operandi t))
+(defun load-theme-modus-vivendi ()
+  (interactive)
+  (load-theme 'modus-vivendi t))
+
+(use-package modus-themes
+  :ensure t
+  :config
+  (setq modus-themes-common-palette-overrides
+        '((border-mode-line-active bg-mode-line-active)
+          (border-mode-line-inactive bg-mode-line-inactive)
+          (fringe bg-inactive)
+          (bg-region bg-active)
+          (fg-region unspecified))
+        modus-themes-bold-constructs t
+        modus-themes-italic-constructs t
+        modus-themes-prompts '(bold intense)
+        modus-themes-completions '((matches . (extrabold))
+                                   (selection . (semibold text-also)))
+        modus-themes-org-blocks 'tinted-background)
+  :bind (("C-c t l" . load-theme-modus-operandi)
+         ("C-c t d" . load-theme-modus-vivendi)
+         ("C-c t o" . load-theme-modus-operandi)
+         ("C-c t v" . load-theme-modus-vivendi)
+         ("C-c t t" . modus-themes-toggle)))
