@@ -72,3 +72,10 @@ behavior of `comment-dwim'."
     (define-key map [t] #'insert-pair)
     map))
 (bind-key "C-(" insert-pair-map)
+
+;; C-a my attention key in tmux, so remap emacs' C-a to C-b
+;; C-b is normally bound to backward-char
+(bind-key "C-b" 'move-beginning-of-line)
+
+(when (> emacs-major-version 28)
+  (bind-key "C-c d" 'duplicate-dwim))
