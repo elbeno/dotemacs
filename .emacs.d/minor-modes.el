@@ -70,7 +70,7 @@
 (use-package eldoc
   :ensure t
   :hook
-  (emacs-lisp-mode lisp-interaction-mode c++-mode)
+  (emacs-lisp-mode lisp-interaction-mode c++-mode c++-ts-mode)
   :diminish eldoc-mode)
 
 ;;------------------------------------------------------------------------------
@@ -210,6 +210,10 @@
   (grugru-define-on-major-mode '(c++-mode) 'symbol '("public" "protected" "private"))
   (grugru-define-on-major-mode '(c++-mode) 'symbol '("class" "struct"))
   (grugru-define-on-major-mode '(c++-mode) 'symbol '("static_cast" "dynamic_cast" "reinterpret_cast" "const_cast" "bit_cast"))
+  (when (fboundp 'c++-ts-mode)
+    (grugru-define-on-major-mode '(c++-ts-mode) 'symbol '("public" "protected" "private"))
+    (grugru-define-on-major-mode '(c++-ts-mode) 'symbol '("class" "struct"))
+    (grugru-define-on-major-mode '(c++-ts-mode) 'symbol '("static_cast" "dynamic_cast" "reinterpret_cast" "const_cast" "bit_cast")))
   :bind
   (("C-c /" . grugru-forward)
    ("C-c C-/" . grugru-backward))
@@ -234,7 +238,7 @@
     (let ((language (format-all--language-id-buffer)))
       (format-all--set-chain language
                              (format-all--get-default-chain language))))
-  :hook ((c++-mode cmake-mode) . my/format-all-buffer-setup)
+  :hook ((c++-mode c++-ts-mode cmake-mode) . my/format-all-buffer-setup)
   :bind (("C-c f" . format-all-buffer)))
 
 ;;------------------------------------------------------------------------------

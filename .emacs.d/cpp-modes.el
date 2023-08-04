@@ -49,9 +49,10 @@
 
 ;;------------------------------------------------------------------------------
 ;; syntax highlighting
-(use-package modern-cpp-font-lock
-  :ensure t
-  :hook (c++-mode . modern-c++-font-lock-mode))
+(unless (use-treesit-for 'cpp)
+  (use-package modern-cpp-font-lock
+    :ensure t
+    :hook (c++-mode . modern-c++-font-lock-mode)))
 
 ;;------------------------------------------------------------------------------
 ;; clang-format
@@ -77,6 +78,11 @@
               ("C-c n" . cpp-auto-include/namespace-qualify-file)
               ("C-c i" . cpp-auto-include/ensure-includes-for-file)
               ("C-c o" . cpp-auto-include/ensure-includes-for-current-line)))
+(eval-after-load 'c-ts-mode
+  '(bind-keys :map c++-ts-mode-map
+              ("C-c n" . cpp-auto-include/namespace-qualify-file)
+              ("C-c i" . cpp-auto-include/ensure-includes-for-file)
+              ("C-c o" . cpp-auto-include/ensure-includes-for-current-line)))
 
 ;;------------------------------------------------------------------------------
 ;; Transposing arguments
@@ -89,6 +95,9 @@
 (eval-after-load 'cc-mode
   '(bind-keys :map c++-mode-map
               ("C-M-t" . c-transpose-args)))
+(eval-after-load 'c-ts-mode
+  '(bind-keys :map c++-ts-mode-map
+              ("C-M-t" . c-transpose-args)))
 
 ;;------------------------------------------------------------------------------
 ;; Toggling include quote styles
@@ -97,18 +106,9 @@
 (eval-after-load 'cc-mode
   '(bind-keys :map c++-mode-map
               ("C-c q" . c-toggle-include-quotes)))
-
-;;------------------------------------------------------------------------------
-;; indentation rules
-(defun indentation-c-mode-hook ()
-  (c-set-offset 'substatement-open 0)
-  (c-set-offset 'brace-list-open 0)
-  (c-set-offset 'member-init-cont '-)
-  (c-set-offset 'arglist-intro '+)
-  (c-set-offset 'arglist-close 0)
-  (c-set-offset 'case-label '+)
-  (c-set-offset 'statement-case-open 0))
-(add-hook 'c-mode-common-hook 'indentation-c-mode-hook)
+(eval-after-load 'c-ts-mode
+  '(bind-keys :map c++-ts-mode-map
+              ("C-c q" . c-toggle-include-quotes)))
 
 ;;------------------------------------------------------------------------------
 ;; Align Boost.SML tables
@@ -117,6 +117,10 @@
 
 (eval-after-load 'cc-mode
   '(bind-keys :map c++-mode-map
+              ("C-<tab>" . align)
+              ("C-]" . find-and-align-boost-sml)))
+(eval-after-load 'c-ts-mode
+  '(bind-keys :map c++-ts-mode-map
               ("C-<tab>" . align)
               ("C-]" . find-and-align-boost-sml)))
 
@@ -157,6 +161,7 @@
         lsp-headerline-breadcrumb-enable t)
   :hook ((lsp-mode . lsp-enable-which-key-integration)
          (c++-mode . my/config-lsp-mode)
+         (c++-ts-mode . my/config-lsp-mode)
          (lsp-completion-mode . my/lsp-mode-setup-completion)))
 
 (use-package lsp-ui
@@ -198,6 +203,9 @@
 
 (eval-after-load 'cc-mode
   '(bind-keys :map c++-mode-map
+              ("M-k" . projectile-compile-project)))
+(eval-after-load 'c-ts-mode
+  '(bind-keys :map c++-ts-mode-map
               ("M-k" . projectile-compile-project)))
 
 ;; make compilation buffers support ANSI colours

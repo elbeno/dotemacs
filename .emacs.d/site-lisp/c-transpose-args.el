@@ -84,12 +84,56 @@ The first arg is the one with point in it."
 ;;;###autoload
 (defun c-transpose-args-backward () (interactive) (c-transpose-args-direction nil))
 
+(defun my/ts-transpose-nodes (n1 n2 arg)
+  (when (and n1 n2)
+    (let* ((b1 (treesit-node-start n1))
+           (e1 (treesit-node-end n1))
+           (b2 (treesit-node-start n2))
+           (e2 (treesit-node-end n2))
+           (s1 (buffer-substring b1 e1))
+           (s2 (buffer-substring b2 e2)))
+      (delete-region b2 e2)
+      (goto-char b2)
+      (insert s1)
+      (delete-region b1 e1)
+      (goto-char b1)
+      (insert s2)
+      (goto-char (if arg (1- b1) e2)))))
+
+(defun my/cpp-ts-transpose-args (arg)
+  (let* ((parent-is-arg-list
+          (lambda (node) (let ((parent-type (treesit-node-type (treesit-node-parent node))))
+                      (or (string-equal parent-type "argument_list")
+                          (string-equal parent-type "parameter_list")
+                          (string-equal parent-type "template_argument_list")
+                          (string-equal parent-type "template_parameter_list")
+                          (string-equal parent-type "initializer_list")))))
+         (leaf-node (treesit-node-at (point)))
+         (arg-node (or (treesit-parent-until leaf-node parent-is-arg-list)
+                       leaf-node)))
+    (cond ((string-equal (treesit-node-text arg-node) "(") nil)
+          ((string-equal (treesit-node-text arg-node) ")") nil)
+          ((string-equal (treesit-node-text arg-node) "{") nil)
+          ((string-equal (treesit-node-text arg-node) "}") nil)
+          ((string-equal (treesit-node-text arg-node) "<") nil)
+          ((string-equal (treesit-node-text arg-node) ">") nil)
+          ((string-equal (treesit-node-text arg-node) "[") nil)
+          ((string-equal (treesit-node-text arg-node) "]") nil)
+          ((string-equal (treesit-node-text arg-node) ",")
+           (my/ts-transpose-nodes (treesit-node-prev-sibling arg-node)
+                                  (treesit-node-next-sibling arg-node)
+                                  arg))
+          (t (my/ts-transpose-nodes (treesit-node-prev-sibling (treesit-node-prev-sibling arg-node))
+                                    arg-node arg)))))
+
 ;;;###autoload
-(defun c-transpose-args (prefix)
-  "Transpose argument at point with the argument before it.
-With prefix arg ARG, transpose with the argument after it."
-  (interactive "P")
-  (cond ((not prefix) (c-transpose-args-backward))
-        (t (c-transpose-args-forward))))
+(defun c-transpose-args (arg)
+  "Transpose argument around point, leaving point after both.
+With prefix arg, leave point before both."
+  (interactive "*P")
+  (if (derived-mode-p 'c++-ts-mode)
+      (my/cpp-ts-transpose-args arg)
+    (cond ((not arg) (c-transpose-args-backward))
+          (t (c-transpose-args-forward)))))
 
 (provide 'c-transpose-args)
