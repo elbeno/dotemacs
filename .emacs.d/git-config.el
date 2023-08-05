@@ -10,6 +10,8 @@
 
 (use-package git-commit
   :ensure t)
+(use-package git-modes
+  :ensure t)
 
 ;; git time machine
 (use-package git-timemachine
