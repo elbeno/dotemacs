@@ -537,6 +537,7 @@
                    (and "endian::"
                         (or "little" "big" "native")
                         symbol-end)
+                   (and "is_constant_evaluated" (* space) "(")
                    (and (or "true_type" "false_type")
                         symbol-end)))))
     ;; [ratio.syn]
