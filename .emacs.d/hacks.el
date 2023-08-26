@@ -157,3 +157,11 @@ selection criteria for filtering the lists."
 
 (advice-add #'clipetty--emit
             :override #'my/clipetty--emit)
+
+;; c++-ts-mode operators are not complete
+;; added: <=>
+(defvar c-ts-mode--operators
+  '("=" "-" "*" "/" "+" "%" "~" "|" "&" "^" "<<" ">>" "->"
+    "." "<" "<=" ">=" ">" "==" "!=" "!" "&&" "||" "-="
+    "+=" "*=" "/=" "%=" "|=" "&=" "^=" ">>=" "<<=" "--" "++" "<=>")
+  "C/C++ operators for tree-sitter font-locking.")
