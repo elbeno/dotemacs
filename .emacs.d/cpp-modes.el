@@ -230,3 +230,12 @@
 
 (use-package gud
   :bind (("C-x C-a <f5>" . gdb-run-or-cont)))
+
+;;------------------------------------------------------------------------------
+;; Manage template spew
+(condition-case nil
+    (with-temp-buffer
+      (url-insert-file-contents "https://raw.githubusercontent.com/jefftrull/tspew/master/tspew.el")
+      (eval-buffer)
+      (add-hook 'compilation-mode-hook 'tspew-mode))
+  (error nil))
