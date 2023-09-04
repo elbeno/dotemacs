@@ -21,13 +21,14 @@
 
 ;;------------------------------------------------------------------------------
 ;; install languages for tree-sitter
-(setq my/treesit-languages '(c cpp))
+(setq my/treesit-languages '(c cpp python))
 
 (when (fboundp 'treesit-language-available-p)
   (setq major-mode-remap-alist
         '((c-mode . c-ts-mode)
           (c++-mode . c++-ts-mode)
-          (c-or-c++-mode . c-or-c++-ts-mode)))
+          (c-or-c++-mode . c-or-c++-ts-mode)
+          (python-mode . python-ts-mode)))
   (mapc (lambda (lang)
           (unless (treesit-language-available-p lang)
             (treesit-install-language-grammar lang)))
