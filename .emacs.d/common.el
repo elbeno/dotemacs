@@ -149,8 +149,7 @@
 (use-package avy
   :ensure t
   :bind (("C-c SPC" . avy-goto-word-or-subword-1)
-         ("C-;" . avy-goto-word-or-subword-1)
-         ("C-." . avy-pop-mark)))
+         ("C-," . avy-pop-mark)))
 
 (use-package ace-window
   :ensure t
@@ -460,3 +459,31 @@
   :ensure t
   :bind
   (("C-c <f2>" . powerthesaurus-lookup-dwim)))
+
+;;------------------------------------------------------------------------------
+;; embark
+(use-package embark
+  :ensure t
+  :bind
+  (("C-." . embark-act)
+   ("M-." . embark-dwim)
+   ("C-h B" . embark-bindings))
+  :init
+  ;; Optionally replace the key help with a completing-read interface
+  (setq prefix-help-command #'embark-prefix-help-command)
+  ;; Show the Embark target at point via Eldoc.  You may adjust the Eldoc
+  ;; strategy, if you want to see the documentation from multiple providers.
+  (add-hook 'eldoc-documentation-functions #'embark-eldoc-first-target)
+  ;; (setq eldoc-documentation-strategy #'eldoc-documentation-compose-eagerly)
+  :config
+  ;; Hide the mode line of the Embark live/completions buffers
+  (add-to-list 'display-buffer-alist
+               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                 nil
+                 (window-parameters (mode-line-format . none)))))
+
+;; Consult users will also want the embark-consult package.
+(use-package embark-consult
+  :ensure t
+  :hook
+  (embark-collect-mode . consult-preview-at-point-mode))
