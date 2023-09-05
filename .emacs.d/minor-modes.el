@@ -319,3 +319,18 @@ targets."
   (setq keycast-mode-line-insert-after "] "
         keycast-mode-line-remove-tail-elements nil)
   (keycast-mode-line-mode))
+
+;; make keycast embark-aware
+;; see https://github.com/oantolin/embark/wiki/Additional-Configuration#showing-embark-actions-keys-in-keycast-mode
+(defun store-action-key+cmd (cmd)
+  (force-mode-line-update t)
+  (setq this-command cmd
+        keycast--this-command-keys (this-single-command-keys)
+        keycast--this-command-desc cmd))
+
+(advice-add 'embark-keymap-prompter :filter-return #'store-action-key+cmd)
+
+;; version of keycast--update that accepts (and ignores) parameters
+(defun force-keycast-update (&rest _) (keycast--update))
+
+(advice-add 'embark-act :before #'force-keycast-update)
