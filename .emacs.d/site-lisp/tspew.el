@@ -31,19 +31,12 @@ Suggested usage: (add-hook 'compilation-mode-hook 'tspew-mode)
 (defvar tspew-syntax-table (make-syntax-table)
   "Syntax table for lexing compiler errors" )
 ;; modify to suit our needs
-;; BOZO may be unnecessary - default syntax table appears to do these things already:
 ;; left and right angle brackets are a kind of parentheses in type names
 (modify-syntax-entry ?< "(>" tspew-syntax-table)
 (modify-syntax-entry ?> ")<" tspew-syntax-table)
-;; left and right square brackets are used as parentheses for the "with" clause in a function name
-(modify-syntax-entry ?< "([" tspew-syntax-table)
-(modify-syntax-entry ?> ")]" tspew-syntax-table)
 
 ;; colon is a "symbol constituent" - usable in identifiers
 (modify-syntax-entry ?: "_" tspew-syntax-table)
-;; & and * can be present after any type. symbol constituent seems right
-(modify-syntax-entry ?& "_" tspew-syntax-table)
-(modify-syntax-entry ?* "_" tspew-syntax-table)
 
 ;; now we can use (with-symbol-table tspew-syntax-table (movement-fn))
 
@@ -231,8 +224,19 @@ This is the primary engine for the formatting algorithm"
   (save-excursion
     (let* ((start (+ start 6))    ;; "[with "
            (end (- end 1))        ;; directly before "]"
-           (tparam (progn (goto-char start) (forward-symbol 1) (buffer-substring start (point))))
-           (result (list (cons start 0))))  ;; a single newline after "[with "
+           (result (list (cons start 0)))  ;; a single newline after "[with "
+           (parse-rhs
+            (tspew--parser-alternative #'tspew--parse-sequence #'tspew--parse-type))
+           (parse-with-stmt-tparam
+            (lambda ()
+              (when (looking-at "\\.\\.\\.") (forward-char 3))  ;; skip ellipses, which looks like punctuation
+              (tspew--parse-type)))
+           (tparam
+            (progn
+              (goto-char start)
+              (funcall (tspew--parser-builtin-int-type))        ;; this might be an integral NTTP
+              (funcall parse-with-stmt-tparam)                  ;; skip name
+              (buffer-substring start (point)))))
 
       ;; do first X = Y pair
       (forward-char 3)   ;; skip " = "
@@ -240,7 +244,7 @@ This is the primary engine for the formatting algorithm"
             (append result
                     (tspew--format-region
                      (point)
-                     (progn (tspew--parse-type) (point))
+                     (progn (funcall parse-rhs) (point))
                      (+ (length tparam) 3))))
       (while (not (equal (point) end))
         (cl-assert (equal (char-after) ?\;))
@@ -249,13 +253,18 @@ This is the primary engine for the formatting algorithm"
 
         (skip-syntax-forward " ")
         (setq tparam
-              (buffer-substring (point) (progn (forward-symbol 1) (point))))
+              (buffer-substring (point)
+                                (progn
+                                  (funcall (tspew--parser-builtin-int-type))
+                                  (funcall parse-with-stmt-tparam)
+                                  (point))))
+
         (forward-char 3)     ;; " = "
         (setq result
               (append result
                       (tspew--format-region
                        (point)
-                       (progn (tspew--parse-type) (point))
+                       (progn (funcall parse-rhs) (point))
                        (+ (length tparam) 3)))))
       (forward-char)
       result)))  ;; skip trailing right bracket
@@ -305,33 +314,53 @@ This is the primary engine for the formatting algorithm"
            (tspew--format-region tstart tend)
            (list (cons (point) 0)))))     ;; newline between return type and function name
 
-      (progn (tspew--parse-func-name) '())
+      ;; even the function name can require formatting
+      (append
+       (tspew--format-region (point) (progn (tspew--parse-func-name) (point)))
+       (list (cons (point) 0)))
 
       ;; at this point we could end with a clang-style function template specialization
       (if-let ((fun-spl-end (save-excursion (and (funcall (tspew--parser-paren-expr ?<)) (point)))))
           (tspew--format-region (point) fun-spl-end)
 
         ;; otherwise it's the gcc possibilities: parameters, member function qualifiers, with clause
-        (list (cons (point) 0))
-        (tspew--format-region (point) (progn  (tspew--parse-param-list) (point)))
+        (append
+         (tspew--format-region (point) (progn  (tspew--parse-param-list) (point)))
 
-        ;; skip trailing space and memfn qual, if present
-        (if (< (point) end)
-            (progn
-              (skip-syntax-forward " ")
-              (funcall (tspew--parser-memfn-qual))
-              '())
-          '())
+         ;; the param list may be followed by (no whitespace) "::" and a type, also requiring formatting
+         ;; and then optionally another param list, and optionally another type, and...
+         (if (looking-at "::")
+             (let ((result '()))
+               (while (looking-at "::")
+                 (setq result
+                       (append result
+                               (list (cons (point) 0))
+                               (tspew--format-region (point) (progn (tspew--parse-type) (point)))))
+                 (if (equal (char-after) ?\()
+                     (setq result
+                           (append result
+                                   (list (cons (point) 0))
+                                   (tspew--format-region (point) (progn (funcall (tspew--parser-paren-expr ?\()) (point)))))))
+               result)
+           '())
 
-        (if (< (point) end)
-            (let ((wc-start (progn (skip-syntax-forward " ") (point))))
-              (if (tspew--parse-with-clause)
-                  (append
-                   ;; newline before with clause, if present
-                   (list (cons wc-start 0))
-                   (tspew--format-with-clause wc-start (point)))
-                '()))
-          '())))))
+         ;; skip trailing space and memfn qual, if present
+         (if (< (point) end)
+             (progn
+               (skip-syntax-forward " ")
+               (funcall (tspew--parser-memfn-qual))
+               '())
+           '())
+
+         (if (< (point) end)
+             (let ((wc-start (progn (skip-syntax-forward " ") (point))))
+               (if (tspew--parse-with-clause)
+                   (append
+                    ;; newline before with clause, if present
+                    (list (cons wc-start 0))
+                    (tspew--format-with-clause wc-start (point)))
+                 '()))
+           '()))))))
 
   ;; newlines in between these:
   ;; 1) output static if present
@@ -387,11 +416,12 @@ This is the primary engine for the formatting algorithm"
 This includes operator overloads, lambdas, and anonymous classes"
   (let ((opr-regexp "operator\\(<<\\|<\\|>>\\|>\\|()\\|\\[]\\)")
         (anon-class-regexp "(anonymous class)\\|{anonymous}")
-        (lambda-regexp "(lambda at [[:alnum:]_/.-]+:[0-9]+:[0-9]+)"))
+        (lambda-clang-regexp "(lambda at [[:alnum:]_/.-]+:[0-9]+:[0-9]+)")
+        (lambda-gcc-regexp "<lambda([^)]+)>"))
     (save-excursion
       (goto-char start)
       (while (re-search-forward
-              (concat "\\(" opr-regexp "\\)\\|\\(" anon-class-regexp "\\)\\|\\(" lambda-regexp "\\)")
+              (concat "\\(" opr-regexp "\\)\\|\\(" anon-class-regexp "\\)\\|\\(" lambda-clang-regexp "\\)\\|\\(" lambda-gcc-regexp "\\)")
               end t)
         (with-silent-modifications
           (put-text-property (match-beginning 0) (match-end 0) 'syntax-table (string-to-syntax "_")))))))
@@ -612,47 +642,50 @@ The value nil will unfold all levels."
 
 (defun tspew--parse-cv ()
   "Parse the const or volatile keywords"
-  (if (or (looking-at-p "const\\s ") (looking-at "volatile\\s "))
+  (and (or (looking-at-p "const\\s ") (looking-at "volatile\\s "))
       (progn
         (skip-syntax-forward "w")
         (skip-syntax-forward " ")
-        t)
-    nil))
+        t)))
 
 ;; mandatory whitespace
 (defun tspew--parse-whitespace ()
   "Parse one or more whitespace characters"
   (let ((start (point)))
-    (if (> (skip-syntax-forward " ") 0)
-        t
-      (goto-char start)
-      nil)))
+    (or (> (skip-syntax-forward " ") 0)
+        (progn
+          (goto-char start)
+          nil))))
 
 (defun tspew--parse-template-preamble ()
   "Parse the initial template<class X, class Y...> in function template specializations"
-  (if (looking-at-p "template<")
+  (and (looking-at-p "template<")
       (progn
         (forward-word 1)
         (forward-sexp 1)
         (skip-syntax-forward " ")
-        t)
-    nil))
+        t)))
 
 (defun tspew--parse-with-clause ()
   "Parse a type elaboration for function template instantiations of the form \"[with X = Y; Q = R; ...]\""
-  (if (looking-at-p "\\[with ")
+  (and (looking-at-p "\\[with ")
       (progn
         (forward-sexp)
-        t)
-    nil))
+        t)))
 
 (defun tspew--parse-ref-modifier ()
   "Parse a pointer, ref, or rvalue ref"
-  (if (looking-at-p "\\*\\|&\\|&&")
+  (and (looking-at-p "\\*\\|&\\|&&")
       (progn
         (skip-syntax-forward "_")
-        t)
-    nil))
+        t)))
+
+(defun tspew--parse-sequence ()
+  "Parse a curly braced sequence (i.e. of types or integers)"
+  (and (equal (char-after) ?{)
+       (progn
+         (forward-sexp)
+         t)))
 
 ;;
 ;; parser generators (take a param, return a parser)
@@ -676,12 +709,11 @@ The value nil will unfold all levels."
   "Create a parser for a pre-selected keyword.
 It requires - and consumes - trailing whitespace"
   (lambda ()
-    (if (looking-at-p (concat kwd "\\s "))   ;; trailing whitespace required
+    (and (looking-at-p (concat kwd "\\s "))   ;; trailing whitespace required
         (progn
           (forward-char (length kwd))
           (skip-syntax-forward " ")
-          t)
-      nil)))
+          t))))
 
 (defun tspew--parser-memfn-qual ()
   "Parse a member function qualifier, consuming trailing whitespace"
@@ -731,6 +763,16 @@ To parse zero or more, combine with tspew--parser-optional"
            (while (funcall p))  ;; run until one fails
            t))))                ;; and return true
 
+(defun tspew--parser-alternating (p1 p2)
+  "Create a parser that parses p1 and p2 alternately,
+passing if at least one parser matches:
+p1 [p2 [p1 [p2 [p1 ...]]]]"
+  (lambda ()
+    (and (funcall p1)
+         (progn
+           (while (and (funcall p2) (funcall p1)))
+           t))))
+
 ;;
 ;; parser utilities
 ;;
@@ -746,6 +788,21 @@ To parse zero or more, combine with tspew--parser-optional"
   "Parse a comma-separated function parameter list as seen in compiler error messages"
   (forward-sexp)
   )
+
+(defun tspew--parser-builtin-int-type ()
+  "Parse a builtin C++ integral type (int/char with modifiers), with following whitespace"
+  (tspew--parser-alternative
+   (tspew--parser-sequential
+    (tspew--parser-optional (tspew--parser-keyword "unsigned"))
+    (tspew--parser-keyword "char"))
+   (tspew--parser-sequential
+    (tspew--parser-optional
+     (tspew--parser-multiple
+      (tspew--parser-alternative
+       (tspew--parser-keyword "long")
+       (tspew--parser-keyword "short")
+       (tspew--parser-keyword "unsigned"))))
+    (tspew--parser-keyword "int"))))
 
 (defun tspew--parse-type ()
   "Parse a type as found in compiler error messages"
@@ -763,19 +820,31 @@ To parse zero or more, combine with tspew--parser-optional"
              (tspew--parser-keyword "decltype")
              (tspew--parser-paren-expr ?\())
             (tspew--parser-sequential
-             ;; stuff we might see in here: typename, const, volatile
+             ;; first, we can have const/constexpr/volatile
              (tspew--parser-optional
               (tspew--parser-multiple
                (tspew--parser-alternative
-                (tspew--parser-keyword "typename")
                 (tspew--parser-keyword "constexpr")
-                (tspew--parser-keyword "auto")
-                (tspew--parser-keyword "struct")
                 #'tspew--parse-cv)))
-             #'tspew--parse-symbol
-             (tspew--parser-optional (tspew--parser-sequential
-                                     (tspew--parser-paren-expr ?<)
-                                     (tspew--parser-optional #'tspew--parse-symbol)))
+             ;; then one of three things
+             (tspew--parser-alternative
+              ;; a builtin int of some kind
+              (tspew--parser-builtin-int-type)
+              ;; a user-defined type (or float or double, which look like types)
+              (tspew--parser-sequential
+               ;; we sometimes see typename or struct first
+               (tspew--parser-optional
+                (tspew--parser-alternative
+                 (tspew--parser-keyword "typename")
+                 (tspew--parser-keyword "auto")
+                 (tspew--parser-keyword "struct")))
+               ;; the base name of the type
+               #'tspew--parse-symbol
+               ;; template args if any
+               (tspew--parser-optional (tspew--parser-sequential
+                                        (tspew--parser-paren-expr ?<)
+                                        (tspew--parser-optional #'tspew--parse-symbol)))))
+             ;; any of the above can have reference modifiers
              (tspew--parser-optional (tspew--parser-sequential
                                       (tspew--parser-optional #'tspew--parse-whitespace)
                                       #'tspew--parse-ref-modifier))))))
@@ -797,6 +866,13 @@ To parse zero or more, combine with tspew--parser-optional"
              ;; gcc, and clang sometimes
              (tspew--parser-sequential
               (tspew--parser-paren-expr ?\()
+              ;; we can have child classes with function call operators here,
+              ;; which themselves can have child classes, and so on
+              ;; gcc seems to format them like types but clang puts the arg lists in parens
+              (tspew--parser-optional
+               (tspew--parser-alternating
+                #'tspew--parse-type
+                (tspew--parser-paren-expr ?\()))
 
               (tspew--parser-optional
                (tspew--parser-sequential
