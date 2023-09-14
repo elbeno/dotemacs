@@ -487,3 +487,18 @@
   :ensure t
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
+
+;;------------------------------------------------------------------------------
+;; time and world clock
+(use-package time
+  :ensure t
+  :custom
+  (world-clock-time-format "%a %e %b %T %Z")
+  (display-time-day-and-date t)
+  (display-time-default-load-average nil)
+  (zoneinfo-style-world-list
+   '(("America/Los_Angeles" "Folsom")
+     ("America/Phoenix" "Chandler")
+     ("America/Denver" "Denver")
+     ("Asia/Kolkata" "Bangalore")
+     ("Asia/Singapore" "Penang"))))
