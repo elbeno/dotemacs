@@ -57,6 +57,7 @@
   :custom
   (dired-find-subdir t "Reuse buffers for opened directories")
   :config
+  (setq dired-dwim-target t)
   (defun jjgr-dired-up-directory (&optional other-window)
     "Run Dired on parent directory of current directory, reusing buffer."
     (interactive "P")
