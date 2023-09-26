@@ -501,4 +501,5 @@
      ("America/Phoenix" "Chandler")
      ("America/Denver" "Denver")
      ("Asia/Kolkata" "Bangalore")
-     ("Asia/Singapore" "Penang"))))
+     ("Asia/Singapore" "Penang")
+     ("Australia/Brisbane" "Brisbane"))))
