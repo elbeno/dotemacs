@@ -503,3 +503,13 @@
      ("Asia/Kolkata" "Bangalore")
      ("Asia/Singapore" "Penang")
      ("Australia/Brisbane" "Brisbane"))))
+
+;;------------------------------------------------------------------------------
+;; increment numbers in region
+(defun replace-numbers-in-region-with-increments ()
+  "Replace numbers in a given region with numbers incrementing from zero."
+  (interactive)
+  (replace-regexp "[0-9]+"
+                  '((lambda (x n) (number-to-string n)) . 0)
+                  nil (region-beginning) (region-end)))
+(bind-key "C-S-#" 'replace-numbers-in-region-with-increments)
