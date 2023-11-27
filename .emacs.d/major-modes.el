@@ -93,6 +93,14 @@
   :after dired-mode)
 
 ;;------------------------------------------------------------------------------
+;; Dirvish
+(use-package dirvish
+  :ensure t
+  :after dired-mode
+  :config
+  (dirvish-override-dired-mode))
+
+;;------------------------------------------------------------------------------
 ;; AsciiDoc
 (use-package adoc-mode
   :ensure t)
