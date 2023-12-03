@@ -157,9 +157,25 @@
 
 ;;------------------------------------------------------------------------------
 ;; smart-scan: use M-n and M-p to jump to next/prev thing at point
+;; remove M-' from smartscan keymap: it's used by surround
+(defvar smartscan-map
+  (let ((m (make-sparse-keymap)))
+    (define-key m (kbd "M-n") 'smartscan-symbol-go-forward)
+    (define-key m (kbd "M-p") 'smartscan-symbol-go-backward)
+    m)
+  "Keymap for `smartscan'.")
+
 (use-package smartscan
   :ensure t
   :config (global-smartscan-mode t))
+
+;;------------------------------------------------------------------------------
+;; use surround for changing delimiters
+(use-package surround
+  :ensure t
+  :bind-keymap ("M-'" . surround-keymap)
+  :bind (:map surround-keymap
+              ("M-'" . smartscan-symbol-replace)))
 
 ;;------------------------------------------------------------------------------
 ;; visual-regexp-steroids: better regexp searching
