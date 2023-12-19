@@ -393,6 +393,14 @@
   :ensure t
   :after consult)
 
+(use-package consult-dir
+  :ensure t
+  :after consult
+  :bind (("C-x C-d" . consult-dir)
+         :map minibuffer-local-completion-map
+         ("C-x C-d" . consult-dir)
+         ("C-x C-j" . consult-dir-jump-file)))
+
 ;;------------------------------------------------------------------------------
 ;; extras in the minibuffer
 (use-package marginalia
