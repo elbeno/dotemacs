@@ -112,18 +112,11 @@
   :after vertico)
 
 ;;------------------------------------------------------------------------------
-;; Undo-tree
-(use-package undo-tree
+;; Undo
+(use-package vundo
   :ensure t
-  :config
-  (global-undo-tree-mode 1)
-  (setq undo-tree-visualizer-timestamps t
-        undo-tree-visualizer-diff t
-        undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo"))
-        undo-tree-auto-save-history nil)
-  :diminish undo-tree-mode
-  :bind (("C-z" . undo-tree-undo)
-         ("C-x u" . undo-tree-visualize)))
+  :bind (("C-z" . undo)
+         ("C-x u" . vundo)))
 
 ;;------------------------------------------------------------------------------
 ;; Google-this
