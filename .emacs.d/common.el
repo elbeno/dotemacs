@@ -549,3 +549,14 @@
         ;; If nil, the fzf buffer will appear at the top of the window
         fzf/position-bottom t
         fzf/window-height 15))
+
+;;------------------------------------------------------------------------------
+(use-package cyclekey
+  :load-path (lambda () (concat dotfile-dir ".emacs.d/site-lisp/"))
+  :ensure nil
+  :init
+  (setq cyclekey-languages '("French" "German" "Spanish")
+        cyclekey-save-languages nil)
+  :config
+  (cyclekey-init)
+  :bind ("M-o" . cyclekey-cycle))
