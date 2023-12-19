@@ -79,3 +79,6 @@ behavior of `comment-dwim'."
 
 (when (> emacs-major-version 28)
   (bind-key "C-c d" 'duplicate-dwim))
+
+;; prevent accidental suspend
+(global-unset-key (kbd "C-x C-z"))
