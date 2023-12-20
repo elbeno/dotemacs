@@ -243,7 +243,7 @@
   :bind (("<f3>" . symbol-overlay-put)))
 
 ;;------------------------------------------------------------------------------
-;; simple modeline
+;; simple modeline functionality
 (defun my-truncate-buffer-name (buf-name)
   (let ((len (length buf-name)))
     (cond ((> len 30)
@@ -552,6 +552,7 @@
         fzf/window-height 15))
 
 ;;------------------------------------------------------------------------------
+;; cycle accented characters at point
 (use-package cyclekey
   :load-path (lambda () (concat dotfile-dir ".emacs.d/site-lisp/"))
   :ensure nil
@@ -561,3 +562,9 @@
   :config
   (cyclekey-init)
   :bind ("M-o" . cyclekey-cycle))
+
+;;------------------------------------------------------------------------------
+;; Prettier modeline
+(use-package doom-modeline
+  :ensure t
+  :init (doom-modeline-mode 1))
