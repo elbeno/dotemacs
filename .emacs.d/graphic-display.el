@@ -81,3 +81,16 @@
   :ensure t
   :hook dired-mode
   :after all-the-icons)
+
+;;------------------------------------------------------------------------------
+;; Display file info
+(use-package file-info
+  :ensure t
+  :bind ("C-c <f3>" . 'file-info-show)
+  :config
+  (setq hydra-hint-display-type 'posframe)
+  (setq hydra-posframe-show-params `(:poshandler posframe-poshandler-frame-center
+                                               :internal-border-width 2
+                                               :internal-border-color "#61AFEF"
+                                               :left-fringe 16
+                                               :right-fringe 16)))
