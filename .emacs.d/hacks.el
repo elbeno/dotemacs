@@ -14,7 +14,7 @@
     (org-table-save-field
      ;; Make sure invisible characters in the table are at the right
      ;; place since column widths take them into account.
-     (org-font-lock-ensure beg end)
+     (font-lock-ensure beg end)
      (move-marker org-table-aligned-begin-marker beg)
      (move-marker org-table-aligned-end-marker end)
      (goto-char beg)
