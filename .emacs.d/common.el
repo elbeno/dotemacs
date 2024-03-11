@@ -5,15 +5,16 @@
 
 ;;------------------------------------------------------------------------------
 ;; UTF8 defaults
-(set-language-environment "UTF-8")
+(set-language-environment 'utf-8)
 (prefer-coding-system 'utf-8)
 (define-coding-system-alias 'UTF-8 'utf-8)
 (set-default-coding-systems 'utf-8)
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
 (set-selection-coding-system 'utf-8)
-(setq buffer-file-coding-system 'utf-8)
-(setq locale-coding-system 'utf-8)
+(setq buffer-file-coding-system 'utf-8
+      default-file-name-coding-system 'utf-8
+      locale-coding-system 'utf-8)
 (when (display-graphic-p)
   (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
 

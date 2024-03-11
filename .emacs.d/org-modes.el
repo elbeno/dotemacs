@@ -49,7 +49,7 @@
   :config
   (setq org-bullets-bullet-list
         '("◉" "✸" "✿" "◎" "►" "◇"))
-  :hook org-mode)
+  :hook (org-mode . org-bullets-mode))
 
 (use-package org-re-reveal
   :ensure t

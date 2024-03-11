@@ -19,7 +19,7 @@
 ;; Highlight FIXME/TODO/etc
 (use-package hl-todo
   :ensure t
-  :hook prog-mode)
+  :hook (prog-mode . hl-todo-mode))
 
 ;;------------------------------------------------------------------------------
 ;; Special types of comments

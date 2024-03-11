@@ -218,7 +218,7 @@ targets."
 
 (use-package flycheck-pos-tip
   :ensure t
-  :hook flycheck-mode)
+  :hook (flycheck-mode . flycheck-pos-tip-mode))
 
 ;;------------------------------------------------------------------------------
 ;; Emojify
