@@ -85,6 +85,7 @@
     (eglot-ensure)
     (add-hook 'before-save-hook 'eglot-format-buffer nil t)
     (add-hook 'before-save-hook 'my/eglot-organize-imports nil t))
+  (fset #'jsonrpc--log-event #'ignore)
   :bind (:map eglot-mode-map
               ("C-c i" . my/eglot-organize-imports)
               ("C-c f" . eglot-format)
