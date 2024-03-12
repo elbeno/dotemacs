@@ -1,8 +1,6 @@
 ;;------------------------------------------------------------------------------
 ;; debugging
 (setq debug-on-error nil)
-;; plenty of memory, GC threshold is 100MB
-(setq gc-cons-threshold 100000000)
 ;; don't resize the frame on font changes etc
 (setq frame-inhibit-implied-resize t)
 
@@ -50,6 +48,13 @@
       use-package-compute-statistics t)
 
 (setq personal-keybindings nil)
+
+;;------------------------------------------------------------------------------
+;; Setup GC
+(use-package gcmh
+  :ensure t
+  :config
+  (gcmh-mode 1))
 
 ;;------------------------------------------------------------------------------
 ;; Startup profiling
@@ -143,9 +148,6 @@
 (require 'server)
 (unless (server-running-p)
   (server-start))
-
-;; Restore GC threshold
-(setq gc-cons-threshold 800000)
 
 (put 'narrow-to-region 'disabled nil)
 
