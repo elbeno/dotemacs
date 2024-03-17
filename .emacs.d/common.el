@@ -143,7 +143,8 @@
 (use-package avy
   :ensure t
   :bind (("C-c SPC" . avy-goto-word-or-subword-1)
-         ("C-," . avy-pop-mark)))
+         ("C-," . avy-pop-mark)
+         ("C-j" . avy-goto-char-timer)))
 
 (use-package ace-window
   :ensure t
