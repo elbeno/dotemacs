@@ -53,42 +53,19 @@
 ;;------------------------------------------------------------------------------
 ;; eglot
 (when (> emacs-major-version 28)
-(defun my/eglot-organize-imports ()
-  "Offer to execute the source.organizeImports code action."
-  (interactive)
-  (unless (eglot--server-capable :codeActionProvider)
-    (eglot--error "Server can't execute code actions!"))
-  (let* ((server (eglot--current-server-or-lose))
-         (actions (jsonrpc-request
-                   server
-                   :textDocument/codeAction
-                   (list :textDocument (eglot--TextDocumentIdentifier))))
-         (action (cl-find-if
-                  (jsonrpc-lambda (&key kind &allow-other-keys)
-                    (string-equal kind "source.organizeImports" ))
-                  actions)))
-    (when action
-      (eglot--dcase action
-        (((Command) command arguments)
-          (eglot-execute-command server (intern command) arguments))
-        (((CodeAction) edit command)
-          (when edit (eglot--apply-workspace-edit edit))
-          (when command
-            (eglot--dbind ((Command) command arguments) command
-              (eglot-execute-command server (intern command) arguments)))))))))
-
-(when (> emacs-major-version 28)
 (use-package eglot
   :ensure t
   :config
+  (defun my/eglot-organize-imports () (interactive)
+	 (eglot-code-actions nil nil "source.organizeImports" t))
   (defun my/python-eglot-config ()
     (eglot-ensure)
     (add-hook 'before-save-hook 'eglot-format-buffer nil t)
     (add-hook 'before-save-hook 'my/eglot-organize-imports nil t))
   (fset #'jsonrpc--log-event #'ignore)
   :bind (:map eglot-mode-map
-              ("C-c i" . my/eglot-organize-imports)
               ("C-c f" . eglot-format)
+              ("C-c i" . my/eglot-organize-imports)
               ("C-c r" . eglot-rename)
               ("C-c s" . toggle-string-to-fstring)
               ("C-<return>" . eglot-code-actions)
