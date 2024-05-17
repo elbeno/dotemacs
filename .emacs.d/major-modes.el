@@ -90,15 +90,18 @@
 
 (use-package dired-git-info
   :ensure t
-  :after dired-mode)
+  :after dired)
 
 ;;------------------------------------------------------------------------------
 ;; Dirvish
-(use-package dirvish
-  :ensure t
-  :after dired-mode
-  :config
-  (dirvish-override-dired-mode))
+(if (display-graphic-p)
+    (use-package dirvish
+      :ensure t
+      :after dired
+      :config
+      (dirvish-override-dired-mode)
+      :bind
+      (("C-x j" . dirvish-dwim))))
 
 ;;------------------------------------------------------------------------------
 ;; AsciiDoc
