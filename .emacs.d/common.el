@@ -135,6 +135,8 @@
 (use-package google-this
   :ensure t
   :commands (google-this-parse-and-search-string)
+  :config
+  (setq google-this-browse-url-function 'eww-browse-url)
   :bind
   (("C-c <f1>" . duckduckgo-this-cpp-reference)))
 
