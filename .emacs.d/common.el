@@ -582,7 +582,14 @@
 ;; Prettier modeline
 (use-package doom-modeline
   :ensure t
-  :init (doom-modeline-mode 1))
+  :init (doom-modeline-mode 1)
+  (setq doom-modeline-minor-modes t))
+
+;;------------------------------------------------------------------------------
+;; minions: minor modes in modeline
+(use-package minions
+  :ensure t
+  :config (minions-mode 1))
 
 ;;------------------------------------------------------------------------------
 ;; Writable grep buffer
