@@ -31,7 +31,7 @@
   :safe 'stringp)
 
 (defcustom my-cpp-llvm-roots
-  '("/usr/lib/llvm-18/" "/usr/lib/llvm-17/" "/usr/lib/llvm-16/")
+  '("/usr/lib/llvm-19/" "/usr/lib/llvm-18/" "/usr/lib/llvm-17/" "/usr/lib/llvm-16/")
   "The paths to search for llvm binaries."
   :group 'my-cpp-config
   :type 'list

@@ -595,3 +595,8 @@
 ;; Writable grep buffer
 (use-package wgrep
   :ensure t)
+
+;;------------------------------------------------------------------------------
+;; Lookup words
+(setopt dictionary-server "dict.org")
+(bind-key "C-c <f3>" 'dictionary-lookup-definition)

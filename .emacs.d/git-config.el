@@ -8,8 +8,6 @@
   (("C-c g" . magit-status)
    ("C-c B" . magit-blame)))
 
-(use-package git-commit
-  :ensure t)
 (use-package git-modes
   :ensure t)
 
