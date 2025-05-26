@@ -601,3 +601,12 @@
 ;; Lookup words
 (setopt dictionary-server "dict.org")
 (bind-key "C-c <f3>" 'dictionary-lookup-definition)
+
+;;------------------------------------------------------------------------------
+;; Bind extra help keys
+(use-package help
+  :bind
+  (:map help-map
+        ("=" . describe-char)
+        ("j" . describe-face)
+        ("-" . describe-keymap)))
