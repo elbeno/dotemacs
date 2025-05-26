@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 ;;------------------------------------------------------------------------------
 ;; markdown mode
 (use-package markdown-mode

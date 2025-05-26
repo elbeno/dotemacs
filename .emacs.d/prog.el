@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 ;;------------------------------------------------------------------------------
 ;; tree-sitter grammar repositories
 (setq treesit-language-source-alist

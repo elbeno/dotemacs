@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 ;;------------------------------------------------------------------------------
 ;; Disable themes completely before applying a new one
 (defadvice load-theme (before theme-dont-propagate activate)

@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 ;;------------------------------------------------------------------------------
 ;; Org-mode customization: allow left-alignment of numeric fields
 

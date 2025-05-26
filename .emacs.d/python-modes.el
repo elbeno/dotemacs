@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 ;;------------------------------------------------------------------------------
 ;; toggle strings between f-strings and otherwise
 (defun toggle-string-to-fstring ()

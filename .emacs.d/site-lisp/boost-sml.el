@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 (defcustom boost-sml-table-start "make_transition_table"
   "Marker for the beginning of a Boost SML table."
   :group 'boost-sml

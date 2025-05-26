@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 ;;; zone-words.el --- Discover words to describe emotions while you zone out.
 
 ;;; Commentary:

@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 ;;; cpp-auto-include.el --- auto include header file for C++
 
 ;; Copyright (C) 2014 by Syohei YOSHIDA

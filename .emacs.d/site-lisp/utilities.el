@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 ;;------------------------------------------------------------------------------
 ;; Get rid of all buffers, going back to just *scratch*
 (defun nuke-all-buffers ()

@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 (defun files-in-below-directory (directory)
   "List the .el files in DIRECTORY and in its sub-directories."
   ;; Although the function will be used non-interactively,

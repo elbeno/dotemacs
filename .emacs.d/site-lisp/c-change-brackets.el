@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 (defun c-change-to-angle-include ()
   (when (re-search-forward "\"" nil t)
     (replace-match ">")

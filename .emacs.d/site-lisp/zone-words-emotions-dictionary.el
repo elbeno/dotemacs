@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 ;;; zone-words-emotions-dictionary.el --- zone-words dictionary.
 
 ;;; Commentary:
