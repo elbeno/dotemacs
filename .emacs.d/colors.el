@@ -91,4 +91,12 @@
          ("C-c t d" . load-theme-modus-vivendi)
          ("C-c t o" . load-theme-modus-operandi)
          ("C-c t v" . load-theme-modus-vivendi)
-         ("C-c t t" . modus-themes-toggle)))
+         ("C-c t m" . modus-themes-select)))
+
+;;------------------------------------------------------------------------------
+;; ef themes
+(use-package ef-themes
+  :ensure t
+  :config
+  (setq ef-themes-to-toggle '(ef-summer ef-winter))
+  :bind (("C-c t e" . ef-themes-select)))
