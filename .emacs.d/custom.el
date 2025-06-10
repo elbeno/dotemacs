@@ -38,6 +38,8 @@
  '(magit-todos-insert-after '(bottom) nil nil "Changed by setter of obsolete option `magit-todos-insert-at'")
  '(org-export-with-sub-superscripts '{})
  '(package-selected-packages nil)
+ '(package-vc-selected-packages
+   '((ultra-scroll :vc-backend Git :url "https://github.com/jdtsmith/ultra-scroll")))
  '(protect-buffer-bury-p nil)
  '(safe-local-variable-values
    '((eval when (require 'rainbow-mode nil t) (rainbow-mode 1))))
