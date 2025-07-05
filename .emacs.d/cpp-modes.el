@@ -79,12 +79,12 @@
   '(bind-keys :map c++-mode-map
               ("C-c n" . cpp-auto-include/namespace-qualify-file)
               ("C-c i" . cpp-auto-include/ensure-includes-for-file)
-              ("C-c o" . cpp-auto-include/ensure-includes-for-current-line)))
+              ("C-c I" . cpp-auto-include/ensure-includes-for-current-line)))
 (eval-after-load 'c-ts-mode
   '(bind-keys :map c++-ts-mode-map
               ("C-c n" . cpp-auto-include/namespace-qualify-file)
               ("C-c i" . cpp-auto-include/ensure-includes-for-file)
-              ("C-c o" . cpp-auto-include/ensure-includes-for-current-line)))
+              ("C-c I" . cpp-auto-include/ensure-includes-for-current-line)))
 
 ;;------------------------------------------------------------------------------
 ;; Transposing arguments
