@@ -235,7 +235,7 @@ clang-format from meddling with the formatting."
 
 (defun boost-sml/align-events-with-guards (lines)
   (let* ((event-guards (mapcar #'boost-sml/event-and-guard lines))
-         (max-len (reduce #'max (mapcar #'length event-guards) :initial-value 0)))
+         (max-len (cl-reduce #'max (mapcar #'length event-guards) :initial-value 0)))
     (mapc (lambda (l)
             (let ((pad-len (- max-len (length (boost-sml/event-and-guard l)))))
                 (setf (nth 4 l)
@@ -289,7 +289,7 @@ clang-format from meddling with the formatting."
             guard))))
 
 (defun boost-sml/align-guard-closes (lines)
-  (let ((max-len (reduce #'max (mapcar (lambda (l) (length (nth 4 l))) lines) :initial-value 0)))
+  (let ((max-len (cl-reduce #'max (mapcar (lambda (l) (length (nth 4 l))) lines) :initial-value 0)))
     (mapc (lambda (l) (boost-sml/expand-guard max-len l)) lines)))
 
 (defun boost-sml/put-parens-around-action (line)
@@ -321,7 +321,7 @@ clang-format from meddling with the formatting."
             action))))
 
 (defun boost-sml/align-action-closes (lines)
-  (let ((max-len (reduce #'max (mapcar (lambda (l) (length (nth 6 l))) lines) :initial-value 0)))
+  (let ((max-len (cl-reduce #'max (mapcar (lambda (l) (length (nth 6 l))) lines) :initial-value 0)))
     (mapc (lambda (l) (boost-sml/expand-action max-len l)) lines)))
 
 (defun boost-sml/put-spaces-in-action (line)
