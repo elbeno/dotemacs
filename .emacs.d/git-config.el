@@ -49,4 +49,8 @@
 ;; display TODOs
 (use-package magit-todos
   :ensure t
+  :after magit
   :config (magit-todos-mode 1))
+
+;; be ready to edit commit messages
+(require 'magit-commit)
