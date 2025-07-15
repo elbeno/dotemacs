@@ -42,7 +42,8 @@
   (message "`use-package' not found.  Installing...")
   (package-install 'use-package))
 
-(setq use-package-enable-imenu-support t)
+(setq use-package-enable-imenu-support t
+      package-install-upgrade-built-in t)
 (require 'use-package)
 (setq use-package-minimum-reported-time 0
       use-package-verbose t
