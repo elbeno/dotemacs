@@ -98,15 +98,10 @@
 
 ;;------------------------------------------------------------------------------
 ;; Ultrascroll
-(package-vc-install
- '(ultra-scroll
-   :vc-backend Git
-   :url  "https://github.com/jdtsmith/ultra-scroll"))
-
 (use-package ultra-scroll
-  ;:load-path "~/code/emacs/ultra-scroll" ; if you git clone'd instead of package-vc-install
+  :ensure t
   :init
-  (setq scroll-conservatively 101 ; important!
+  (setq scroll-conservatively 3
         scroll-margin 0)
   :config
   (ultra-scroll-mode 1))
