@@ -72,10 +72,12 @@
 ;; modus themes
 (defun load-theme-modus-operandi ()
   (interactive)
-  (load-theme 'modus-operandi t))
+  (require 'modus-themes)
+  (modus-themes-load-theme 'modus-operandi))
 (defun load-theme-modus-vivendi ()
   (interactive)
-  (load-theme 'modus-vivendi t))
+  (require 'modus-themes)
+  (modus-themes-load-theme 'modus-vivendi))
 
 (use-package modus-themes
   :ensure t
