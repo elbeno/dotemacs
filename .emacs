@@ -1,7 +1,15 @@
 ;; -*- lexical-binding: t; -*-
 ;;------------------------------------------------------------------------------
+;; don't gc during startup
+(defvar my/gc-cons-threshold (* 32 1024 1024))
+(setq gc-cons-threshold most-positive-fixnum)
+(defun my/restore-gc-cons-threshold ()
+  (setq gc-cons-threshold my/gc-cons-threshold))
+(add-hook 'emacs-startup-hook #'my/restore-gc-cons-threshold 99)
+
 ;; debugging
 (setq debug-on-error nil)
+
 ;; don't resize the frame on font changes etc
 (setq frame-inhibit-implied-resize t)
 

@@ -18,6 +18,7 @@
       locale-coding-system 'utf-8)
 (when (display-graphic-p)
   (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
+(setq default-input-method nil)
 
 ;;------------------------------------------------------------------------------
 ;; Clean up display
@@ -97,6 +98,11 @@
 ;;------------------------------------------------------------------------------
 ;; Prevent prompt on opening large TAGS file
 (setq large-file-warning-threshold 100000000)
+
+
+;;------------------------------------------------------------------------------
+;; Better process interaction
+(setq read-process-output-max (* 2 1024 1024))
 
 ;;------------------------------------------------------------------------------
 ;; vertico
