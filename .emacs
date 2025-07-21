@@ -59,6 +59,12 @@
 
 (setq personal-keybindings nil)
 
+(defun my/vc-install (repo)
+  (let ((url (format "https://www.github.com/%s" repo))
+        (pac-name (intern (file-name-base repo))))
+    (unless (package-installed-p pac-name)
+      (package-vc-install url))))
+
 ;;------------------------------------------------------------------------------
 ;; Setup GC
 (use-package gcmh

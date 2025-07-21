@@ -19,6 +19,21 @@
   :ensure t
   :bind (("C-c t b" . load-theme-tomorrow-night-deepblue)))
 
+(defun load-theme-hercules ()
+  (interactive)
+  (mapc #'disable-theme custom-enabled-themes)
+  (load-theme 'hercules t))
+
+(defun load-theme-hercules-light ()
+  (interactive)
+  (mapc #'disable-theme custom-enabled-themes)
+  (load-theme 'hercules-light t))
+
+(use-package hercules-theme
+  :init (my/vc-install "0xcefaedfe/hercules-theme")
+  :bind (("C-c t h" . load-theme-hercules)
+         ("C-c t H" . load-theme-hercules-light)))
+
 (load-theme-cyberpunk)
 
 ;;------------------------------------------------------------------------------
