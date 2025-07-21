@@ -44,64 +44,47 @@
   :mode ("\\.json$" . json-mode))
 
 ;;------------------------------------------------------------------------------
-;; Dired
-(use-package dired
-  :bind
-  (("C-x j" . dired-jump))
-  (:map dired-mode-map
-        ("M-<up>" . jjgr-dired-up-directory)
-        ("<return>" . jjgr-dired-find-file)
-        ("g" . dired-git-info-mode)
-        ("r" . revert-buffer)
-        ("b" . jjgr-dired-up-directory))
-  :custom
-  (dired-find-subdir t "Reuse buffers for opened directories")
-  :config
-  (setq dired-dwim-target t)
-  (defun jjgr-dired-up-directory (&optional other-window)
-    "Run Dired on parent directory of current directory, reusing buffer."
-    (interactive "P")
-    (let* ((dir (dired-current-directory))
-           (orig (current-buffer))
-           (up (file-name-directory (directory-file-name dir))))
-      (or (dired-goto-file (directory-file-name dir))
-          ;; Only try dired-goto-subdir if buffer has more than one dir.
-          (and (cdr dired-subdir-alist)
-               (dired-goto-subdir up))
-          (progn
-            (kill-buffer orig)
-            (dired up)
-            (dired-goto-file dir)))))
-  (defun jjgr-dired-find-file (&optional prefix)
-    "Open file with either operating system defaults or within Emacs."
-    (interactive "P")
-    (if prefix
-        (org-open-file (dired-get-file-for-visit) 'system)
-      (dired-find-file)))
-  (defun my/dired-config ()
-    (diredfl-mode)
-    (hl-line-mode)
-    (set-face-background hl-line-face "gray13"))
-  :hook (dired-mode . my/dired-config))
-
-(use-package diredfl
-  :ensure t
-  :defer)
-
-(use-package dired-git-info
-  :ensure t
-  :after dired)
-
-;;------------------------------------------------------------------------------
 ;; Dirvish
-(if (display-graphic-p)
-    (use-package dirvish
-      :ensure t
-      :after dired
-      :config
-      (dirvish-override-dired-mode)
-      :bind
-      (("C-x j" . dirvish-dwim))))
+(use-package dirvish
+  :ensure t
+  :init
+  (dirvish-override-dired-mode)
+  :config
+  (setq dirvish-mode-line-format
+        '(:left (sort symlink) :right (omit yank index)))
+  (setq dirvish-mode-line-height 10)
+  (setq dirvish-attributes
+        '(nerd-icons file-time file-size collapse subtree-state vc-state git-msg))
+  (setq dirvish-subtree-state-style 'nerd)
+  (setq delete-by-moving-to-trash t)
+  (setq dirvish-path-separators (list
+                                 (format "  %s " (nerd-icons-codicon "nf-cod-home"))
+                                 (format "  %s " (nerd-icons-codicon "nf-cod-root_folder"))
+                                 (format " %s " (nerd-icons-faicon "nf-fa-angle_right"))))
+  (setq dired-listing-switches
+        "-l --almost-all --human-readable --group-directories-first --no-group")
+  (dirvish-peek-mode) ; Preview files in minibuffer
+  (dirvish-side-follow-mode) ; similar to `treemacs-follow-mode'
+  :bind
+  (("C-x j" . dirvish-dwim)
+   :map dirvish-mode-map               ; Dirvish inherits `dired-mode-map'
+   ("<left>" . dired-up-directory)
+   ("?" . dirvish-dispatch)          ; [?] a helpful cheatsheet
+   ("a" . dirvish-setup-menu)        ; [a]ttributes settings:`t' toggles mtime, `f' toggles fullframe, etc.
+   ("f" . dirvish-file-info-menu)    ; [f]ile info
+   ("o" . dirvish-quick-access)      ; [o]pen `dirvish-quick-access-entries'
+   ("s" . dirvish-quicksort)         ; [s]ort flie list
+   ("r" . dirvish-history-jump)      ; [r]ecent visited
+   ("l" . dirvish-ls-switches-menu)  ; [l]s command flags
+   ("v" . dirvish-vc-menu)           ; [v]ersion control commands
+   ("*" . dirvish-mark-menu)
+   ("y" . dirvish-yank-menu)
+   ("N" . dirvish-narrow)
+   ("^" . dirvish-history-last)
+   ("TAB" . dirvish-subtree-toggle)
+   ("M-f" . dirvish-history-go-forward)
+   ("M-b" . dirvish-history-go-backward)
+   ("M-e" . dirvish-emerge-menu)))
 
 ;;------------------------------------------------------------------------------
 ;; AsciiDoc

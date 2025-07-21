@@ -501,14 +501,6 @@
     (corfu-terminal-mode +1))
   :after corfu)
 
-(use-package kind-icon
-  :ensure t
-  :after corfu
-  :custom
-  (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
-  :config
-  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
-
 ;;------------------------------------------------------------------------------
 ;; powerthesaurus
 (use-package powerthesaurus
@@ -633,3 +625,22 @@
         ("=" . describe-char)
         ("j" . describe-face)
         ("-" . describe-keymap)))
+
+;;------------------------------------------------------------------------------
+;; Use nerd fonts
+(use-package nerd-icons
+  :ensure t
+  :custom (nerd-icons-font-family "BerkeleyMono Nerd Font"))
+
+(use-package nerd-icons-corfu
+  :ensure t
+  :after corfu
+  :custom
+  (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
+
+(use-package nerd-icons-completion
+  :ensure t
+  :after marginalia
+  :config
+  (nerd-icons-completion-mode)
+  (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
