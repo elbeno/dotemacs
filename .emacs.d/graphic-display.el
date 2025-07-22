@@ -4,13 +4,13 @@
 (setq pixel-scroll-mode t)
 
 ;;------------------------------------------------------------------------------
-;; font: Inconsolata
-(set-frame-font "Berkeley Mono-11")
+;; font: Berkeley Mono
+(set-frame-font "BerkeleyMono Nerd Font-11")
 
 (custom-set-faces
- '(fixed-pitch ((t (:family "Berkeley Mono")))))
+ '(fixed-pitch ((t (:family "BerkeleyMono Nerd Font")))))
 (custom-set-faces
- '(org-document-title ((t (:family "Berkeley Mono" :height 1.0)))))
+ '(org-document-title ((t (:family "BerkeleyMono Nerd Font" :height 1.0)))))
 
 ;;------------------------------------------------------------------------------
 (use-package dash

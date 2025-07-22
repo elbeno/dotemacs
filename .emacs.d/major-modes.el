@@ -69,6 +69,7 @@
   (("C-x j" . dirvish-dwim)
    :map dirvish-mode-map               ; Dirvish inherits `dired-mode-map'
    ("<left>" . dired-up-directory)
+   ("<right>" . dired-find-file)
    ("?" . dirvish-dispatch)          ; [?] a helpful cheatsheet
    ("a" . dirvish-setup-menu)        ; [a]ttributes settings:`t' toggles mtime, `f' toggles fullframe, etc.
    ("f" . dirvish-file-info-menu)    ; [f]ile info
