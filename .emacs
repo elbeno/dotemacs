@@ -28,8 +28,9 @@
 
 ;;------------------------------------------------------------------------------
 ;; apply custom variables
-(setq custom-file (concat dotfile-dir ".emacs.d/custom.el"))
-(load custom-file)
+(setq custom-file (concat dotfile-dir ".emacs.d/local/custom.el"))
+(when (file-exists-p custom-file)
+  (load custom-file))
 
 ;;------------------------------------------------------------------------------
 ;; package setup
