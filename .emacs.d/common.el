@@ -611,6 +611,10 @@
   (nerd-icons-completion-mode)
   (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
 
+(use-package nerd-icons-ibuffer
+  :ensure t
+  :hook (ibuffer-mode . nerd-icons-ibuffer-mode))
+
 ;;------------------------------------------------------------------------------
 ;; treemacs: tree interface for opening files
 (use-package treemacs
@@ -708,10 +712,6 @@
 
 (use-package treemacs-projectile
   :after (treemacs projectile)
-  :ensure t)
-
-(use-package treemacs-icons-dired
-  :hook (dired-mode . treemacs-icons-dired-enable-once)
   :ensure t)
 
 (use-package treemacs-magit
