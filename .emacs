@@ -36,7 +36,7 @@
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
                          ("stable-melpa" . "http://stable.melpa.org/packages/")
                          ("melpa" . "http://melpa.org/packages/")
-			 ("org-contrib" . "http://elpa.nongnu.org/nongnu/")
+			 ("nongnu" . "http://elpa.nongnu.org/nongnu/")
 			 ("cselpa" . "https://elpa.thecybershadow.net/packages/")))
 
 (package-initialize)
