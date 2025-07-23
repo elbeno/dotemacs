@@ -219,6 +219,9 @@
          ("C-r" . vr/isearch-backward)
          ("C-s" . vr/isearch-forward)))
 
+;; use case-insensitive searching in general
+(setq case-fold-search t)
+
 ;;------------------------------------------------------------------------------
 ;; make shell files executable on save
 (add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)

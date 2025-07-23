@@ -13,6 +13,7 @@
         org-startup-indented t
         org-src-fontify-natively t
         org-export-allow-bind-keywords t
+        org-export-with-sub-superscripts '{}
         org-latex-listings 'minted
         org-reveal-note-key-char nil
         org-directory (concat (getenv "HOME") "/.org_notes"))

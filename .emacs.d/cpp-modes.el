@@ -176,6 +176,7 @@
         lsp-ui-sideline-update-mode 'point
         lsp-ui-doc-header t
         lsp-ui-doc-include-signature t
+        lsp-ui-doc-position 'bottom
         lsp-ui-sideline-ignore-duplicate t
         lsp-ui-flycheck-enable t
         lsp-ui-imenu-enable t)

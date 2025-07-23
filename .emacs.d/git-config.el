@@ -50,7 +50,9 @@
 (use-package magit-todos
   :ensure t
   :after magit
-  :config (magit-todos-mode 1))
+  :config
+  (setq magit-todos-insert-after '(bottom))
+  (magit-todos-mode 1))
 
 ;; speed up magit refresh
 (use-package magit-prime

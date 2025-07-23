@@ -114,6 +114,9 @@
 ;; Bookmarks
 (use-package bm
   :ensure t
+  :config
+  (setq bm-cycle-all-buffers t
+        bm-marker 'bm-marker-right)
   :bind (("C-<f2>" . bm-toggle)
          ("<f2>" . bm-next)
          ("S-<f2>" . bm-previous)))
