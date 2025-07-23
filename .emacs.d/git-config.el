@@ -52,5 +52,12 @@
   :after magit
   :config (magit-todos-mode 1))
 
+;; speed up magit refresh
+(use-package magit-prime
+  :init (my/vc-install "Azkae/magit-prime")
+  :after magit
+  :config
+  (add-hook 'magit-pre-refresh-hook 'magit-prime-refresh-cache))
+
 ;; be ready to edit commit messages
 (require 'magit-commit)
