@@ -90,11 +90,18 @@
 ;;------------------------------------------------------------------------------
 ;; AsciiDoc
 (use-package adoc-mode
-  :ensure t)
+  :ensure t
+  :mode ("\\.adoc$" . adoc-mode))
 
 ;;------------------------------------------------------------------------------
 ;; Graphviz dotfiles
 (use-package graphviz-dot-mode
   :ensure t
   :config
-  (setq graphviz-dot-indent-width 2))
+  (setq graphviz-dot-indent-width 2)
+  :mode ("\\.dot$" . graphviz-dot-mode))
+
+;;------------------------------------------------------------------------------
+;; eat terminal emulator
+(use-package eat
+  :ensure t)
