@@ -708,7 +708,11 @@
         ("C-x t d"   . treemacs-select-directory)
         ("C-x t B"   . treemacs-bookmark)
         ("C-x t C-t" . treemacs-find-file)
-        ("C-x t M-t" . treemacs-find-tag)))
+        ("C-x t M-t" . treemacs-find-tag))
+  (:map treemacs-mode-map
+        ("<f12>"     . treemacs-quit)
+        ("<left>"    . treemacs-collapse-parent-node)
+        ("<right>"   . treemacs-RET-action)))
 
 (use-package treemacs-projectile
   :after (treemacs projectile)
