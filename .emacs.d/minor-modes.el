@@ -114,12 +114,26 @@
 ;; Bookmarks
 (use-package bm
   :ensure t
+  :init
+  (setq bm-restore-repository-on-load t)
   :config
   (setq bm-cycle-all-buffers t
-        bm-marker 'bm-marker-right)
-  :bind (("C-<f2>" . bm-toggle)
-         ("<f2>" . bm-next)
-         ("S-<f2>" . bm-previous)))
+        bm-marker 'bm-marker-right
+        bm-repository-file (expand-file-name "bm-repository" user-emacs-directory))
+  (setq-default bm-buffer-persistence t)
+  (add-hook 'after-init-hook 'bm-repository-load)
+  (add-hook 'kill-buffer-hook #'bm-buffer-save)
+  (add-hook 'kill-emacs-hook #'(lambda nil
+                                 (bm-buffer-save-all)
+                                 (bm-repository-save)))
+  (add-hook 'after-save-hook #'bm-buffer-save)
+  (add-hook 'find-file-hooks   #'bm-buffer-restore)
+  (add-hook 'after-revert-hook #'bm-buffer-restore)
+  (add-hook 'vc-before-checkin-hook #'bm-buffer-save)
+  (add-hook 'bm-after-goto-hook 'org-bookmark-jump-unhide)
+  :bind (("<f2>" . bm-next)
+         ("S-<f2>" . bm-previous)
+         ("C-<f2>" . bm-toggle)))
 
 ;;------------------------------------------------------------------------------
 ;; Mark the fill column

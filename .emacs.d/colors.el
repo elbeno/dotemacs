@@ -256,3 +256,9 @@ When called from Lisp, THEME is the symbol of a theme."
   (interactive (list (my/doom-themes--select-prompt nil)))
   (mapc #'disable-theme custom-enabled-themes)
   (load-theme theme t))
+
+;;------------------------------------------------------------------------------
+;; solaire mode: distinguish "real" buffers
+(use-package solaire-mode
+  :ensure t
+  :init (solaire-global-mode +1))
