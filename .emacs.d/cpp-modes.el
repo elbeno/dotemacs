@@ -217,6 +217,13 @@
   (ansi-color-apply-on-region compilation-filter-start (point)))
 (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
 
+(use-package fancy-compilation
+  :ensure t
+  :commands (fancy-compilation-mode))
+
+(with-eval-after-load 'compile
+  (fancy-compilation-mode))
+
 ;;------------------------------------------------------------------------------
 ;; Debugging
 
