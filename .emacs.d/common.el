@@ -730,3 +730,18 @@
   :after treemacs
   :config
   (treemacs-load-theme "nerd-icons"))
+
+;;------------------------------------------------------------------------------
+;; cape: completion at point
+(use-package cape
+  :ensure t
+  :bind (("C-c x" . cape-prefix-map)
+         ("C-/" . cape-dabbrev))
+  :init
+  (add-hook 'completion-at-point-functions #'cape-dabbrev)
+  (add-hook 'completion-at-point-functions #'cape-file)
+  (add-hook 'completion-at-point-functions #'cape-elisp-block))
+
+;; prevent undo-tree from overriding this keybind
+(eval-after-load 'undo-tree
+  '(define-key undo-tree-map (kbd "C-/") nil))
