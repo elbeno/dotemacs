@@ -203,3 +203,7 @@ With prefix arg ARG, transpose with the argument after it."
 (defun my-render-org-tables-in-buffer ()
   (save-excursion
     (org-element-map (org-element-parse-buffer) 'table 'my-render-org-table)))
+
+(use-package org-block-capf
+  :init (my/vc-install "xenodium/org-block-capf")
+  :hook (org-mode . org-block-capf-add-to-completion-at-point-functions))

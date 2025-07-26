@@ -736,7 +736,7 @@
 (use-package cape
   :ensure t
   :bind (("C-c x" . cape-prefix-map)
-         ("C-/" . cape-dabbrev))
+         ("C-/" . completion-at-point))
   :init
   (add-hook 'completion-at-point-functions #'cape-dabbrev)
   (add-hook 'completion-at-point-functions #'cape-file)
