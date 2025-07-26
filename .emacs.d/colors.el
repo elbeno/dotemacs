@@ -1,10 +1,13 @@
 ;; -*- lexical-binding: t; -*-
 ;;------------------------------------------------------------------------------
 ;; Nice themes
+(defun my/load-theme (theme)
+    (mapc #'disable-theme custom-enabled-themes)
+    (load-theme theme t))
+
 (defun load-theme-cyberpunk ()
   (interactive)
-  (mapc #'disable-theme custom-enabled-themes)
-  (load-theme 'cyberpunk t))
+  (my/load-theme 'cyberpunk))
 
 (use-package cyberpunk-theme
   :ensure t
@@ -12,8 +15,7 @@
 
 (defun load-theme-tomorrow-night-deepblue ()
   (interactive)
-  (mapc #'disable-theme custom-enabled-themes)
-  (load-theme 'tomorrow-night-deepblue t))
+  (my/load-theme 'tomorrow-night-deepblue))
 
 (use-package tomorrow-night-deepblue-theme
   :ensure t
@@ -21,19 +23,57 @@
 
 (defun load-theme-hercules ()
   (interactive)
-  (mapc #'disable-theme custom-enabled-themes)
-  (load-theme 'hercules t))
-
-(defun load-theme-hercules-light ()
-  (interactive)
-  (mapc #'disable-theme custom-enabled-themes)
-  (load-theme 'hercules-light t))
+  (my/load-theme 'hercules))
 
 (use-package hercules-theme
   :init (my/vc-install "0xcefaedfe/hercules-theme")
-  :bind (("C-c t h" . load-theme-hercules)
-         ("C-c t H" . load-theme-hercules-light)))
+  :bind (("C-c t h" . load-theme-hercules)))
 
+(defun load-theme-tron-legacy ()
+  (interactive)
+  (my/load-theme 'tron-legacy))
+
+(use-package tron-legacy-theme
+  :ensure t
+  :config
+  (setq tron-legacy-theme-vivid-cursor t
+        tron-legacy-theme-softer-bg t
+        tron-legacy-theme-dark-fg-bright-comments t)
+  :bind (("C-c t r" . load-theme-tron-legacy)))
+
+(defun load-theme-poet-dark ()
+  (interactive)
+  (my/load-theme 'poet-dark))
+
+(use-package poet-theme
+  :ensure t
+  :bind (("C-c t p" . load-theme-poet-dark)))
+
+(defun load-theme-zenburn ()
+  (interactive)
+  (my/load-theme 'zenburn))
+
+(use-package zenburn-theme
+  :ensure t
+  :bind (("C-c t z" . load-theme-zenburn)))
+
+(defun load-theme-moe-dark ()
+  (interactive)
+  (my/load-theme 'moe-dark))
+
+(use-package moe-theme
+  :ensure t
+  :bind (("C-c t m" . load-theme-moe-dark)))
+
+(defun load-theme-ample ()
+  (interactive)
+  (my/load-theme 'ample))
+
+(use-package ample-theme
+  :ensure t
+  :bind (("C-c t a" . load-theme-ample)))
+
+;; default theme
 (load-theme-cyberpunk)
 
 ;;------------------------------------------------------------------------------
@@ -89,6 +129,7 @@
   (interactive)
   (require 'modus-themes)
   (modus-themes-load-theme 'modus-operandi))
+
 (defun load-theme-modus-vivendi ()
   (interactive)
   (require 'modus-themes)
@@ -109,19 +150,28 @@
         modus-themes-completions '((matches . (extrabold))
                                    (selection . (semibold text-also)))
         modus-themes-org-blocks 'tinted-background)
-  :bind (("C-c t l" . load-theme-modus-operandi)
-         ("C-c t d" . load-theme-modus-vivendi)
+  :bind (("C-c t v" . load-theme-modus-vivendi)
          ("C-c t o" . load-theme-modus-operandi)
-         ("C-c t v" . load-theme-modus-vivendi)
-         ("C-c t m" . modus-themes-select)))
+         ("C-c t M" . modus-themes-select)))
 
 ;;------------------------------------------------------------------------------
 ;; ef themes
 (use-package ef-themes
   :ensure t
-  :config
-  (setq ef-themes-to-toggle '(ef-summer ef-winter))
-  :bind (("C-c t e" . ef-themes-select)))
+  :bind (("C-c t E" . ef-themes-select)))
+
+;; themes selection, piggybacking on ef-themes selection
+(defun my/themes--select-prompt (themes history &optional prompt)
+  "Minibuffer prompt for `themes-select'.
+With optional PROMPT string, use it.  Else use a generic prompt."
+  (require 'ef-themes)
+  (let* ((completion-extra-properties `(:annotation-function ,#'ef-themes--annotate-theme)))
+    (intern
+     (completing-read
+      (or prompt "Select Theme: ")
+      themes
+      nil t nil
+      'my/solarized-themes--select-theme-history))))
 
 ;;------------------------------------------------------------------------------
 ;; doom themes
@@ -222,43 +272,171 @@
     doom-zenburn)
   "List of doom themes.")
 
-(defun my/doom-themes--enable-themes ()
-  "Enable all doom themes."
-  (mapc
-   (lambda (theme)
-     (unless (memq theme custom-known-themes)
-       (load-theme theme :no-confirm :no-enable)))
-   my/doom-themes))
-
-(defun my/doom-themes--load ()
-  "Return all the known doom themes."
-  (ef-themes--completion-table 'theme (my/doom-themes--enable-themes)))
-
-(defun my/doom-themes--select-prompt (&optional prompt)
-  "Minibuffer prompt for `doom-themes-select'.
-With optional PROMPT string, use it.  Else use a generic prompt."
-  (require 'ef-themes)
-  (let* ((themes (my/doom-themes--load))
-         (completion-extra-properties `(:annotation-function ,#'ef-themes--annotate-theme)))
-    (intern
-     (completing-read
-      (or prompt "Select Doom Theme: ")
-      themes
-      nil t nil
-      'my/doom-themes--select-theme-history))))
-
 (defvar my/doom-themes--select-theme-history nil
   "Minibuffer history of `my/doom-themes--select-prompt'.")
+
+(defun my/doom-themes--select-prompt ()
+  "Minibuffer prompt for `doom-themes-select'.
+With optional PROMPT string, use it.  Else use a generic prompt."
+  (my/themes--select-prompt my/doom-themes
+                            my/doom-themes--select-theme-history
+                            "Select Doom Theme: "))
 
 (defun my/doom-themes-select (theme)
   "Load a doom THEME using minibuffer completion.
 When called from Lisp, THEME is the symbol of a theme."
-  (interactive (list (my/doom-themes--select-prompt nil)))
-  (mapc #'disable-theme custom-enabled-themes)
-  (load-theme theme t))
+  (interactive (list (my/doom-themes--select-prompt)))
+  (my/load-theme theme))
 
 ;;------------------------------------------------------------------------------
 ;; solaire mode: distinguish "real" buffers
 (use-package solaire-mode
   :ensure t
   :init (solaire-global-mode +1))
+
+;;------------------------------------------------------------------------------
+;; kaolin themes
+(use-package kaolin-themes
+  :ensure t
+  :bind (("C-c t K" . my/kaolin-themes-select)))
+
+(defconst my/kaolin-themes
+  '(kaolin-dark
+    kaolin-light
+    kaolin-aurora
+    kaolin-blossom
+    kaolin-breeze
+    kaolin-bubblegum
+    kaolin-eclipse
+    kaolin-galaxy
+    kaolin-mono-dark
+    kaolin-mono-light
+    kaolin-ocean
+    kaolin-shiva
+    kaolin-temple
+    kaolin-valley-dark
+    kaolin-valley-light)
+  "List of kaolin themes.")
+
+(defvar my/kaolin-themes--select-theme-history nil
+  "Minibuffer history of `my/kaolin-themes--select-prompt'.")
+
+(defun my/kaolin-themes--select-prompt ()
+  "Minibuffer prompt for `kaolin-themes-select'.
+With optional PROMPT string, use it.  Else use a generic prompt."
+  (my/themes--select-prompt my/kaolin-themes
+                            my/kaolin-themes--select-theme-history
+                            "Select Kaolin Theme: "))
+
+(defun my/kaolin-themes-select (theme)
+  "Load a kaolin THEME using minibuffer completion.
+When called from Lisp, THEME is the symbol of a theme."
+  (interactive (list (my/kaolin-themes--select-prompt)))
+  (my/load-theme theme))
+
+;;------------------------------------------------------------------------------
+;; solarized themes
+(use-package solarized-theme
+  :ensure t
+  :bind (("C-c t S" . my/solarized-themes-select)))
+
+(defconst my/solarized-themes
+  '(solarized-dark
+    solarized-light
+    solarized-gruvbox-dark
+    solarized-gruvbox-light
+    solarized-selenized-dark
+    solarized-selenized-light
+    solarized-zenburn)
+  "List of solarized themes.")
+
+(defvar my/solarized-themes--select-theme-history nil
+  "Minibuffer history of `my/solarized-themes--select-prompt'.")
+
+(defun my/solarized-themes--select-prompt ()
+  "Minibuffer prompt for `solarized-themes-select'.
+With optional PROMPT string, use it.  Else use a generic prompt."
+  (my/themes--select-prompt my/solarized-themes
+                            my/solarized-themes--select-theme-history
+                            "Select Solarized Theme: "))
+
+(defun my/solarized-themes-select (theme)
+  "Load a solarized THEME using minibuffer completion.
+When called from Lisp, THEME is the symbol of a theme."
+  (interactive (list (my/solarized-themes--select-prompt)))
+  (my/load-theme theme))
+
+;;------------------------------------------------------------------------------
+;; toggle themes
+(defconst my/theme-toggle-list
+  '((hercules . hercules-light)
+    (hercules-light . hercules)
+    (moe-dark . moe-light)
+    (moe-light . moe-dark)
+    (modus-operandi . modus-vivendi)
+    (modus-vivendi . modus-operandi)
+    (kaolin-dark . kaolin-light)
+    (kaolin-light . kaolin-dark)
+    (kaolin-mono-dark . kaolin-mono-light)
+    (kaolin-mono-light . kaolin-mono-dark)
+    (kaolin-valley-dark . kaolin-valley-light)
+    (kaolin-valley-light . kaolin-valley-dark)
+    (solarized-dark . solarized-light)
+    (solarized-light . solarized-dark)
+    (solarized-gruvbox-dark . solarized-gruvbox-light)
+    (solarized-gruvbox-light . solarized-gruvbox-dark)
+    (solarized-selenized-dark . solarized-selenized-light)
+    (solarized-selenized-light . solarized-selenized-dark)
+    (doom-nord . doom-nord-light)
+    (doom-nord-light . doom-nord)
+    (doom-one . doom-one-light)
+    (doom-one-light . doom-one)
+    (doom-gruvbox . doom-gruvbox-light)
+    (doom-gruvbox-light . doom-gruvbox)
+    (doom-opera . doom-opera-light)
+    (doom-opera-light . doom-opera)
+    (doom-ayu-dark . doom-ayu-light)
+    (doom-ayu-light . doom-ayu-dark)
+    (doom-solarized-dark . doom-solarized-light)
+    (doom-solarized-light . doom-solarized-dark)
+    (doom-acario-dark . doom-acario-light)
+    (doom-acario-light . doom-acario-dark)
+    (doom-feather-dark . doom-feather-light)
+    (doom-feather-light . doom-feather-dark)
+    (doom-oksolar-dark . doom-oksolar-light)
+    (doom-oksolar-light . doom-oksolar-dark)
+    (doom-material-dark . doom-material)
+    (doom-material . doom-material-dark)
+    (ef-day . ef-night)
+    (ef-night . ef-day)
+    (ef-spring . ef-autumn)
+    (ef-autumn . ef-spring)
+    (ef-summer . ef-winter)
+    (ef-winter . ef-summer)
+    (ef-dark . ef-light)
+    (ef-light . ef-dark)
+    (ef-duo-dark . ef-duo-light)
+    (ef-duo-light . ef-duo-dark)
+    (ef-elea-dark . ef-elea-light)
+    (ef-elea-light . ef-elea-dark)
+    (ef-trio-dark . ef-trio-light)
+    (ef-trio-light . ef-trio-dark)
+    (ef-maris-dark . ef-maris-light)
+    (ef-maris-light . ef-maris-dark)
+    (ef-melissa-dark . ef-melissa-light)
+    (ef-melissa-light . ef-melissa-dark)
+    (ef-tritanopia-dark . ef-tritanopia-light)
+    (ef-tritanopia-light . ef-tritanopia-dark)
+    (ef-deuteranopia-dark . ef-deuteranopia-light)
+    (ef-deuteranopia-light . ef-deuteranopia-dark)
+    (ample . ample-light)
+    (ample-light . ample)))
+
+(defun my/toggle-theme ()
+  (interactive)
+  (let* ((current-theme (car custom-enabled-themes))
+         (sister-theme (assoc current-theme my/theme-toggle-list)))
+    (when sister-theme
+      (my/load-theme (cdr sister-theme)))))
+
+(bind-key "C-c t t" #'my/toggle-theme)
