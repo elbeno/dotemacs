@@ -138,6 +138,7 @@
   :ensure t
   :custom
   (lsp-completion-provider :none)
+  (lsp-keymap-prefix "C-l")
   :init
   (defun my/lsp-mode-setup-completion ()
     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
@@ -160,9 +161,10 @@
         lsp-auto-guess-root t
         lsp-clangd-binary-path (find-exe (find-llvm-root) "clangd")
         lsp-prefer-flymake nil
-        lsp-headerline-breadcrumb-enable t)
-  :hook ((lsp-mode . lsp-enable-which-key-integration)
-         (c++-mode . my/config-lsp-mode)
+        lsp-headerline-breadcrumb-enable t
+        lsp-semantic-tokens-enable t
+        lsp-modeline-diagnostics-scope :workspace)
+  :hook ((c++-mode . my/config-lsp-mode)
          (c++-ts-mode . my/config-lsp-mode)
          (lsp-completion-mode . my/lsp-mode-setup-completion)))
 
@@ -188,6 +190,10 @@
       (lsp-enable-imenu)
       (lsp-ui-mode))
   :hook (lsp-mode . my/config-lsp-ui-mode))
+
+(use-package lsp-treemacs
+  :ensure t
+  :hook (lsp-mode . lsp-treemacs-sync-mode))
 
 ;;------------------------------------------------------------------------------
 ;; building & error navigation
