@@ -276,7 +276,6 @@
   ;; Replace bindings. Lazily loaded due by `use-package'.
   :bind (;; C-c bindings (mode-specific-map)
          ;;("C-c h" . consult-history)
-         ("M-g i" . consult-imenu)
          ("C-c m" . consult-mode-command)
          ("C-c k" . consult-kmacro)
          ;; C-x bindings (ctl-x-map)
