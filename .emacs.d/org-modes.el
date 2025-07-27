@@ -206,4 +206,15 @@ With prefix arg ARG, transpose with the argument after it."
 
 (use-package org-block-capf
   :init (my/vc-install "xenodium/org-block-capf")
-  :hook (org-mode . org-block-capf-add-to-completion-at-point-functions))
+  :hook (org-mode . org-block-capf-add-to-completion-at-point-functions)
+  :bind (:map org-mode-map
+              ("TAB" . my/org-tab-action)))
+
+(defun my/org-tab-action (&optional arg)
+  "Org-mode: call completion-at-point if looking at '<.*'.
+Otherwise call org-cycle."
+  (interactive)
+  (if (looking-back (org-block-capf--regexp)
+                    (line-beginning-position))
+      (completion-at-point)
+    (org-cycle arg)))
