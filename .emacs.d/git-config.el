@@ -61,6 +61,13 @@
   :config
   (add-hook 'magit-pre-refresh-hook 'magit-prime-refresh-cache))
 
+;; use forge for github etc
+(use-package forge
+  :after magit
+  :ensure t
+  :config
+  (setq auth-sources '("~/.authinfo")))
+
 ;; be ready to edit commit messages
 (require 'magit-commit)
 
