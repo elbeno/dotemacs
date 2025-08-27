@@ -763,6 +763,10 @@
 
 ;;------------------------------------------------------------------------------
 ;;; A Help Transient on C-S-h
+(use-package which-key
+  :ensure t
+  :defer)
+
 (use-package helpful
   :ensure t
   :bind ("C-h f" . #'helpful-callable)
@@ -839,7 +843,6 @@
     ("C-i" "Info" info)
     ("C-4" "Other Window" info-other-window)
     ("C-e" "Emacs" info-emacs-manual)
-    ("C-l" "Elisp" info-elisp-manual)
     ("C-r" "Pick Manual" info-display-manual)
     ]
    ["External"
