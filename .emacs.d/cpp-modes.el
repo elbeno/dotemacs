@@ -251,3 +251,10 @@
 ;; Manage template spew
 (require 'tspew)
 (add-hook 'compilation-mode-hook 'tspew-mode)
+
+;;------------------------------------------------------------------------------
+;; demangling
+(use-package demangle-mode
+  :ensure t
+  :init
+  (add-to-list 'auto-mode-alist '("\\.lst$" . demangle-mode)))
