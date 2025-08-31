@@ -862,6 +862,7 @@
   :config
   ;; (setq dumb-jump-prefer-searcher 'rg) ;; use git grep within projects, otherwise rg
   (setq dumb-jump-force-searcher 'rg)  ;; always use rg
+  (setq dumb-jump-quiet t)
   (add-to-list 'dumb-jump-language-file-exts
                '(:language "cmake" :ext "cmake" :agtype nil :rgtype "cmake"))
   (add-to-list 'dumb-jump-language-comments
@@ -885,7 +886,34 @@
                '(:type "target"
                  :supports ("ag" "grep" "rg" "git-grep")
                  :language "cmake"
-                 :regex "^\\s*\\badd_(executable|library|custom_target)\\b\\s*\\\(\\s*\\bJJJ\\b"
+                 :regex "^\\s*\\badd_(executable|library|custom_target)\\b\\s*\\\(\\s*(\\${[^}]+})?\\bJJJ\\b"
                  :tests
                  ("add_custom_target(test)" "add_library (test" "add_executable(\n test")))
   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
+
+(setq my-default-build-dir "build")
+
+(defun get-current-project-cicd-dir ()
+  (when (project-current)
+    (let ((install-file
+          (concat (project-root (project-current))
+            my-default-build-dir "/_deps/cicd-repo-infrastructure-build/cmake_install.cmake")))
+      (when (file-exists-p install-file)
+        (with-temp-buffer
+          (insert-file-contents-literally install-file)
+          (goto-char (point-min))
+          (when (re-search-forward "^# Install script for directory: \\(.*\\)$" nil t)
+            (match-string 1)
+          ))))))
+
+;; advise dumb-jump: when searching cmake, add CPM cache CICD directory
+(defun add-cpm-cache-to-cmake-rg (rg-command)
+  (let ((cicd-dir (get-current-project-cicd-dir))
+        (cmake-search (string-match-p "--type cmake" rg-command)))
+    (if (and cicd-dir cmake-search)
+        (progn
+          (dumb-jump-debug-message
+            (concat "Adding CICD directory to rg command: " rg-command " " cicd-dir))
+          (concat rg-command " " cicd-dir))
+      rg-command)))
+(advice-add #'dumb-jump-generate-rg-command :filter-return #'add-cpm-cache-to-cmake-rg)
