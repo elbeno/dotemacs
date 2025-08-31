@@ -853,3 +853,39 @@
    ]
   )
 (global-set-key (kbd "C-S-h") 'hrm-help-transient)
+
+;;------------------------------------------------------------------------------
+;; dumb-jump: search-powered go-to-definition
+;; additions for CMake: rg knows to search .cmake and CMakeLists.txt files
+(use-package dumb-jump
+  :ensure t
+  :config
+  ;; (setq dumb-jump-prefer-searcher 'rg) ;; use git grep within projects, otherwise rg
+  (setq dumb-jump-force-searcher 'rg)  ;; always use rg
+  (add-to-list 'dumb-jump-language-file-exts
+               '(:language "cmake" :ext "cmake" :agtype nil :rgtype "cmake"))
+  (add-to-list 'dumb-jump-language-comments
+               '(:comment "#" :language "cmake"))
+  (add-to-list 'dumb-jump-find-rules
+               '(:type "function"
+                 :supports ("ag" "grep" "rg" "git-grep")
+                 :language "cmake"
+                 :regex "^\\s*\\b(function|macro)\\b\\s*\\\(\\s*\\bJJJ\\b"
+                 :tests
+                 ("function(test)" "function (test arg)" "function(\n test")))
+  (add-to-list 'dumb-jump-find-rules
+               '(:type "variable"
+                 :supports ("ag" "grep" "rg" "git-grep")
+                 :language "cmake"
+                 :regex "^\\s*\\b(set|option)\\b\\s*\\\(\\s*\\bJJJ\\b"
+                 :tests
+                 ("set(test)" "set (test arg)" "set(\n test"
+                  "option(test)" "option (test arg)" "option(\n test")))
+  (add-to-list 'dumb-jump-find-rules
+               '(:type "target"
+                 :supports ("ag" "grep" "rg" "git-grep")
+                 :language "cmake"
+                 :regex "^\\s*\\badd_(executable|library|custom_target)\\b\\s*\\\(\\s*\\bJJJ\\b"
+                 :tests
+                 ("add_custom_target(test)" "add_library (test" "add_executable(\n test")))
+  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
