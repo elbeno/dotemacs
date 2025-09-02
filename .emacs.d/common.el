@@ -857,12 +857,20 @@
 ;;------------------------------------------------------------------------------
 ;; dumb-jump: search-powered go-to-definition
 ;; additions for CMake: rg knows to search .cmake and CMakeLists.txt files
+(defun my/rg-supports-pcre2 ()
+  (with-temp-buffer
+    (call-process "rg" nil t nil "--version")
+    (goto-char (point-min))
+    (re-search-forward "\+pcre2" nil t)))
+
 (use-package dumb-jump
   :ensure t
   :config
   ;; (setq dumb-jump-prefer-searcher 'rg) ;; use git grep within projects, otherwise rg
   (setq dumb-jump-force-searcher 'rg)  ;; always use rg
   (setq dumb-jump-quiet t)
+  (unless (my/rg-supports-pcre2)
+    (setq dumb-jump-rg-search-args ""))
   (add-to-list 'dumb-jump-language-file-exts
                '(:language "cmake" :ext "cmake" :agtype nil :rgtype "cmake"))
   (add-to-list 'dumb-jump-language-comments
@@ -886,18 +894,23 @@
                '(:type "target"
                  :supports ("ag" "grep" "rg" "git-grep")
                  :language "cmake"
-                 :regex "^\\s*\\badd_(executable|library|custom_target)\\b\\s*\\\(\\s*(\\${[^}]+})?\\bJJJ\\b"
+                 :regex "^\\s*\\badd_(executable|library|custom_target)\\b\\s*\\\(\\s*(\\$\\\{[^}]+})?\\bJJJ\\b"
                  :tests
                  ("add_custom_target(test)" "add_library (test" "add_executable(\n test")))
   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
 
-(setq my-default-build-dir "build")
+(setq my/potential-build-dirs '("build"))
 
-(defun get-current-project-cicd-dir ()
+(defun my/find-build-dir ()
+  (let* ((root-dir (project-root (project-current)))
+         (dirs (mapcar (lambda (s) (concat root-dir s)) my/potential-build-dirs)))
+    (seq-find #'file-directory-p dirs)))
+
+(defun my/get-current-project-cicd-dir ()
   (when (project-current)
-    (let ((install-file
-          (concat (project-root (project-current))
-            my-default-build-dir "/_deps/cicd-repo-infrastructure-build/cmake_install.cmake")))
+    (let* ((build-dir (my/find-build-dir))
+           (install-file
+            (concat build-dir "/_deps/cicd-repo-infrastructure-build/cmake_install.cmake")))
       (when (file-exists-p install-file)
         (with-temp-buffer
           (insert-file-contents-literally install-file)
@@ -907,8 +920,8 @@
           ))))))
 
 ;; advise dumb-jump: when searching cmake, add CPM cache CICD directory
-(defun add-cpm-cache-to-cmake-rg (rg-command)
-  (let ((cicd-dir (get-current-project-cicd-dir))
+(defun my/add-cpm-cache-to-cmake-rg (rg-command)
+  (let ((cicd-dir (my/get-current-project-cicd-dir))
         (cmake-search (string-match-p "--type cmake" rg-command)))
     (if (and cicd-dir cmake-search)
         (progn
@@ -916,4 +929,4 @@
             (concat "Adding CICD directory to rg command: " rg-command " " cicd-dir))
           (concat rg-command " " cicd-dir))
       rg-command)))
-(advice-add #'dumb-jump-generate-rg-command :filter-return #'add-cpm-cache-to-cmake-rg)
+(advice-add #'dumb-jump-generate-rg-command :filter-return #'my/add-cpm-cache-to-cmake-rg)
