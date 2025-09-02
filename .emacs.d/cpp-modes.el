@@ -160,6 +160,7 @@
   (setq lsp-enable-indentation nil
         lsp-auto-guess-root t
         lsp-clangd-binary-path (find-exe (find-llvm-root) "clangd")
+        lsp-clients-clangd-executable (find-exe (find-llvm-root) "clangd")
         lsp-prefer-flymake nil
         lsp-headerline-breadcrumb-enable t
         lsp-semantic-tokens-enable t
@@ -249,8 +250,9 @@
 
 ;;------------------------------------------------------------------------------
 ;; Manage template spew
-(require 'tspew)
-(add-hook 'compilation-mode-hook 'tspew-mode)
+(use-package tspew
+  :init (my/vc-install "jefftrull/tspew")
+  :config (add-hook 'compilation-mode-hook 'tspew-mode))
 
 ;;------------------------------------------------------------------------------
 ;; demangling
@@ -258,3 +260,8 @@
   :ensure t
   :init
   (add-to-list 'auto-mode-alist '("\\.lst$" . demangle-mode)))
+
+;;------------------------------------------------------------------------------
+;; beardbolt
+(use-package beardbolt
+  :init (my/vc-install "joaotavora/beardbolt"))
