@@ -57,6 +57,10 @@
   :ensure t
   :defer)
 
+(use-package ob-mermaid
+  :ensure t
+  :defer)
+
 (use-package htmlize
   :ensure t
   :defer)
