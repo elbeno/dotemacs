@@ -105,3 +105,12 @@
 ;; eat terminal emulator
 (use-package eat
   :ensure t)
+
+;;------------------------------------------------------------------------------
+;; Mermaid
+(use-package mermaid-mode
+  :ensure t
+  :config
+  (setq mermaid-output-format ".png"
+        mermaid-flags (concat "-p " (expand-file-name "~/.puppeteerrc.json")))
+  :mode ("\\.mmd$" . mermaid-mode))
