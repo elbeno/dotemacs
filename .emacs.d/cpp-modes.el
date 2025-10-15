@@ -157,7 +157,8 @@
                  ("M-<down>" . flycheck-next-error)
                  ("M-<up>" . flycheck-previous-error))))
   :config
-  (setq lsp-enable-indentation nil
+  (setq lsp-use-plists t
+        lsp-enable-indentation nil
         lsp-auto-guess-root t
         lsp-clangd-binary-path (find-exe (find-llvm-root) "clangd")
         lsp-clients-clangd-executable (find-exe (find-llvm-root) "clangd")
