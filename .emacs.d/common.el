@@ -522,6 +522,11 @@
      ("Asia/Singapore" "Penang")
      ("Australia/Brisbane" "Brisbane"))))
 
+(use-package time-zones
+  :ensure t
+  :vc (:url "https://github.com/xenodium/time-zones")
+  :commands time-zones)
+
 ;;------------------------------------------------------------------------------
 ;; increment numbers in region
 (defun replace-numbers-in-region-with-increments ()
