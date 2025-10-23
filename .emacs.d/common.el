@@ -47,9 +47,6 @@
   :diminish
   ws-butler-mode)
 
-;; mouse
-(xterm-mouse-mode +1)
-
 ;;------------------------------------------------------------------------------
 ;; Copy/paste stuff
 (setq select-enable-clipboard t
