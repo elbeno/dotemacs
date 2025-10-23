@@ -1,11 +1,16 @@
 ;; -*- lexical-binding: t; -*-
 ;;------------------------------------------------------------------------------
 ;; Fix terminal keys
-(use-package term-keys
-  :ensure t
-  :config
-  (term-keys-mode t)
-  :diminish term-keys-mode)
+(if (getenv "TMUX")
+    (use-package term-keys
+      :ensure t
+      :config
+      (term-keys-mode t)
+      :diminish term-keys-mode)
+  (use-package kkp
+    :ensure t
+    :config
+    (global-kkp-mode +1)))
 
 ;;------------------------------------------------------------------------------
 ;; Use system clipboard
