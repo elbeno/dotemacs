@@ -147,7 +147,7 @@
   (add-hook 'prog-mode-hook
             (lambda ()
               (let ((my-post-fill-column-fg
-                    (if (display-graphic-p) "gray20" "yellow")))
+                    (if (my/graphic-mode-p) "gray20" "yellow")))
                 (unless (string-match-p (regexp-quote "*temp*") (buffer-name))
                   (whitespace-mode)
                   (set-face-attribute 'whitespace-line nil

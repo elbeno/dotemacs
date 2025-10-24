@@ -66,6 +66,9 @@
     (unless (package-installed-p pac-name)
       (package-vc-install url))))
 
+(defun my/graphic-mode-p ()
+  (or (display-graphic-p) (string-equal (daemonp) "gui")))
+
 ;;------------------------------------------------------------------------------
 ;; Setup GC
 (use-package gcmh
@@ -85,7 +88,7 @@
 
 ;;------------------------------------------------------------------------------
 ;; Graphic or terminal mode?
-(if (display-graphic-p)
+(if (my/graphic-mode-p)
   (load "graphic-display.el")
   (load "terminal.el"))
 
@@ -149,18 +152,6 @@
 (bind-key "C-c C-b" 'my-search-backward-1)
 
 ;;------------------------------------------------------------------------------
-;; Graphic window settings
-(when (display-graphic-p)
-  (setq default-frame-height (frame-height))
-  (setq default-frame-alist
-        (append
-         `((width . ,column-wrap-hard)
-           (height . ,default-frame-height))
-         default-frame-alist))
-
-  (size-frame-default))
-
-;;------------------------------------------------------------------------------
 ;; Start server
 (require 'server)
 (unless (server-running-p)
@@ -176,18 +167,6 @@
 ;; apply local site-specific changes
 (let ((local-file (concat dotfile-dir ".emacs.d/local.el")))
   (load local-file))
-
-;------------------------------------------------------------------------------
-;; welcome dashboard
-(when (display-graphic-p)
-  (use-package welcome-dashboard
-    :ensure nil ;; when using local file and not straight nor use-package
-    :config
-    (setq welcome-dashboard-latitude 39.9237
-          welcome-dashboard-longitude -104.9201
-          welcome-dashboard-image-file (concat dotfile-dir ".emacs.d/site-lisp/lorikeet.png")
-          welcome-dashboard-title (concat "Welcome " user-full-name ", have a great day!"))
-    (welcome-dashboard-create-welcome-hook)))
 
 ;; Local Variables:
 ;; byte-compile-warnings: (not free-vars)

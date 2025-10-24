@@ -16,7 +16,7 @@
 (setq buffer-file-coding-system 'utf-8
       default-file-name-coding-system 'utf-8
       locale-coding-system 'utf-8)
-(when (display-graphic-p)
+(when (my/graphic-mode-p)
   (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
 (setq default-input-method nil)
 
@@ -464,7 +464,7 @@
 (use-package corfu-terminal
   :ensure t
   :init
-  (unless (display-graphic-p)
+  (unless (my/graphic-mode-p)
     (corfu-terminal-mode +1))
   :after corfu)
 
