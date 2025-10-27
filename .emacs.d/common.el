@@ -37,6 +37,7 @@
 (setq sentence-end-double-space nil)
 (setq-default indent-tabs-mode nil)
 (setq tab-width 2)
+(setq switch-to-buffer-obey-display-actions t)
 
 ;; Keep whitespace clean
 (setq require-final-newline t)
@@ -250,6 +251,9 @@
 (use-package symbol-overlay
   :ensure t
   :bind (("<f3>" . symbol-overlay-put)))
+(use-package symbol-overlay-mc
+  :ensure t
+  :bind (("C-<f3>" . symbol-overlay-mc-mark)))
 
 ;;------------------------------------------------------------------------------
 ;; simple modeline functionality
@@ -571,7 +575,8 @@
 (use-package doom-modeline
   :ensure t
   :init (doom-modeline-mode 1)
-  (setq doom-modeline-minor-modes t))
+  (setq doom-modeline-minor-modes t
+        doom-modeline-vcs-max-length 35))
 
 ;;------------------------------------------------------------------------------
 ;; minions: minor modes in modeline
