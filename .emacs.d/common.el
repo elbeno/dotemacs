@@ -185,6 +185,10 @@
          ("C-," . avy-pop-mark)
          ("C-j" . avy-goto-char-timer)))
 
+(use-package casual-avy
+  :ensure t
+  :bind (("M-j" . casual-avy-tmenu)))
+
 (use-package ace-window
   :ensure t
   :bind ("C-c w" . ace-window))
@@ -250,10 +254,10 @@
 ;; symbol-overlay
 (use-package symbol-overlay
   :ensure t
-  :bind (("<f3>" . symbol-overlay-put)))
-(use-package symbol-overlay-mc
+  :bind (("C-<f3>" . symbol-overlay-put)))
+(use-package casual-symbol-overlay
   :ensure t
-  :bind (("C-<f3>" . symbol-overlay-mc-mark)))
+  :bind (("<f3>" . casual-symbol-overlay-tmenu)))
 
 ;;------------------------------------------------------------------------------
 ;; simple modeline functionality
