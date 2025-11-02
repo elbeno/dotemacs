@@ -599,6 +599,12 @@
 (bind-key "C-c <f3>" 'dictionary-lookup-definition)
 
 ;;------------------------------------------------------------------------------
+;; eros: eval result overlays
+(use-package eros
+  :ensure t
+  :config (eros-mode 1))
+
+;;------------------------------------------------------------------------------
 ;; Bind extra help keys
 (use-package help
   :bind
