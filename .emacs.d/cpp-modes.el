@@ -136,6 +136,7 @@
 
 (use-package lsp-mode
   :ensure t
+  :after eldoc
   :custom
   (lsp-completion-provider :none)
   (lsp-keymap-prefix "C-l")
@@ -172,6 +173,7 @@
 
 (use-package lsp-ui
   :ensure t
+  :after eldoc
   :config
   (setq lsp-ui-sideline-enable t
         lsp-ui-sideline-show-symbol t
