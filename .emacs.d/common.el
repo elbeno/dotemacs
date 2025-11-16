@@ -469,12 +469,13 @@
     (corfu-mode 1)))
 (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
 
-(use-package corfu-terminal
-  :ensure t
-  :init
+(when (< emacs-major-version 31)
   (unless (my/graphic-mode-p)
-    (corfu-terminal-mode +1))
-  :after corfu)
+    (use-package corfu-terminal
+      :ensure t
+      :init
+      (corfu-terminal-mode +1)
+      :after corfu)))
 
 ;;------------------------------------------------------------------------------
 ;; powerthesaurus
