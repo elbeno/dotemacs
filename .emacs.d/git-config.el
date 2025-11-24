@@ -28,6 +28,15 @@
   ;; Enable magit-commit-mode after typing 's', 'S', 'd'
   (add-hook 'git-messenger:popup-buffer-hook #'magit-commit-mode))
 
+;; colour magit blame by age
+(use-package magit-blame-color-by-age
+  :init (my/vc-install "jdtsmith/magit-blame-color-by-age")
+  :hook magit-blame-mode
+  ;; if you'd like date first on heading lines:
+  :config (setf (alist-get 'heading-format (alist-get 'headings magit-blame-styles)) "%C %-20a %s\n")
+  ;; For full heading coloring
+  :custom (magit-blame-color-by-age-full-heading t))
+
 ;; on-the-fly diff highlighting
 (use-package diff-hl
   :ensure t
