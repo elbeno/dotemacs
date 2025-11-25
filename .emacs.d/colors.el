@@ -440,3 +440,7 @@ When called from Lisp, THEME is the symbol of a theme."
       (my/load-theme (cdr sister-theme)))))
 
 (bind-key "C-c t t" #'my/toggle-theme)
+
+(use-package easy-theme-preview
+  :init (my/vc-install "ayys/easy-theme-preview")
+  :bind (("C-c t P" . easy-theme-preview)))
