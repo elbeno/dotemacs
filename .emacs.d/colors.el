@@ -81,6 +81,14 @@
   :init (my/vc-install "daut/miasma-theme.el")
   :bind (("C-c t s" . load-theme-miasma)))
 
+(defun load-theme-fleury ()
+  (interactive)
+  (my/load-theme 'fleury))
+
+(use-package fleury-theme
+  :init (my/vc-install "ShamsParvezArka/fleury-theme.el")
+  :bind (("C-c t f" . load-theme-fleury)))
+
 ;; default theme
 (load-theme-cyberpunk)
 
