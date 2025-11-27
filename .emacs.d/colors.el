@@ -73,6 +73,14 @@
   :ensure t
   :bind (("C-c t a" . load-theme-ample)))
 
+(defun load-theme-miasma ()
+  (interactive)
+  (my/load-theme 'miasma))
+
+(use-package miasma-theme
+  :init (my/vc-install "daut/miasma-theme.el")
+  :bind (("C-c t s" . load-theme-miasma)))
+
 ;; default theme
 (load-theme-cyberpunk)
 
