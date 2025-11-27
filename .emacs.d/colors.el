@@ -383,6 +383,36 @@ When called from Lisp, THEME is the symbol of a theme."
   (my/load-theme theme))
 
 ;;------------------------------------------------------------------------------
+;; tomorrow themes
+(use-package color-theme-sanityinc-tomorrow
+  :ensure t
+  :bind (("C-c t T" . my/tomorrow-themes-select)))
+
+(defconst my/tomorrow-themes
+  '(sanityinc-tomorrow-blue
+    sanityinc-tomorrow-bright
+    sanityinc-tomorrow-day
+    sanityinc-tomorrow-eighties
+    sanityinc-tomorrow-night)
+  "List of tomorrow themes.")
+
+(defvar my/tomorrow-themes--select-theme-history nil
+  "Minibuffer history of `my/tomorrow-themes--select-prompt'.")
+
+(defun my/tomorrow-themes--select-prompt ()
+  "Minibuffer prompt for `tomorrow-themes-select'.
+With optional PROMPT string, use it.  Else use a generic prompt."
+  (my/themes--select-prompt my/tomorrow-themes
+                            my/tomorrow-themes--select-theme-history
+                            "Select Tomorrow Theme: "))
+
+(defun my/tomorrow-themes-select (theme)
+  "Load a tomorrow THEME using minibuffer completion.
+When called from Lisp, THEME is the symbol of a theme."
+  (interactive (list (my/tomorrow-themes--select-prompt)))
+  (my/load-theme theme))
+
+;;------------------------------------------------------------------------------
 ;; toggle themes
 (defconst my/theme-toggle-list
   '((hercules . hercules-light)
@@ -446,7 +476,9 @@ When called from Lisp, THEME is the symbol of a theme."
     (ef-deuteranopia-dark . ef-deuteranopia-light)
     (ef-deuteranopia-light . ef-deuteranopia-dark)
     (ample . ample-light)
-    (ample-light . ample)))
+    (ample-light . ample)
+    (sanityinc-tomorrow-day . sanityinc-tomorrow-night)
+    (sanityinc-tomorrow-night . sanityinc-tomorrow-day)))
 
 (defun my/toggle-theme ()
   (interactive)
