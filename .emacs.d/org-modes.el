@@ -55,15 +55,15 @@
 
 (use-package org-re-reveal
   :ensure t
-  :defer)
+  :defer t)
 
 (use-package ob-mermaid
   :ensure t
-  :defer)
+  :defer t)
 
 (use-package htmlize
   :ensure t
-  :defer)
+  :defer t)
 
 (use-package org-roam
   :ensure t

@@ -784,7 +784,7 @@
 ;;; A Help Transient on C-S-h
 (use-package which-key
   :ensure t
-  :defer)
+  :defer t)
 
 (use-package helpful
   :ensure t
