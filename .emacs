@@ -151,6 +151,9 @@
 (bind-key "C-c C-f" 'my-search-forward-1)
 (bind-key "C-c C-b" 'my-search-backward-1)
 
+;; don't put deletions in kill-ring while in minibuffer
+(define-key minibuffer-local-map (kbd "M-DEL") 'my-delete-backward-word)
+
 ;;------------------------------------------------------------------------------
 ;; Start server
 (require 'server)

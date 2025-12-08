@@ -9,19 +9,6 @@
   (delete-other-windows))
 
 ;;------------------------------------------------------------------------------
-;; Evaluate s-exp at point and replace it with its value
-;; cf. eval-last-sexp bound to C-x C-e
-(defun eval-and-replace ()
-  "Replace the preceding sexp with its value."
-  (interactive)
-  (backward-kill-sexp)
-  (condition-case nil
-      (prin1 (eval (read (current-kill 0)))
-             (current-buffer))
-    (error (message "Invalid expression")
-           (insert (current-kill 0)))))
-
-;;------------------------------------------------------------------------------
 ;; Toggle horizontal/vertical window split
 (defun toggle-window-split ()
   (interactive)
@@ -196,3 +183,11 @@ Example of an XCode UUID: a513b85041a3535fc3520c3d."
                        (or count 1))
     (forward-char)
     (point)))
+
+;;------------------------------------------------------------------------------
+;; delete word without adding to kill-ring
+(defun my-delete-backward-word ()
+  (interactive "*")
+  (push-mark)
+  (backward-word)
+  (delete-region (point) (mark)))
