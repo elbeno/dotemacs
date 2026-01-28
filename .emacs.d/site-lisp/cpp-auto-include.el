@@ -333,7 +333,7 @@
                             "in_place_index_t" "in_place_index")
                         (* space) "<")
                    (and "pair" (* space) "{")
-                   (and (or "make_pair" "to_chars" "from_chars")
+                   (and (or "make_pair" "to_chars" "from_chars" "to_underlying")
                         (* space) "(")
                    (and "chars_format::"
                         (or "scientific" "fixed" "hex" "general")
