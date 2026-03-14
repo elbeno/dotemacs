@@ -280,3 +280,8 @@
     (require 'zone-words)
     (setq zone-programs (vconcat [zone-words] zone-programs))
     (zone-when-idle 120)))
+
+;;------------------------------------------------------------------------------
+;; speedrect - handy things for rectangle-mark-mode
+(use-package speedrect
+  :config (speedrect-mode))
