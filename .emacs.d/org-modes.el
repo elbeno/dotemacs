@@ -16,7 +16,8 @@
         org-export-with-sub-superscripts '{}
         org-latex-listings 'minted
         org-reveal-note-key-char nil
-        org-directory (concat (getenv "HOME") "/.org_notes"))
+        org-directory (concat (getenv "HOME") "/.org_notes")
+        org-hide-emphasis-markers t)
   (unless (file-exists-p org-directory)
     (make-directory org-directory))
   (setq org-default-notes-file (concat org-directory "/notes.org"))
@@ -44,6 +45,20 @@
      (haskell . t)
      (emacs-lisp . t)))
   (add-to-list 'org-structure-template-alist '("n" . "notes")))
+
+;; show emphasis markers at point
+(use-package org-appear
+  :ensure t
+  :after org
+  :hook (org-mode . org-appear-mode)
+  :custom
+  (org-appear-autolinks t))
+
+;; inline previews of latex fragments
+(use-package org-fragtog
+  :ensure t
+  :after org
+  :hook (org-mode . org-fragtog-mode))
 
 ;; better header bullets
 (use-package org-bullets

@@ -284,4 +284,5 @@
 ;;------------------------------------------------------------------------------
 ;; speedrect - handy things for rectangle-mark-mode
 (use-package speedrect
+  :ensure t
   :config (speedrect-mode))
