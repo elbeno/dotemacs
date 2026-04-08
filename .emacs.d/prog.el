@@ -40,3 +40,8 @@
   (and (fboundp 'treesit-language-available-p)
        (treesit-language-available-p lang)
        (member lang my/treesit-languages)))
+
+;; let-completion for emacs lisp
+(use-package let-completion
+  :ensure t
+  :hook (emacs-lisp-mode . let-completion-mode))

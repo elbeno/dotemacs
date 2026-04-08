@@ -53,7 +53,19 @@
 (setq select-enable-clipboard t
       select-enable-primary t
       save-interprogram-paste-before-kill t
-      mouse-yank-at-point t)
+      mouse-yank-at-point t
+      kill-do-not-save-duplicates t)
+
+;;------------------------------------------------------------------------------
+;; Persistent kill-ring (strip properties)
+(setq savehist-additional-variables
+      '(search-ring regexp-search-ring kill-ring))
+
+(add-hook 'savehist-save-hook
+          (lambda ()
+            (setq kill-ring
+                  (mapcar #'substring-no-properties
+                          (cl-remove-if-not #'stringp kill-ring)))))
 
 ;;------------------------------------------------------------------------------
 ;; Autosaves/backups
@@ -100,10 +112,28 @@
 ;; Prevent prompt on opening large TAGS file
 (setq large-file-warning-threshold 100000000)
 
-
 ;;------------------------------------------------------------------------------
 ;; Better process interaction
 (setq read-process-output-max (* 2 1024 1024))
+
+;;------------------------------------------------------------------------------
+;; assume left-to-right text everywhere
+(setq-default bidi-display-reordering 'left-to-right
+              bidi-paragraph-direction 'left-to-right)
+(setq bidi-inhibit-bpa t)
+
+;;------------------------------------------------------------------------------
+;; skip fontification while typing
+(setq redisplay-skip-fontification-on-input t)
+
+;;------------------------------------------------------------------------------
+;; don't render cursors in non-focused windows
+(setq-default cursor-in-non-selected-windows nil)
+(setq highlight-nonselected-windows nil)
+
+;;------------------------------------------------------------------------------
+;; don't do remote access for find-file-at-point
+(setq ffap-machine-p-known 'reject)
 
 ;;------------------------------------------------------------------------------
 ;; vertico
@@ -205,7 +235,7 @@
 
 (use-package smartscan
   :ensure t
-  :config (global-smartscan-mode t))
+  :config (global-smartscan-mode 1))
 
 ;;------------------------------------------------------------------------------
 ;; use surround for changing delimiters
