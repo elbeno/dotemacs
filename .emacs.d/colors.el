@@ -118,12 +118,12 @@
 (defun load-theme-modus-operandi ()
   (interactive)
   (require 'modus-themes)
-  (modus-themes-load-theme 'modus-operandi))
+  (my/load-theme 'modus-operandi))
 
 (defun load-theme-modus-vivendi ()
   (interactive)
   (require 'modus-themes)
-  (modus-themes-load-theme 'modus-vivendi))
+  (my/load-theme 'modus-vivendi))
 
 (use-package modus-themes
   :ensure t

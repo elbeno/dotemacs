@@ -22,7 +22,7 @@
 
 ;;------------------------------------------------------------------------------
 ;; install languages for tree-sitter
-(setq my/treesit-languages '(c cpp python))
+(setq my/treesit-languages '(c cpp json python))
 
 (when (fboundp 'treesit-language-available-p)
   (setq major-mode-remap-alist
