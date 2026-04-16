@@ -268,3 +268,48 @@
 ;; beardbolt
 (use-package beardbolt
   :init (my/vc-install "joaotavora/beardbolt"))
+
+;;------------------------------------------------------------------------------
+;; org-capture template for ADR notes
+(defun my/find-library-name (filename)
+  "Given a filename, find the library name by looking recursively
+   at parent directories until we find include/.
+   e.g. /home/user/dev/proj/include/msg/foo.hpp -> msg"
+  (cond ((string-equal filename "/") nil)
+        ((string-match-p "/include/$" (file-name-parent-directory filename))
+         (file-name-nondirectory (directory-file-name filename)))
+        (t (my/find-library-name (file-name-parent-directory filename)))))
+
+(defun my/find-adr-notes-file ()
+  "Find the ADR notes file for the current buffer.
+   This is created from the current library name in the docs/adr directory.
+   e.g. /home/user/dev/proj/include/msg/foo.hpp
+     -> /home/user/dev/proj/docs/adr/msg.org
+
+   If the current library name is indeterminate, return the default notes file."
+  (let ((root (projectile-project-root))
+        (libname
+         (my/find-library-name
+          (expand-file-name (buffer-file-name (current-buffer))))))
+    (if (and root libname)
+        (concat (file-name-concat root "docs" "adr" libname) ".org")
+      org-default-notes-file)))
+
+(defun my/visit-adr-notes-file ()
+  "Find and visit the ADR notes file (if any) for the current buffer."
+  (set-buffer (org-capture-target-buffer (my/find-adr-notes-file)))
+  (goto-char (point-max)))
+
+(setq org-capture-templates
+      '(("a" "ADR" entry (function my/visit-adr-notes-file)
+         "* ADR: %^{Title}
+:PROPERTIES:
+:Date: %u
+:END:
+
+** Context
+
+** Decision
+
+** Consequences
+")))
