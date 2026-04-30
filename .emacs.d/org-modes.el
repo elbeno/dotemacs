@@ -11,13 +11,11 @@
   (setq org-log-done t
         org-support-shift-select t
         org-startup-indented t
-        org-src-fontify-natively t
         org-export-allow-bind-keywords t
         org-export-with-sub-superscripts '{}
         org-latex-listings 'minted
         org-reveal-note-key-char nil
-        org-directory (concat (getenv "HOME") "/.org_notes")
-        org-hide-emphasis-markers t)
+        org-directory (concat (getenv "HOME") "/.org_notes"))
   (unless (file-exists-p org-directory)
     (make-directory org-directory))
   (setq org-default-notes-file (concat org-directory "/notes.org"))
@@ -60,13 +58,22 @@
   :after org
   :hook (org-mode . org-fragtog-mode))
 
-;; better header bullets
-(use-package org-bullets
+;; general beautification
+(use-package org-modern
   :ensure t
   :config
-  (setq org-bullets-bullet-list
-        '("◉" "✸" "✿" "◎" "►" "◇"))
-  :hook (org-mode . org-bullets-mode))
+  (setq org-agenda-tags-column 0
+        org-auto-align-tags nil
+        org-catch-invisible-edits 'show-and-error
+        org-ellipsis "…"
+        org-hide-emphasis-markers t
+        org-insert-heading-respect-content t
+        org-pretty-entities t
+        org-special-ctrl-a/e t
+        org-src-fontify-natively t
+        org-tags-column 0)
+  :after org
+  :hook (org-mode . org-modern-mode))
 
 (use-package org-re-reveal
   :ensure t
@@ -223,6 +230,7 @@ With prefix arg ARG, transpose with the argument after it."
   (save-excursion
     (org-element-map (org-element-parse-buffer) 'table 'my-render-org-table)))
 
+;; quick blocks with <src etc
 (use-package org-block-capf
   :init (my/vc-install "xenodium/org-block-capf")
   :hook (org-mode . org-block-capf-add-to-completion-at-point-functions)
