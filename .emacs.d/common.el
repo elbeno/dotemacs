@@ -521,7 +521,10 @@
   :bind
   (("C-." . embark-act)
    ("M-." . embark-dwim)
-   ("C-h B" . embark-bindings))
+   ("C-h B" . embark-bindings)
+   :map minibuffer-local-map
+         ("C-c C-c" . embark-collect)
+         ("C-c C-e" . embark-export))
   :init
   ;; Optionally replace the key help with a completing-read interface
   (setq prefix-help-command #'embark-prefix-help-command)
@@ -665,6 +668,17 @@
 (use-package nerd-icons-ibuffer
   :ensure t
   :hook (ibuffer-mode . nerd-icons-ibuffer-mode))
+
+(use-package nerd-icons-dired
+  :ensure t
+  :hook (dired-mode . nerd-icons-dired-mode))
+
+(use-package nerd-icons-grep
+  :ensure t
+  :init
+  (nerd-icons-grep-mode)
+  :custom
+  (grep-use-headings t))
 
 ;;------------------------------------------------------------------------------
 ;; treemacs: tree interface for opening files
