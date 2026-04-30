@@ -239,17 +239,12 @@
   (add-hook 'prog-mode-hook #'yas-minor-mode))
 
 ;;------------------------------------------------------------------------------
-;; format-all
-(use-package format-all
+;; apheleia
+(use-package apheleia
   :ensure t
-  :init
-  (defun my/format-all-buffer-setup ()
-    (format-all-mode)
-    (let ((language (format-all--language-id-buffer)))
-      (format-all--set-chain language
-                             (format-all--get-default-chain language))))
-  :hook ((c++-mode c++-ts-mode cmake-mode) . my/format-all-buffer-setup)
-  :bind (("C-c f" . format-all-buffer)))
+  :hook
+  ((c++-mode c++-ts-mode cmake-mode python-ts-mode) . apheleia-mode)
+  :bind (("C-c f" . apheleia-format-buffer)))
 
 ;;------------------------------------------------------------------------------
 ;; jinx for spellchecking
