@@ -979,3 +979,33 @@
           (concat rg-command " " cicd-dir))
       rg-command)))
 (advice-add #'dumb-jump-generate-rg-command :filter-return #'my/add-cpm-cache-to-cmake-rg)
+
+;;------------------------------------------------------------------------------
+;; prescient for sorting and filtering candidates
+(use-package prescient
+  :ensure t
+  :custom
+  (completion-preview-sort-function #'prescient-completion-sort)
+  (prescient-sort-length-enable nil)
+  :config
+  (prescient-persist-mode 1))
+
+(use-package corfu-prescient
+  :ensure t
+  :after corfu prescient
+  :custom
+  (corfu-prescient-enable-filtering nil)
+  (corfu-prescient-enable-sorting t)
+  (corfu-prescient-override-sorting nil)
+  :config
+  (corfu-prescient-mode 1))
+
+(use-package vertico-prescient
+  :ensure t
+  :after vertico prescient
+  :custom
+  (vertico-prescient-enable-filtering nil)
+  (vertico-prescient-enable-sorting t)
+  (vertico-prescient-override-sorting nil)
+  :config
+  (vertico-prescient-mode 1))
