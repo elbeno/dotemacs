@@ -87,6 +87,38 @@
    ("M-b" . dirvish-history-go-backward)
    ("M-e" . dirvish-emerge-menu)))
 
+;; use eza to preview directories
+(dirvish-define-preview eza (file)
+  "Use `eza' to generate directory preview."
+  :require ("eza") ; tell Dirvish to check if we have the executable
+  (when (file-directory-p file) ; we only interest in directories here
+    `(shell . ("eza" "-al" "--color=always" "--icons=always"
+               "--group-directories-first" ,file))))
+
+(push 'eza dirvish-preview-dispatchers)
+
+;; use gnome-epub-thumbnailer to preview epub files
+(setq dirvish-epub-thumbnailer-program "gnome-epub-thumbnailer")
+
+(dirvish-define-preview gnome-epub (file preview-window)
+  "Preview epub files.
+Require: `epub-thumbnailer' (executable)"
+  :require (dirvish-epub-thumbnailer-program)
+  (when (equal ext "epub")
+    (let* ((width (dirvish-media--img-size preview-window))
+           (height (dirvish-media--img-size preview-window 'height))
+           (cache (dirvish--img-thumb-name file width ".jpg")))
+      (if (file-exists-p cache)
+          `(img . ,(create-image cache nil nil :max-width width :max-height height))
+        `(cache . (,dirvish-epub-thumbnailer-program "--size" ,(number-to-string width) ,file ,cache))))))
+
+(setq dirvish-preview-dispatchers (remove 'epub dirvish-preview-dispatchers))
+(push 'gnome-epub dirvish-preview-dispatchers)
+
+;; trim down previews in terminal mode
+(unless (my/graphic-mode-p)
+  (setq dirvish-preview-dispatchers '(eza audio archive)))
+
 ;;------------------------------------------------------------------------------
 ;; AsciiDoc
 (use-package adoc-mode
