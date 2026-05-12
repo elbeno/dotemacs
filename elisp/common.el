@@ -69,12 +69,12 @@
 
 ;;------------------------------------------------------------------------------
 ;; Autosaves/backups
-(make-directory (concat user-emacs-directory "backups") t)
-(make-directory (concat user-emacs-directory "autosaves") t)
+(make-directory (expand-file-name "backups" user-emacs-directory) t)
+(make-directory (expand-file-name "autosaves" user-emacs-directory) t)
 (setq backup-directory-alist
-      `((".*" . , (concat user-emacs-directory "backups/"))))
+      `((".*" . , (expand-file-name "backups/" user-emacs-directory))))
 (setq auto-save-file-name-transforms
-      `((".*" ,(concat user-emacs-directory "autosaves/") t)))
+      `((".*" ,(expand-file-name "autosaves/" user-emacs-directory) t)))
 (setq create-lockfiles nil)
 
 ;; Delete backups older than one month
@@ -95,8 +95,7 @@
 ;; More usable defaults
 (defalias 'list-buffers 'ibuffer)
 (defalias 'yes-or-no-p 'y-or-n-p)
-(setq load-prefer-newer t
-      apropos-do-all t)
+(setq apropos-do-all t)
 (diminish 'abbrev-mode)
 
 ;;------------------------------------------------------------------------------
@@ -111,10 +110,6 @@
 ;;------------------------------------------------------------------------------
 ;; Prevent prompt on opening large TAGS file
 (setq large-file-warning-threshold 100000000)
-
-;;------------------------------------------------------------------------------
-;; Better process interaction
-(setq read-process-output-max (* 2 1024 1024))
 
 ;;------------------------------------------------------------------------------
 ;; assume left-to-right text everywhere
@@ -598,7 +593,7 @@
 ;;------------------------------------------------------------------------------
 ;; cycle accented characters at point
 (use-package cyclekey
-  :load-path (lambda () (concat user-emacs-directory "elisp/site-lisp/"))
+  :load-path (lambda () (expand-file-name "elisp/site-lisp/" user-emacs-directory))
   :ensure nil
   :init
   (setq cyclekey-languages '("French" "German" "Spanish")

@@ -1,41 +1,21 @@
 ;; -*- lexical-binding: t; -*-
 ;;------------------------------------------------------------------------------
-;; don't gc during startup
-(defvar my/gc-cons-threshold (* 32 1024 1024))
-(setq gc-cons-threshold most-positive-fixnum)
-(defun my/restore-gc-cons-threshold ()
-  (setq gc-cons-threshold my/gc-cons-threshold))
-(add-hook 'emacs-startup-hook #'my/restore-gc-cons-threshold 99)
-
-;; debugging
-(setq debug-on-error nil)
-
-;; don't resize the frame on font changes etc
-(setq frame-inhibit-implied-resize t)
-
 ;; my stuff is in .emacs.d
-(add-to-list 'load-path (concat user-emacs-directory "elisp/"))
+(add-to-list 'load-path (expand-file-name "elisp/" user-emacs-directory))
 ;; 3rd party stuff is in site-lisp
-(add-to-list 'load-path (concat user-emacs-directory "elisp/site-lisp/"))
+(add-to-list 'load-path (expand-file-name "elisp/site-lisp/" user-emacs-directory))
 ;; packages
-(setq package-user-dir (concat user-emacs-directory "packages/"))
+(setq package-user-dir (expand-file-name "packages/" user-emacs-directory))
 
 ;;------------------------------------------------------------------------------
 ;; apply custom variables
-(setq custom-file (concat user-emacs-directory "custom.el"))
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (when (file-exists-p custom-file)
   (load custom-file))
 
 ;;------------------------------------------------------------------------------
 ;; package setup
-(setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
-                         ("stable-melpa" . "http://stable.melpa.org/packages/")
-                         ("melpa" . "http://melpa.org/packages/")
-			 ("nongnu" . "http://elpa.nongnu.org/nongnu/")
-			 ("cselpa" . "https://elpa.thecybershadow.net/packages/")))
-
 (package-initialize)
-(setq package-enable-at-startup nil)
 
 (unless package-archive-contents
   (message "Refreshing package archives...")
@@ -45,12 +25,7 @@
   (message "`use-package' not found.  Installing...")
   (package-install 'use-package))
 
-(setq use-package-enable-imenu-support t
-      package-install-upgrade-built-in t)
 (require 'use-package)
-(setq use-package-minimum-reported-time 0
-      use-package-verbose t
-      use-package-compute-statistics t)
 
 (setq personal-keybindings nil)
 
