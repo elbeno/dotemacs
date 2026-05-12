@@ -1,4 +1,9 @@
-*.elc
-.emacs.d/packages
-.emacs.d/local
-.emacs.d/snippets
+# Ignore everything emacs puts in here
+*
+
+# Don't ignore my files
+!.gitignore
+!README.md
+!early-init.el
+!init.el
+!elisp

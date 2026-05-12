@@ -13,22 +13,16 @@
 ;; don't resize the frame on font changes etc
 (setq frame-inhibit-implied-resize t)
 
-;; this file's true directory
-(setq dotfile-dir (file-name-directory
-                   (file-chase-links
-                    (or load-file-name
-                        (buffer-file-name)))))
-
 ;; my stuff is in .emacs.d
-(add-to-list 'load-path (concat dotfile-dir ".emacs.d/"))
+(add-to-list 'load-path (concat user-emacs-directory "elisp/"))
 ;; 3rd party stuff is in site-lisp
-(add-to-list 'load-path (concat dotfile-dir ".emacs.d/site-lisp/"))
+(add-to-list 'load-path (concat user-emacs-directory "elisp/site-lisp/"))
 ;; packages
-(setq package-user-dir (concat dotfile-dir ".emacs.d/packages/"))
+(setq package-user-dir (concat user-emacs-directory "packages/"))
 
 ;;------------------------------------------------------------------------------
 ;; apply custom variables
-(setq custom-file (concat dotfile-dir ".emacs.d/local/custom.el"))
+(setq custom-file (concat user-emacs-directory "custom.el"))
 (when (file-exists-p custom-file)
   (load custom-file))
 
@@ -168,8 +162,7 @@
 
 ;------------------------------------------------------------------------------
 ;; apply local site-specific changes
-(let ((local-file (concat dotfile-dir ".emacs.d/local.el")))
-  (load local-file))
+(load "local.el")
 
 ;; Local Variables:
 ;; byte-compile-warnings: (not free-vars)

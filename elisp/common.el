@@ -69,12 +69,12 @@
 
 ;;------------------------------------------------------------------------------
 ;; Autosaves/backups
-(make-directory "~/.emacs.d/backups" t)
-(make-directory "~/.emacs.d/autosaves" t)
+(make-directory (concat user-emacs-directory "backups") t)
+(make-directory (concat user-emacs-directory "autosaves") t)
 (setq backup-directory-alist
-      `((".*" . , "~/.emacs.d/backups/")))
+      `((".*" . , (concat user-emacs-directory "backups/"))))
 (setq auto-save-file-name-transforms
-      `((".*" ,"~/.emacs.d/autosaves/" t)))
+      `((".*" ,(concat user-emacs-directory "autosaves/") t)))
 (setq create-lockfiles nil)
 
 ;; Delete backups older than one month
@@ -598,7 +598,7 @@
 ;;------------------------------------------------------------------------------
 ;; cycle accented characters at point
 (use-package cyclekey
-  :load-path (lambda () (concat dotfile-dir ".emacs.d/site-lisp/"))
+  :load-path (lambda () (concat user-emacs-directory "elisp/site-lisp/"))
   :ensure nil
   :init
   (setq cyclekey-languages '("French" "German" "Spanish")
