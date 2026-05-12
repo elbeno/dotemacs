@@ -46,3 +46,19 @@
                          ("stable-melpa" . "http://stable.melpa.org/packages/")
                          ("melpa" . "http://melpa.org/packages/")
 			 ("nongnu" . "http://elpa.nongnu.org/nongnu/")))
+
+;;------------------------------------------------------------------------------
+;; local early settings
+(setq early-local-file (expand-file-name "early-local.el" user-emacs-directory))
+(when (file-exists-p early-local-file)
+  (load early-local-file))
+
+;;------------------------------------------------------------------------------
+;; native compilation options
+(setq native-comp-compiler-options '("-O2"
+                                     "-g0"
+                                     "-fno-finite-math-only"))
+
+(when (boundp 'my/cpu-architecture)
+  (setq native-comp-driver-options `(,(format "-mtune=%s" my/cpu-architecture)
+                                     ,(format "-march=%s" my/cpu-architecture))))
