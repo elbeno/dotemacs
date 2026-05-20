@@ -394,8 +394,8 @@
    consult-theme :preview-key '(:debounce 0.2 any)
    consult-ripgrep consult-git-grep consult-grep
    consult-bookmark consult-recent-file consult-xref
-   consult--source-bookmark consult--source-file-register
-   consult--source-recent-file consult--source-project-recent-file
+   ;; consult--source-bookmark consult--source-file-register
+   ;; consult--source-recent-file consult--source-project-recent-file
    ;; :preview-key (kbd "M-.")
    :preview-key '(:debounce 0.4 any))
 
@@ -419,7 +419,7 @@
   ;; (setq consult-project-function (lambda (_) (vc-root-dir)))
   ;;;; 4. locate-dominating-file
   ;; (setq consult-project-function (lambda (_) (locate-dominating-file "." ".git")))
-)
+  )
 
 (use-package consult-flycheck
   :ensure t
@@ -518,8 +518,8 @@
    ("M-." . embark-dwim)
    ("C-h B" . embark-bindings)
    :map minibuffer-local-map
-         ("C-c C-c" . embark-collect)
-         ("C-c C-e" . embark-export))
+   ("C-c C-c" . embark-collect)
+   ("C-c C-e" . embark-export))
   :init
   ;; Optionally replace the key help with a completing-read interface
   (setq prefix-help-command #'embark-prefix-help-command)
@@ -935,26 +935,26 @@
                '(:comment "#" :language "cmake"))
   (add-to-list 'dumb-jump-find-rules
                '(:type "function"
-                 :supports ("ag" "grep" "rg" "git-grep")
-                 :language "cmake"
-                 :regex "^\\s*\\b(function|macro)\\b\\s*\\\(\\s*\\bJJJ\\b"
-                 :tests
-                 ("function(test)" "function (test arg)" "function(\n test")))
+                       :supports ("ag" "grep" "rg" "git-grep")
+                       :language "cmake"
+                       :regex "^\\s*\\b(function|macro)\\b\\s*\\\(\\s*\\bJJJ\\b"
+                       :tests
+                       ("function(test)" "function (test arg)" "function(\n test")))
   (add-to-list 'dumb-jump-find-rules
                '(:type "variable"
-                 :supports ("ag" "grep" "rg" "git-grep")
-                 :language "cmake"
-                 :regex "^\\s*\\b(set|option)\\b\\s*\\\(\\s*\\bJJJ\\b"
-                 :tests
-                 ("set(test)" "set (test arg)" "set(\n test"
-                  "option(test)" "option (test arg)" "option(\n test")))
+                       :supports ("ag" "grep" "rg" "git-grep")
+                       :language "cmake"
+                       :regex "^\\s*\\b(set|option)\\b\\s*\\\(\\s*\\bJJJ\\b"
+                       :tests
+                       ("set(test)" "set (test arg)" "set(\n test"
+                        "option(test)" "option (test arg)" "option(\n test")))
   (add-to-list 'dumb-jump-find-rules
                '(:type "target"
-                 :supports ("ag" "grep" "rg" "git-grep")
-                 :language "cmake"
-                 :regex "^\\s*\\badd_(executable|library|custom_target)\\b\\s*\\\(\\s*(\\$\\\{[^}]+})?\\bJJJ\\b"
-                 :tests
-                 ("add_custom_target(test)" "add_library (test" "add_executable(\n test")))
+                       :supports ("ag" "grep" "rg" "git-grep")
+                       :language "cmake"
+                       :regex "^\\s*\\badd_(executable|library|custom_target)\\b\\s*\\\(\\s*(\\$\\\{[^}]+})?\\bJJJ\\b"
+                       :tests
+                       ("add_custom_target(test)" "add_library (test" "add_executable(\n test")))
   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
 
 (setq my/potential-build-dirs '("build"))
@@ -975,7 +975,7 @@
           (goto-char (point-min))
           (when (re-search-forward "^# Install script for directory: \\(.*\\)$" nil t)
             (match-string 1)
-          ))))))
+            ))))))
 
 ;; advise dumb-jump: when searching cmake, add CPM cache CICD directory
 (defun my/add-cpm-cache-to-cmake-rg (rg-command)

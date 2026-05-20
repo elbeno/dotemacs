@@ -71,7 +71,8 @@
         org-pretty-entities t
         org-special-ctrl-a/e t
         org-src-fontify-natively t
-        org-tags-column 0)
+        org-tags-column 0
+        org-modern-table nil)
   :after org
   :hook (org-mode . org-modern-mode))
 

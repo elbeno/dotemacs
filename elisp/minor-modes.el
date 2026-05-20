@@ -147,7 +147,7 @@
   (add-hook 'prog-mode-hook
             (lambda ()
               (let ((my-post-fill-column-fg
-                    (if (my/graphic-mode-p) "gray20" "yellow")))
+                     (if (my/graphic-mode-p) "gray20" "yellow")))
                 (unless (string-match-p (regexp-quote "*temp*") (buffer-name))
                   (whitespace-mode)
                   (set-face-attribute 'whitespace-line nil
@@ -242,9 +242,9 @@
 ;; apheleia
 (use-package apheleia
   :ensure t
-  :hook
-  ((c++-mode c++-ts-mode cmake-mode python-ts-mode) . apheleia-mode)
-  :bind (("C-c f" . apheleia-format-buffer)))
+  :config
+  (apheleia-global-mode +1))
+(bind-key "C-c f" #'apheleia-format-buffer)
 
 ;;------------------------------------------------------------------------------
 ;; jinx for spellchecking

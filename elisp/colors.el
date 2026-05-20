@@ -2,12 +2,12 @@
 ;;------------------------------------------------------------------------------
 ;; Nice themes
 (defun my/load-theme (theme)
-    (mapc #'disable-theme custom-enabled-themes)
-    (load-theme theme t))
+  (mapc #'disable-theme custom-enabled-themes)
+  (load-theme theme t))
 
 (defmacro my/theme-package (theme package binding)
   (let* ((theme-name (symbol-name theme))
-        (load-func-name (concat "my/load-theme-" theme-name)))
+         (load-func-name (concat "my/load-theme-" theme-name)))
     `(progn
        (defun ,(intern load-func-name) ()
          (interactive)
@@ -171,11 +171,11 @@ With optional PROMPT string, use it.  Else use a generic prompt."
 
 (defmacro my/theme-selector (theme)
   (let* ((theme-name (symbol-name theme))
-        (var-name (concat "my/" theme-name "-themes"))
-        (prompt-func-name (concat "my/" theme-name "-themes--select-prompt"))
-        (select-func-name (concat "my/" theme-name "-themes-select"))
-        (hist-name (concat "my/" theme-name "-themes--select-theme-history"))
-        (prompt (concat "Select " (cap-first theme-name) " Theme: ")))
+         (var-name (concat "my/" theme-name "-themes"))
+         (prompt-func-name (concat "my/" theme-name "-themes--select-prompt"))
+         (select-func-name (concat "my/" theme-name "-themes-select"))
+         (hist-name (concat "my/" theme-name "-themes--select-theme-history"))
+         (prompt (concat "Select " (cap-first theme-name) " Theme: ")))
     `(progn
        (defvar ,(intern hist-name)  nil
          ,(concat "Minibuffer history of `" prompt-func-name "'."))

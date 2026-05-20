@@ -30,7 +30,6 @@
 
 ;; suppress lexical binding warnings
 (setq warning-minimum-level :error)
-(setq warning-suppress-types '((lexical-binding)))
 
 ;;------------------------------------------------------------------------------
 ;; package setup
