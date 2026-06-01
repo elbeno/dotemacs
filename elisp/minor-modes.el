@@ -183,7 +183,10 @@
 ;; Flycheck
 (use-package flycheck
   :ensure t
-  :hook sh-mode)
+  :hook (bash-ts-mode sh-mode yaml-ts-mode)
+  :bind (:map flycheck-mode-map
+              ("M-<up>" . flycheck-previous-error)
+              ("M-<down>" . flycheck-next-error)))
 
 (use-package flycheck-pos-tip
   :ensure t
