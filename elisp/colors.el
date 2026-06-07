@@ -393,6 +393,39 @@ With optional PROMPT string, use it.  Else use a generic prompt."
 (my/theme-selector alect)
 
 ;;------------------------------------------------------------------------------
+;; doric themes
+(use-package doric-themes
+  :ensure t
+  :bind (("C-c t C" . my/doric-themes-select)))
+
+(defconst my/doric-themes
+  '(doric-water
+    doric-walnut
+    doric-valley
+    doric-plum
+    doric-pine
+    doric-obsidian
+    doric-mermaid
+    doric-magma
+    doric-fire
+    doric-dark
+    doric-copper
+    doric-wind
+    doric-siren
+    doric-oak
+    doric-marble
+    doric-light
+    doric-jade
+    doric-earth
+    doric-coral
+    doric-cherry
+    doric-beach
+    doric-almond)
+  "List of doric themes.")
+
+(my/theme-selector doric)
+
+;;------------------------------------------------------------------------------
 ;; other themes
 (use-package apropospriate-theme
   :ensure t
@@ -541,7 +574,9 @@ With optional PROMPT string, use it.  Else use a generic prompt."
     (alect-light-alt . alect-dark-alt)
     (alect-dark-alt . alect-light-alt)
     (spacemacs-dark . spacemacs-light)
-    (spacemacs-light . spacemacs-dark)))
+    (spacemacs-light . spacemacs-dark)
+    (doric-dark . doric-light)
+    (doric-light . doric-dark)))
 
 (defun my/toggle-theme ()
   (interactive)
