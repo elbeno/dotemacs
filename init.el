@@ -35,9 +35,6 @@
     (unless (package-installed-p pac-name)
       (package-vc-install url))))
 
-(defun my/graphic-mode-p ()
-  (or (display-graphic-p) (string-equal (daemonp) "gui")))
-
 ;;------------------------------------------------------------------------------
 ;; Setup GC
 (use-package gcmh
@@ -56,10 +53,9 @@
 (load "common.el")
 
 ;;------------------------------------------------------------------------------
-;; Graphic or terminal mode?
-(if (my/graphic-mode-p)
-  (load "graphic-display.el")
-  (load "terminal.el"))
+;; Graphic and terminal mode settings
+(load "graphic-display.el")
+(load "terminal.el")
 
 ;;------------------------------------------------------------------------------
 ;; Minor modes
@@ -135,7 +131,7 @@
 ;; Hacks & late-bound overrides
 (load "hacks.el")
 
-;------------------------------------------------------------------------------
+                                        ;------------------------------------------------------------------------------
 ;; apply local site-specific changes
 (load "local.el")
 

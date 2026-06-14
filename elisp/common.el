@@ -16,8 +16,7 @@
 (setq buffer-file-coding-system 'utf-8
       default-file-name-coding-system 'utf-8
       locale-coding-system 'utf-8)
-(when (my/graphic-mode-p)
-  (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
+(setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
 (setq default-input-method nil)
 
 ;;------------------------------------------------------------------------------
@@ -495,7 +494,7 @@
 (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
 
 (when (< emacs-major-version 31)
-  (unless (my/graphic-mode-p)
+  (unless (display-graphic-p)
     (use-package corfu-terminal
       :ensure t
       :init

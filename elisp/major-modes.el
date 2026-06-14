@@ -115,9 +115,17 @@ Require: `epub-thumbnailer' (executable)"
 (setq dirvish-preview-dispatchers (remove 'epub dirvish-preview-dispatchers))
 (push 'gnome-epub dirvish-preview-dispatchers)
 
-;; trim down previews in terminal mode
-(unless (my/graphic-mode-p)
-  (setq dirvish-preview-dispatchers '(eza audio archive)))
+;; trim down previews in terminal mode frames
+(setq my/graphic-dirvish-preview-dispatchers dirvish-preview-dispatchers
+      my/terminal-dirvish-preview-dispatchers '(eza audio archive))
+
+(defun my/adjust-dirvish-preview-dispatchers (&rest r)
+  (if (display-graphic-p)
+      (setq dirvish-preview-dispatchers my/graphic-dirvish-preview-dispatchers)
+    (setq dirvish-preview-dispatchers my/terminal-dirvish-preview-dispatchers)))
+
+(advice-add #'dirvish--check-dependencies
+            :before #'my/adjust-dirvish-preview-dispatchers)
 
 ;;------------------------------------------------------------------------------
 ;; AsciiDoc
