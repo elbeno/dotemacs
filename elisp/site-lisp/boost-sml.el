@@ -103,6 +103,10 @@ clang-format from meddling with the formatting."
   (boost-sml/skip-whitespace)
   (if (looking-at (rx "[")) (boost-sml/next-token) ""))
 
+(defun boost-sml/event-separator-token ()
+  (boost-sml/skip-whitespace)
+  (if (looking-at (rx "+")) (boost-sml/next-token) ""))
+
 (defun boost-sml/action-separator-token ()
   (boost-sml/skip-whitespace)
   (if (looking-at (rx "/")) (boost-sml/next-token) ""))
@@ -114,15 +118,6 @@ clang-format from meddling with the formatting."
 (defun boost-sml/eol-token ()
   (boost-sml/skip-whitespace)
   (if (looking-at (rx ",")) (boost-sml/next-token) ""))
-
-(defun boost-sml/collect-until-including (pred)
-  (let ((start (point))
-        (next (boost-sml/next-token)))
-    (while (not (funcall pred next))
-      (setq next (boost-sml/next-token)))
-    (let ((s (buffer-substring-no-properties start (point))))
-      (list (string-trim-right (string-remove-suffix next (string-trim s)))
-            next))))
 
 (defun boost-sml/collect-until-excluding (pred)
   (let ((start (point))
@@ -165,9 +160,13 @@ clang-format from meddling with the formatting."
 (defun boost-sml/tokenize-line ()
   (beginning-of-line)
   (setq l (list (boost-sml/default-state-token)))
-  (nconc l (boost-sml/collect-until-including
+  (nconc l (boost-sml/collect-until-excluding
             (lambda (tok) (or (boost-sml/is-event-separator tok)
-                         (boost-sml/is-eol tok)))))
+                              (boost-sml/is-action-separator tok)
+                              (boost-sml/is-transition-separator tok)
+                              (boost-sml/is-guard tok)
+                              (boost-sml/is-eol tok)))))
+  (nconc l (list (boost-sml/event-separator-token)))
   (nconc l (boost-sml/collect-until-excluding
             (lambda (tok) (or (boost-sml/is-guard tok)
                          (boost-sml/is-action-separator tok)
