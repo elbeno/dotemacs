@@ -988,6 +988,11 @@
       rg-command)))
 (advice-add #'dumb-jump-generate-rg-command :filter-return #'my/add-cpm-cache-to-cmake-rg)
 
+;; advise dumb-jump: strip off treesitter suffix when getting the major mode
+(defun my/remove-ts-from-major-mode-name (mode-name)
+  (dumb-jump--replace "-ts" "" mode-name))
+(advice-add #'dumb-jump-get-mode-base-name :filter-return #'my/remove-ts-from-major-mode-name)
+
 ;;------------------------------------------------------------------------------
 ;; prescient for sorting and filtering candidates
 (use-package prescient

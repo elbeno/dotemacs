@@ -29,6 +29,7 @@
         '((c-mode . c-ts-mode)
           (c++-mode . c++-ts-mode)
           (c-or-c++-mode . c-or-c++-ts-mode)
+          (cmake-mode . cmake-ts-mode)
           (python-mode . python-ts-mode)
           (json-mode . json-ts-mode)
           (yaml-mode . yaml-ts-mode)))
