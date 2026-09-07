@@ -32,7 +32,9 @@
   (my/load-theme 'hercules))
 
 (use-package hercules-theme
-  :init (my/vc-install "0xcefaedfe/hercules-theme")
+  :vc (:url "https://github.com/0xcefaedfe/hercules-theme.git"
+            :vc-backend Git
+            :rev :newest)
   :bind (("C-c t h" . load-theme-hercules)))
 
 (defun load-theme-tron-legacy ()
@@ -52,7 +54,9 @@
   (my/load-theme 'miasma))
 
 (use-package miasma-theme
-  :init (my/vc-install "daut/miasma-theme.el")
+  :vc (:url "https://github.com/daut/miasma-theme.el.git"
+            :vc-backend Git
+            :rev :newest)
   :bind (("C-c t s" . load-theme-miasma)))
 
 (defun load-theme-fleury ()
@@ -60,7 +64,9 @@
   (my/load-theme 'fleury))
 
 (use-package fleury-theme
-  :init (my/vc-install "ShamsParvezArka/fleury-theme.el")
+  :vc (:url "https://github.com/ShamsParvezArka/fleury-theme.el.git"
+            :vc-backend Git
+            :rev :newest)
   :bind (("C-c t f" . load-theme-fleury)))
 
 ;; default theme
@@ -588,5 +594,7 @@ With optional PROMPT string, use it.  Else use a generic prompt."
 (bind-key "C-c t t" #'my/toggle-theme)
 
 (use-package easy-theme-preview
-  :init (my/vc-install "ayys/easy-theme-preview")
+  :vc (:url "https://github.com/ayys/easy-theme-preview.git"
+            :vc-backend Git
+            :rev :newest)
   :bind (("C-c t P" . easy-theme-preview)))

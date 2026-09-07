@@ -233,7 +233,9 @@ With prefix arg ARG, transpose with the argument after it."
 
 ;; quick blocks with <src etc
 (use-package org-block-capf
-  :init (my/vc-install "xenodium/org-block-capf")
+  :vc (:url "https://github.com/xenodium/org-block-capf.git"
+            :vc-backend Git
+            :rev :newest)
   :hook (org-mode . org-block-capf-add-to-completion-at-point-functions)
   :bind (:map org-mode-map
               ("TAB" . my/org-tab-action)))

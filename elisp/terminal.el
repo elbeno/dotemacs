@@ -3,7 +3,9 @@
 ;; Fix terminal keys
 (use-package term-keys
   :ensure t
-  :init (my/vc-install "CyberShadow/term-keys")
+  :vc (:url "https://github.com/CyberShadow/term-keys.git"
+            :vc-backend Git
+            :rev :newest)
   :config
   (term-keys-mode t)
   :diminish term-keys-mode)
@@ -17,7 +19,9 @@
 ;;------------------------------------------------------------------------------
 ;; Tmux control
 (use-package tmux-control
-  :init (my/vc-install "csheaff/tmux-control")
+  :vc (:url "https://github.com/csheaff/tmux-control.git"
+            :vc-backend Git
+            :rev :newest)
   :custom
   ;; Connection defaults for `M-x tmux-control-connect' — these are examples;
   ;; set them to your own host / socket / session.

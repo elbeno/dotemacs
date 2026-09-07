@@ -30,7 +30,9 @@
 
 ;; colour magit blame by age
 (use-package magit-blame-color-by-age
-  :init (my/vc-install "jdtsmith/magit-blame-color-by-age")
+  :vc (:url "https://github.com/jdtsmith/magit-blame-color-by-age.git"
+            :vc-backend Git
+            :rev :newest)
   :hook magit-blame-mode
   ;; if you'd like date first on heading lines:
   :config (setf (alist-get 'heading-format (alist-get 'headings magit-blame-styles)) "%C %-20a %s\n")
@@ -65,7 +67,9 @@
 
 ;; speed up magit refresh
 (use-package magit-prime
-  :init (my/vc-install "Azkae/magit-prime")
+  :vc (:url "https://github.com/Azkae/magit-prime.git"
+            :vc-backend Git
+            :rev :newest)
   :after magit
   :config
   (add-hook 'magit-pre-refresh-hook 'magit-prime-refresh-cache))

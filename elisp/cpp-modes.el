@@ -292,7 +292,9 @@ When called with a prefix, insert a NOLINT directive on the preceding line."
 ;;------------------------------------------------------------------------------
 ;; Manage template spew
 (use-package tspew
-  :init (my/vc-install "jefftrull/tspew")
+  :vc (:url "https://github.com/jefftrull/tspew.git"
+            :vc-backend Git
+            :rev :newest)
   :config (add-hook 'compilation-mode-hook 'tspew-mode))
 
 ;;------------------------------------------------------------------------------
@@ -305,7 +307,9 @@ When called with a prefix, insert a NOLINT directive on the preceding line."
 ;;------------------------------------------------------------------------------
 ;; beardbolt
 (use-package beardbolt
-  :init (my/vc-install "joaotavora/beardbolt"))
+  :vc (:url "https://github.com/joaotavora/beardbolt.git"
+            :vc-backend Git
+            :rev :newest))
 
 ;;------------------------------------------------------------------------------
 ;; org-capture template for ADR notes

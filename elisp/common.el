@@ -556,7 +556,9 @@
      ("Australia/Brisbane" "Brisbane"))))
 
 (use-package time-zones
-  :init (my/vc-install "xenodium/time-zones")
+  :vc (:url "https://github.com/xenodium/time-zones.git"
+            :vc-backend Git
+            :rev :newest)
   :commands time-zones)
 
 ;;------------------------------------------------------------------------------
