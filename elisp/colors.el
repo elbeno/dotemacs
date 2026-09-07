@@ -432,6 +432,45 @@ With optional PROMPT string, use it.  Else use a generic prompt."
 (my/theme-selector doric)
 
 ;;------------------------------------------------------------------------------
+;; doric themes
+(use-package vulkanite-theme
+  :vc (:url "https://github.com/Meskour/vulkanite-theme-emacs.git"
+            :vc-backend Git
+            :rev :newest)
+  :bind (("C-c t V" . my/vulkanite-themes-select)))
+
+(defconst my/vulkanite-themes
+  '(vulkanite-wave
+    vulkanite-dragon
+    vulkanite-tycho
+    vulkanite-rose-pine-dark
+    vulkanite-kanagawa
+    vulkanite-gruvbox
+    vulkanite-tokyo-night
+    vulkanite-catppuccin
+    vulkanite-everforest
+    vulkanite-one-dark-pro
+    vulkanite-aura
+    vulkanite-batu
+    vulkanite-demon
+    vulkanite-ethereal
+    vulkanite-japan-night
+    vulkanite-last-horizon
+    vulkanite-matrix
+    vulkanite-miasma
+    vulkanite-osaka-jade
+    vulkanite-retro-82
+    vulkanite-solitude
+    vulkanite-terminus
+    vulkanite-vantablack
+    vulkanite-vesper
+    vulkanite-aether
+    omarchy-vulkanite)
+  "List of vulkanite themes.")
+
+(my/theme-selector vulkanite)
+
+;;------------------------------------------------------------------------------
 ;; other themes
 (use-package apropospriate-theme
   :ensure t
