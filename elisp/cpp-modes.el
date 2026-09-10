@@ -31,16 +31,32 @@
   :type 'string
   :safe 'stringp)
 
-(defcustom my-cpp-llvm-roots
-  '("/usr/lib/llvm-22/" "/usr/lib/llvm-21/" "/usr/lib/llvm-20/" "/usr/lib/llvm-19/" "/usr/lib/llvm-18/" "/usr/lib/llvm-17/" "/usr/lib/llvm-16/")
-  "The paths to search for llvm binaries."
+(defcustom my-cpp-llvm-location-pattern "/usr/lib/llvm-%d"
+  "The pattern for LLVM installation locations."
   :group 'my-cpp-config
-  :type 'list
-  :safe 'listp)
+  :type 'string
+  :safe 'stringp)
+
+(defun my-llvm-install-loc (version)
+  (format my-cpp-llvm-location-pattern version))
+
+(defcustom my-cpp-min-llvm-version 17
+  "The minimum version of LLVM to look for."
+  :group 'my-cpp-config
+  :type 'natnum
+  :safe 'natnump)
+
+(defcustom my-cpp-max-llvm-version 22
+  "The current version of LLVM to use for clang-format etc."
+  :group 'my-cpp-config
+  :type 'natnum
+  :safe 'natnump)
 
 (defun find-llvm-root ()
   (let ((llvm-bin (find-file-first-dir
-                   my-cpp-llvm-roots my-cpp-llvm-bin-marker)))
+                   (mapcar #'my-llvm-install-loc
+                           (number-sequence my-cpp-max-llvm-version my-cpp-min-llvm-version -1))
+                   my-cpp-llvm-bin-marker)))
     (when llvm-bin
       (string-remove-suffix "bin/"
                             (file-name-directory (file-truename llvm-bin))))))
