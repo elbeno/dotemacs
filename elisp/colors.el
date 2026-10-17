@@ -199,6 +199,9 @@ With optional PROMPT string, use it.  Else use a generic prompt."
 ;; doom themes
 (use-package doom-themes
   :ensure t
+  :config
+  (setcdr (assoc 'gnus-group-news-low-empty doom-themes-base-faces)
+          '(:inherit 'gnus-group-mail-1-empty :weight 'normal))
   :custom
   ;; Global settings (defaults)
   (doom-themes-enable-bold t)   ; if nil, bold is universally disabled
@@ -470,6 +473,31 @@ With optional PROMPT string, use it.  Else use a generic prompt."
 
 (my/theme-selector vulkanite)
 
+
+;;------------------------------------------------------------------------------
+;; au themes
+(use-package au-themes
+  :vc (:url "https://github.com/szymonwilczek/au-themes"
+            :vc-backend Git
+            :rev :newest)
+  :bind (("C-c t U" . my/au-themes-select)))
+
+(defconst my/au-themes
+  '(au-whispergrove-night
+    au-whispergrove-day
+    au-whispergrove-morning
+    au-aurum-night
+    au-aurum-day
+    au-parchment-night
+    au-parchment-day
+    au-salina-night
+    au-salina-day
+    au-herbarium-night
+    au-herbarium-day)
+  "List of au themes.")
+
+(my/theme-selector au)
+
 ;;------------------------------------------------------------------------------
 ;; other themes
 (use-package apropospriate-theme
@@ -621,7 +649,17 @@ With optional PROMPT string, use it.  Else use a generic prompt."
     (spacemacs-dark . spacemacs-light)
     (spacemacs-light . spacemacs-dark)
     (doric-dark . doric-light)
-    (doric-light . doric-dark)))
+    (doric-light . doric-dark)
+    (au-whispergrove-night . au-whispergrove-day)
+    (au-whispergrove-day . au-whispergrove-night)
+    (au-aurum-night . au-aurum-day)
+    (au-aurum-day . au-aurum-night)
+    (au-parchment-night . au-parchment-day)
+    (au-parchment-day . au-parchment-night)
+    (au-salina-night . au-salina-day)
+    (au-salina-day . au-salina-night)
+    (au-herbarium-night . au-herbarium-day)
+    (au-herbarium-day . au-herbarium-night)))
 
 (defun my/toggle-theme ()
   (interactive)
